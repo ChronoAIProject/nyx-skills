@@ -1,47 +1,63 @@
 ---
 name: chrono-ai-daily
-description: ChronoAI daily
-version: "0.1"
+description: Use when anyone says "每日更新", "daily", or "check in". Auto-detects founder vs team member via GitHub username, shows company roadmap + role-appropriate view.
+version: "0.3"
 metadata:
   category: plain
----
-
----
-name: daily
-description: Use when anyone says "每日更新", "daily", or "check in". Auto-detects founder vs team member via GitHub username, shows company roadmap + role-appropriate view.
 ---
 
 # Daily Check-in / 每日更新
 
 Scan repos, check blockers, report delta. Auto-adapts output based on who's running it.
 
+## Bundled Data Files — READ INLINE, DO NOT REFETCH FROM GITHUB
+
+This skill ships its own copies of two data files inside the package under `references/`:
+
+- **`references/team.yaml`** — team roster (`members` + `non_engineering` sections), products, repos, roles
+- **`references/strategy/goals.md`** — milestone deadlines, current status, disposition triggers
+
+When this skill is loaded via `use_skill`, both files appear inline in the tool result's **`## Associated Files`** section (under headings `### references/team.yaml` and `### references/strategy/goals.md`). Use **that** content as the authoritative source for everything below.
+
+Do **NOT**:
+- `nyxid_proxy GET slug=api-github path=/repos/.../contents/team.yaml`
+- `nyxid_proxy GET slug=api-github-pat path=...team.yaml` etc.
+- `gh api repos/.../contents/team.yaml`
+- `chrono_file_read` / `Read` / global code search for these files
+
+If the `## Associated Files` section is missing `references/team.yaml` or `references/strategy/goals.md`, report `请联系 Auric 重新发布 chrono-ai-daily 技能（缺少捆绑数据文件）` and STOP — do not fall back to remote fetching.
+
+**Freshness note:** the bundled snapshot is updated whenever this skill is re-uploaded to Ornn. If the user reports stale team membership / milestone data, the fix is "re-publish chrono-ai-daily on Ornn", not a runtime fetch.
+
 ## Workflow
 
 ### 0. Role Detection
 
-Detect who is running this skill:
+Detect who is running this skill. In environments **with** a shell (Claude Code locally):
 
 ```bash
 CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null || echo "unknown")
 echo "Current user: $CURRENT_USER"
 ```
 
+In environments **without** a shell (Lark / aevatar bot, etc.), call `nyxid_proxy GET slug=api-github path=/user` and take `.login` from the response. The `api-github` slug only needs `read:user` to identify the caller, so this works even when private-repo scopes are missing.
+
 - If `CURRENT_USER` is `loning` → **founder mode**
-- Otherwise → **Team mode**: read `team.yaml` via Read tool, look up CURRENT_USER in BOTH `members` and `non_engineering` sections.
+- Otherwise → **Team mode**: parse the **inlined `references/team.yaml`** from the `## Associated Files` section above (DO NOT re-fetch). Look up CURRENT_USER in BOTH `members` and `non_engineering` sections.
   - If found → extract `name`, `products`, `repos`, `role` (if present)
   - If not found → show error: "你的 GitHub 用户名 '{CURRENT_USER}' 不在 team.yaml 中。请确认 `gh auth status` 显示的账号正确，或联系 Auric 添加。"
   - Set: USER_NAME, USER_PRODUCTS, USER_REPOS, USER_ROLE
 
 **产品线名称映射:** nyxid=NyxID, aevatar=Aevatar, sisyphus=Sisyphus, ornn=Ornn, automath=Automath, symphony=Symphony, vibe-apps=Vibe Apps
-**Disposition 来源:** goals.md "当前状态 / Current Status" 表
-**触发条件来源:** goals.md "处置触发条件 / Disposition Triggers" 表的"变更条件"列
+**Disposition 来源:** 内联的 `references/strategy/goals.md` "当前状态 / Current Status" 表（取自 Associated Files,**不**从 GitHub 拉取）
+**触发条件来源:** 内联的 `references/strategy/goals.md` "处置触发条件 / Disposition Triggers" 表的"变更条件"列
 **products: [other] 或 products: [] 的处理:** 产品线状态显示"未纳入战略跟踪，联系 Auric 对齐"
 
 ### 1. Repo Scan
 
 **founder mode:** scan ALL core repos (NyxID, Aevatar, Ornn, Automath, Sisyphus branch).
 
-**Team mode:** only scan USER_REPOS from team.yaml. Special handling:
+**Team mode:** only scan USER_REPOS from the inlined `references/team.yaml`. Special handling:
 - If `sisyphus` is in USER_PRODUCTS, also scan `aevatarAI/aevatar` with `?sha=feature/sisyphus-v2`
 - If USER_REPOS is empty (non-engineering with no repos yet), skip repo scan entirely
 
@@ -53,6 +69,8 @@ gh api 'repos/{owner}/{repo}/commits?per_page=20' --jq '.[0:5] | .[] | "\(.sha[0
 gh api 'repos/{owner}/{repo}/pulls?state=all&per_page=30' --jq '.[] | select(.user.login == "'"$CURRENT_USER"'") | "#\(.number) \(.title) [state=\(.state)]"'
 gh api repos/{owner}/{repo}/issues --jq '[.[] | select(.pull_request == null)] | .[] | "#\(.number) [\(if .state == "open" then "open" else "closed" end)] \(.title)"'
 ```
+
+In the Lark / aevatar bot environment, the same calls go through `nyxid_proxy GET slug=api-github path=/repos/{owner}/{repo}/commits?per_page=20` etc. Repo activity is **public-API-accessible** (the public-org repos accept `read:user`-scope tokens for `/commits`, `/pulls`, `/issues`), so the default `api-github` slug works for Step 1. Only fall back to `api-github-pat` if a specific repo returns 401/403/404 for non-public reasons.
 
 **Commit author matching:** match `author.login` == CURRENT_USER. If `author` is null (unsigned commits), fall back to `commit.author.name` containing USER_NAME.
 **PR activity matching (Team mode primary signal):** match `user.login` == CURRENT_USER. Treat a PR as "近期工作" if any of `created_at`, `updated_at`, or `merged_at` is within the last 7 days.
@@ -66,6 +84,11 @@ Read the project board to get current milestone status and sub-issue completion:
 # Get all board items grouped by target milestone
 gh project item-list 3 --owner ChronoAIProject --format json -L 50
 ```
+
+Project boards require `read:project` scope. In the Lark / aevatar bot path:
+- Try `nyxid_proxy GET slug=api-github path=/orgs/ChronoAIProject/projects/3` (or the GraphQL projects-v2 endpoint).
+- If that returns 401/403, retry the same path against `api-github-pat`.
+- If both fail, skip the board section and note in the output: `(看板数据不可用：当前 GitHub 凭据缺少 read:project 作用域，请联系 Auric)` — continue with the rest of the report instead of aborting.
 
 Parse items by Target (M0/M1/M2), count completion per milestone (Done vs total).
 
@@ -82,8 +105,9 @@ gh project item-list 23 --owner aevatarAI --format json -L 30
 **阻塞源 / Blocker source:** 从 Step 2 看板数据中筛选带 `blocker` label 的 items:
 - Issue-backed items: 检查 `content.labels` 是否包含 `blocker`
 - 如无 blocker items → 阻塞状态为 "无 (关键路径畅通)"
+- 如 Step 2 看板数据不可用 → 阻塞状态为 "(看板数据不可用)"
 
-**Deadline 计算:** 从 `strategy/goals.md` 读取当前 milestone 的 deadline，计算剩余天数。
+**Deadline 计算:** 从**内联的** `references/strategy/goals.md`（Associated Files 中,**不**从 GitHub 拉取）读取当前 milestone 的 deadline,计算剩余天数。
 
 **Reconcile 检测 (founder mode only):**
 运行以下检查，发现漂移时在报告中输出 `### ⚠️ 数据漂移警告` section:
@@ -150,6 +174,7 @@ Render rules for the roadmap:
 - The 关键路径 line shows the sequential dependency chain across milestones
 - Mark current position with ~~~~~~~~ under the active step
 - ⚠️ BLOCKER flag: 从看板 `blocker` label 判定，不再从 goals.md 解析
+- 如 Step 2 看板数据不可用,roadmap 简化为只显示 milestone 标题 + deadline (从内联 goals.md 读取),并在底部注明 `(详细任务状态需要看板权限)`
 
 ---
 
@@ -195,16 +220,18 @@ If milestone Current values changed (北极星指标有新数据):
 
 Show diff. Do NOT commit unless Auric says commit.
 
+In the Lark / aevatar bot path founder mode does NOT update docs (no write capability through nyxid_proxy by design); output the diff as a code block and ask Auric to commit it from a Claude Code session locally.
+
 ---
 
 #### Team Mode (CURRENT_USER != loning)
 
-After the roadmap, output the following sections. Data filtered by USER_PRODUCTS and USER_REPOS from team.yaml.
+After the roadmap, output the following sections. Data filtered by USER_PRODUCTS and USER_REPOS from the inlined `references/team.yaml`.
 **替换说明:** 以下 5 个 section 替代旧版的"我的工作/我的待办/我和目标的关系/阻塞提醒"。
 
 ##### 你的产品线状态
 
-从 goals.md 读取 USER_PRODUCTS 中每个产品线的战略状态。
+从内联的 `references/strategy/goals.md` 读取 USER_PRODUCTS 中每个产品线的战略状态。
 多产品线优先级: ACTIVE > INCUBATING > EXPLORING > PARKED. 同级别按里程碑 deadline 排序。PARKED 无 deadline 时按字母序。
 
 ```
@@ -251,6 +278,7 @@ P0 判定: 看板 item 有 label "blocker" (唯一数据源，不再读取 goals
 ```
 
 空 tier 处理: 如果某个优先级层无 item，省略该层标题。
+如果看板不可用,只显示 P2 层(repo open issues)并在头部注明 `(P0/P1 需要看板权限)`。
 如果所有待办为空:
 ```
 看板和 issue list 中暂无你的产品线的待办。如果你认为有遗漏，请联系 Auric 对齐。
@@ -293,6 +321,8 @@ P0 判定: 看板 item 有 label "blocker" (唯一数据源，不再读取 goals
 - {status_icon} #{num} {title} [{status}] {milestone if any}
 {如果无匹配:}
 - 看板上暂无与你直接相关的 item
+{如果看板不可用:}
+- (看板数据不可用)
 ```
 
 ## Rules
@@ -303,7 +333,7 @@ P0 判定: 看板 item 有 label "blocker" (唯一数据源，不再读取 goals
 - 不追踪 feature 完成度，只追踪行动和阻塞
 - 报告要短，一屏能看完
 - 路线图部分全员一致，这是对齐的核心
-- Team mode 读取 team.yaml (members + non_engineering 统一查找) 和 goals.md，按产品线过滤
+- Team mode 读取**内联的** team.yaml (members + non_engineering 统一查找) 和 goals.md (均来自 Associated Files,不从 GitHub 拉取),按产品线过滤
 - Team mode 扫描产品 repo open issues（不只看板），但限制最多 5 条避免信息过载
 - Team mode 的"你的近期工作"优先扫描 PR activity，direct commits 仅作 fallback
 - Team mode 显示"建议优先级"但标注"基于战略，具体可与 Auric 讨论"
@@ -311,3 +341,4 @@ P0 判定: 看板 item 有 label "blocker" (唯一数据源，不再读取 goals
 - Team mode 不修改任何文档
 - Step 2 (看板) 和 Step 3 (关键路径) 全量扫描不变，因为路线图需要全局数据
 - Step 2 board data 双重用途: 全量用于路线图，按 USER_REPOS 过滤后用于"你的待办"和"看板相关"
+- 看板权限缺失时降级而非中止: 只对 Step 2 标记不可用,其他 section 正常输出

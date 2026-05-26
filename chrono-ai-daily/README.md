@@ -1,6 +1,6 @@
 # chrono-ai-daily
 
-> ChronoAI daily
+> Use when anyone says "每日更新", "daily", or "check in". Auto-detects founder vs team member via GitHub username, shows company roadmap + role-appropriate view.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `0.1`
-- Last synced: `2026-05-26T14:39:54.364Z`
+- Latest version: `0.3`
+- Last synced: `2026-05-26T14:42:53.899Z`
 
 ## Install
 
