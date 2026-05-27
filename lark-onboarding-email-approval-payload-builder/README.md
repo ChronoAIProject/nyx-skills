@@ -1,6 +1,6 @@
 # lark-onboarding-email-approval-payload-builder
 
-> Build the Lark approval instance payload for an Aevatar-native onboarding email request using normalized employee and mailbox request details.
+> Builds the connector-ready Lark approval instance payload for the onboarding email approval flow. Use after Aevatar has received a Lark/Base onboarding event and before calling the NyxID Lark approval connector.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.0`
-- Last synced: `2026-05-27T08:00:01.773Z`
+- Latest version: `1.1`
+- Last synced: `2026-05-27T08:23:54.002Z`
 
 ## Install
 

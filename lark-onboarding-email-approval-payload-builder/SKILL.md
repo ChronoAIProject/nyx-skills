@@ -1,6 +1,7 @@
 ---
 name: lark-onboarding-email-approval-payload-builder
-description: Build the Lark approval instance payload for an Aevatar-native onboarding email request using normalized employee and mailbox request details.
+version: "1.1"
+description: Builds the connector-ready Lark approval instance payload for the onboarding email approval flow. Use after Aevatar has received a Lark/Base onboarding event and before calling the NyxID Lark approval connector.
 metadata:
   category: plain
   tag:
@@ -9,73 +10,78 @@ metadata:
     - onboarding
     - lark-approval
     - payload-builder
-version: "1.0"
+  clawdbot:
+    emoji: "mailbox_with_mail"
+    files:
+      - "references/*"
+      - "scripts/*"
 ---
 
 # Lark Onboarding Email Approval Payload Builder
 
-Use this skill when an Aevatar-native onboarding flow needs to create a Lark approval instance for a new employee email account.
+Use this skill when an Aevatar-native onboarding flow needs to create the Lark approval instance payload for a new employee email account.
 
-## Input contract
+This skill does one thing: turn an onboarding event into a deterministic payload for `POST /open-apis/approval/v4/instances`. It does not fetch tenant tokens, store Lark credentials, submit the approval, or handle approval callbacks.
 
-The caller should provide JSON with these fields when available:
+## When to use
 
-- `capability`: `lark-onboarding-email-approval`.
-- `employeeName`: legal or preferred display name.
-- `department`: department or team.
-- `manager`: manager name or identifier.
-- `startDate`: onboarding start date.
-- `requestedEmail`: requested mailbox address or local part.
-- `emailDomain`: target domain when `requestedEmail` is only a local part.
-- `role`: job role or title.
-- `justification`: reason for the mailbox request.
-- `approvalCode`: optional Lark approval definition code.
-- `approverOpenIds`: optional explicit approver OpenIDs.
-- `metadata`: optional source event metadata.
+Use for `lark-onboarding-email-approval` when the caller has an onboarding event with:
 
-Normalize obvious aliases such as `name`, `newHireName`, `team`, `owner`, `supervisor`, `mail`, `email`, `domain`, and `reason`.
+- Lark display name
+- department
+- onboarding date
+- submitter/operator Lark user id
 
-## Task
+The original n8n flow is a short linear flow: webhook, format fields, get Lark tenant token, call approval instance API, respond. This skill replaces only the formatting step.
 
-1. Validate that employee name, department, start date, and requested email can be derived.
-2. Normalize the requested email address. If only a local part is supplied, combine it with `emailDomain`.
-3. Build a Lark approval instance payload suitable for a NyxID Lark approval connector call to `/open-apis/approval/v4/instances`.
-4. Include a concise summary and all original metadata needed for audit.
+## Inputs
 
-## Output contract
+Required input keys, after alias normalization:
 
-Return JSON with this shape:
+- `larkName`
+- `department`
+- `startDate`
+- `operatorId`
+
+Optional input keys:
+
+- `approvalCode`
+- `companyDomain`
+- `requestDate`
+- `autoSubmitLabel`
+
+Field aliases, email generation rules, Lark widget ids, and output shape are defined in `references/onboarding-email-approval-contract.md`.
+
+## Output
+
+Return one JSON object with:
+
+- `summary`
+- `employee`
+- `emailRequest`
+- `requestDetail`
+- `form`
+- `lark.body`
+
+The returned `lark.body` is connector-ready for:
+
+```text
+POST /open-apis/approval/v4/instances
+```
+
+## Determinism requirement
+
+Follow `references/onboarding-email-approval-contract.md`. If executing code is allowed, use `scripts/build_onboarding_email_approval_payload.js` as the reference implementation. If executing code is not allowed, reproduce the same transformations exactly.
+
+Do not invent employee data, Lark app credentials, tenant tokens, approval definitions, operator ids, or approvers.
+
+## Failure behavior
+
+If any required field is missing, return:
 
 ```json
 {
-  "approval_code": "<approval definition code if provided>",
-  "summary": "Email approval for <employeeName>",
-  "employee": {
-    "name": "<employeeName>",
-    "department": "<department>",
-    "role": "<role>",
-    "manager": "<manager>",
-    "startDate": "<startDate>"
-  },
-  "emailRequest": {
-    "address": "<normalized email>",
-    "domain": "<domain>",
-    "justification": "<justification>"
-  },
-  "approvers": ["<approver open id>"],
-  "form": [
-    { "name": "Employee", "value": "<employeeName>" },
-    { "name": "Department", "value": "<department>" },
-    { "name": "Requested Email", "value": "<normalized email>" },
-    { "name": "Start Date", "value": "<startDate>" },
-    { "name": "Justification", "value": "<justification>" }
-  ],
-  "lark": {
-    "approval_code": "<approval definition code if provided>",
-    "form": "<JSON string or connector-ready form value>",
-    "open_id": "<submitter open id if provided>"
-  }
+  "needs_more_information": true,
+  "missing": ["larkName"]
 }
 ```
-
-If required fields are missing, return a JSON object with `needs_more_information: true` and a `missing` array listing the missing fields instead of inventing values.
