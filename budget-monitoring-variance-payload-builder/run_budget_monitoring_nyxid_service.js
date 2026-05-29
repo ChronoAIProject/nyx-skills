@@ -44,7 +44,7 @@ function headerValue(raw) {
 }
 
 function collectHeaders(service) {
-  const candidates = [service.default_headers, service.defaultHeaders, service.headers, service.config && service.config.default_headers];
+  const candidates = [service.default_headers, service.defaultHeaders, service.default_request_headers, service.defaultRequestHeaders, service.headers, service.config && service.config.default_headers];
   const result = {};
   for (const candidate of candidates) {
     if (!candidate) continue;
