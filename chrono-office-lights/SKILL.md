@@ -1,11 +1,14 @@
 ---
 name: chrono-office-lights
 description: Turn the Chrono office lights on or off, room by room. Use whenever an employee or agent needs to control office lighting — the Dubai room, Corridor, Front and Mid Reception, Coworking Table, world-map light strips, or the main office light. Covers both the Home Assistant "Lights" dashboard for people and the NyxID-to-Home-Assistant API calls for agents.
-version: "0.1"
+version: "0.2"
 metadata:
   category: plain
-  location: chrono-office
-  maintainer: chrono-platform
+  tag:
+    - lights
+    - smart-home
+    - home-assistant
+    - office
 ---
 
 # Chrono Office Lights
