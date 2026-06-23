@@ -1,7 +1,7 @@
 ---
 name: aevatar-scheduler
 description: Create and manage cron schedules that fire an Aevatar service on a recurring basis, authenticated as the scope owner via NyxID — over the REST API. Use when a user wants to "schedule", "run on a cron", "set up a recurring run", "run every day/hour/Monday", "automate this service on a timer", "preview a cron", "pause/resume/disable a schedule", or "run it now". It builds the schedule against a published service (identity + endpoint + payload + serving revision), uses scope-owner NyxID auth (which requires the owner's NyxID broker binding), and covers preview, enable/disable, run-now, update, and delete. Publish the service first with the service-publisher skill.
-version: "1.1"
+version: "1.2"
 metadata:
   category: plain
   tag:
@@ -28,6 +28,12 @@ TOK=$(tr -d '\n' < ~/.nyxid/access_token)        # or the agent's own NyxID bear
 scopeId=$(curl -s -H "Authorization: Bearer $TOK" "$BASE/api/studio/context" | jq -r .scopeId)
 auth=(-H "Authorization: Bearer $TOK" -H "Content-Type: application/json")
 ```
+
+> **`jq` is only for convenience** — any JSON reader works (replace `| jq -r .scopeId` with
+> `| python3 -c 'import sys,json;print(json.load(sys.stdin)["scopeId"])'`). Make these calls with
+> the **`curl` binary**, not Python's `urllib`/`requests` (a WAF may 403 those). Reminder: the
+> `scopeOwnerNyxId` precondition below cannot be satisfied by a bare NyxID **CLI** token — it needs
+> the owner's interactive **console** NyxID login (broker binding), or creation 400s.
 
 ## Gather the target (one call: the scope services list)
 
