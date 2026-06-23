@@ -1,7 +1,7 @@
 ---
 name: aevatar-platform-map
-description: Panorama, entry point, and catalog for the whole Aevatar skill collection driven over its REST API. Load this FIRST whenever a user wants to build, publish, schedule, or operate things on Aevatar — "create an agent team", "make a workflow / member", "publish/bind a service", "register it with NyxID", "set up a recurring/scheduled run", "deploy an agent", "invoke my service" — or just wants to know what aevatar skills exist. It teaches the object model (scope → team → member(workflow/script/gagent) → service → schedule), how to authenticate with a NyxID token, how to resolve your scope, and indexes every member of the aevatar skill family (control-plane + authoring + diagnostics + safety-net), all held together by the shared `aevatar` tag. It does not perform the work itself — it routes you to the right companion skill.
-version: "1.3"
+description: Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, or operate anything on Aevatar ("create an agent team", "make a workflow / member", "publish or bind a service", "register it with NyxID", "set up a recurring / cron run", "invoke my service"), wants to know whether something is even possible ("can Aevatar do X?", "能不能用 aevatar 实现"), or just wants to know what Aevatar can do. It teaches the object model (scope → team → member[workflow|script|gagent] → service → schedule), how to authenticate as a NyxID-bearer REST client, how to resolve your scope, and the two caller modes (client REST vs in-session server-side tools). It does not do the work itself — it routes you to the right companion skill (feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, plus diagnostics probes and the safety-net fallback), held together by the shared `aevatar` tag.
+version: "1.4"
 metadata:
   category: plain
   tag:
@@ -18,11 +18,33 @@ metadata:
 
 # Aevatar control plane — the map
 
-You drive Aevatar through its REST API at
-`https://aevatar-console-backend-api.aevatar.ai`. This skill is the **panorama**: the
-object model, how to authenticate, and which companion skill owns each task. Read it
-first, then load the spoke skill for the step you are on. Every companion skill is also
-self-contained, so you can jump straight to one if you already know the step.
+You are the **router and reference** for the Aevatar skill family — you do **not** execute the
+work yourself. Your job: orient the agent (object model, auth, caller mode), then hand off to the
+*one* companion skill that owns the step the user is on. Read this map first; each spoke is
+self-contained, so you can also jump straight in once you know the step.
+
+**What Aevatar is.** A control plane driven entirely over REST at
+`https://aevatar-console-backend-api.aevatar.ai`. Everything hangs off your **scope** (your NyxID
+subject id), and a request almost always walks one chain:
+
+```
+scope → team → member (workflow | script | gagent) → service → schedule
+```
+
+**Settle three things before you route** (each has a full section below — this is the checklist):
+1. **Is it even feasible?** For anything non-trivial, start with **`aevatar-feasibility-advisor`** —
+   it says whether the goal is possible and what must be in place first (which NyxID connector to
+   configure, what's host-gated, what's impossible + the alternative). Don't build something that
+   can't ship.
+2. **Which caller mode are you in?** A plain-REST **client** holding a NyxID bearer, or the model
+   running **in-session** with server-side tools? Only `aevatar-workflow-authoring` needs the
+   server-side tools; everything else is REST either way. See *Two caller modes*.
+3. **Carry the honesty rules** into every hand-off — you make real HTTP calls (no magic
+   server-side action), most steps are async (read state back, never trust a bare 2xx), and NyxID
+   registration is host-gated. See *Honesty rules*.
+
+Then match the user's words to a step in the router below, load that skill, and don't reinvent what
+a spoke already owns.
 
 ## The object model (one picture)
 
