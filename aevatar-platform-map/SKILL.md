@@ -1,7 +1,7 @@
 ---
 name: aevatar-platform-map
 description: Panorama, entry point, and catalog for the whole Aevatar skill collection driven over its REST API. Load this FIRST whenever a user wants to build, publish, schedule, or operate things on Aevatar — "create an agent team", "make a workflow / member", "publish/bind a service", "register it with NyxID", "set up a recurring/scheduled run", "deploy an agent", "invoke my service" — or just wants to know what aevatar skills exist. It teaches the object model (scope → team → member(workflow/script/gagent) → service → schedule), how to authenticate with a NyxID token, how to resolve your scope, and indexes every member of the aevatar skill family (control-plane + authoring + diagnostics + safety-net), all held together by the shared `aevatar` tag. It does not perform the work itself — it routes you to the right companion skill.
-version: "1.2"
+version: "1.3"
 metadata:
   category: plain
   tag:
@@ -79,6 +79,7 @@ endpoints (they are not).
 
 | You want to… | Use the skill | Key endpoints |
 |---|---|---|
+| **Decide if a goal is even possible** + what must be in place first (use FIRST, before building) | `aevatar-feasibility-advisor` | read-only `GET /api/v1/services`, `GET /api/v1/catalog` (NyxID) |
 | Turn an idea into a runnable **workflow YAML** | `aevatar-workflow-authoring` | server-side tools `aevatar_start_workflow`/`ornn_publish_skill`, **or** client REST `…/workflow/draft-run` + ornn zip publish (see *Two caller modes*) |
 | Create a **team**, create **members** (workflow/script/gagent), bind them, set the entry member | `aevatar-team-builder` | `/api/scopes/{id}/teams`, `/members`, `/members/{id}/binding` |
 | **Publish** a member/team **as a service** and **register it to NyxID**; verify it | `aevatar-service-publisher` | `/api/scopes/{id}/binding`, `/api/services/*`, `/members/{id}/published-service` |
@@ -96,6 +97,11 @@ ornn has no separate "collection" object — the aevatar capability set is held 
 a shared **`aevatar` tag** and indexed by this map. An ornn skill search for **`aevatar`**
 returns the whole family as one set; load whichever member you need with `use_skill`. This
 map is the canonical entry point; the rest are pulled on demand.
+
+**Scope first — feasibility** (`category: plain`, public)
+- `aevatar-feasibility-advisor` — *use before building*: is the goal possible, what are its
+  prerequisites (which NyxID connector to configure, what's host-gated), and what's impossible
+  + the alternative. Teaches the connector-vs-channel split and the prerequisite matrix.
 
 **Build & operate — the control-plane family** (client REST, `category: plain`, public)
 - `aevatar-platform-map` — *this map*: object model, auth + scope bootstrap, routing.
@@ -122,6 +128,9 @@ map is the canonical entry point; the rest are pulled on demand.
 
 ## The golden path, end to end
 
+0. **Scope check (do this first)** — confirm the goal is feasible and collect its
+   prerequisites (connectors to configure, host-gated pieces, hard limits) —
+   `aevatar-feasibility-advisor`. Skip only when the ask is obviously in-scope.
 1. **Author** the workflow YAML — `aevatar-workflow-authoring`.
 2. **Create team** — `POST /api/scopes/{scopeId}/teams {displayName}`.
 3. **Create + bind a workflow member** — `POST /api/scopes/{scopeId}/members`, then
