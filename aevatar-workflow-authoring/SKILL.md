@@ -1,7 +1,7 @@
 ---
 name: aevatar-workflow-authoring
 description: Author, validate, and persist an executable aevatar workflow from a natural-language request — use it when the user wants to create, build, set up, or automate a multi-step task as a runnable aevatar workflow (make a workflow that…, automate…, build a pipeline…, set up a recurring…). It generates workflow YAML, dispatch-validates it, then saves it as a reusable workflow that can be re-run and watched in the observatory. Not for running an existing workflow — search for that and start it instead.
-version: "1.1"
+version: "1.2"
 metadata:
   category: tool-based
   tool-list:
@@ -54,6 +54,7 @@ These are the failure modes that break generated workflows. Check every one befo
 - **Determinism for money/counts/dedup.** Use `transform` (`sum`, `group_by`, `round`, …) for any arithmetic, totals, or deduplication. Never let an `llm_call` compute amounts or counts.
 - **Side effects are at-least-once.** `tool_call` / `connector_call` may run more than once on retry. Keep them idempotent where it matters.
 - **External calls go through tools, not raw hosts.** Use `nyxid_proxy` (or a typed tool) — never embed a vendor base URL as a direct target. See **Accessing external services**.
+- **Files are typed inputs.** `input_file_refs` is not `$input` text and not an interpolation variable. Use `foreach` with `items_source: input_file_refs` to process multiple files; file tools are still invoked through `type: tool_call`.
 
 ---
 
@@ -111,7 +112,7 @@ steps:
   parameters: { prompt_prefix: "Summarize the input:" }
 ```
 
-`tool_call` — call a registered tool (incl. `nyxid_proxy`). A JSON-object result is mirrored to `steps.<id>.json.<field>` for later branching.
+`tool_call` — call a registered tool (incl. `nyxid_proxy`, `code_execute`, `document_extract`, `workflow_file_submit`). A JSON-object result is mirrored to `steps.<id>.json.<field>` for later branching.
 ```yaml
 - id: fetch
   type: tool_call
@@ -120,11 +121,48 @@ steps:
     arguments: '{"slug":"my-http-service","path":"/v1/items","method":"GET"}'
 ```
 
-`transform` — deterministic data ops: `trim`, `split`, `json_extract`, and numeric `sum`/`subtract`/`multiply`/`divide`/`round`/`min`/`max`/`group_by`, plus `rss_extract_items`.
+`code_execute` — run deterministic Python/JavaScript/TypeScript/Bash in the sandbox.
+Do not call external services or LLMs from `code_execute`; use `nyxid_proxy` for external services and `llm_call` for LLM work.
+```yaml
+- id: build_payload
+  type: tool_call
+  parameters:
+    tool: code_execute
+    arguments: '{"language":"python","code":"import json\nprint(json.dumps({\"ok\": True}))"}'
+```
+
+`document_extract` — extract text from one current workflow file ref.
+```yaml
+- id: extract_file
+  type: tool_call
+  parameters:
+    tool: document_extract
+    arguments: "{}"
+```
+
+`workflow_file_submit` — upload an existing workflow file ref to a NyxID service.
+```yaml
+- id: submit_file
+  type: tool_call
+  parameters:
+    tool: workflow_file_submit
+    arguments: '{"file_ref":{"file_id":"<file-id>","owner_run_id":"<run-id>"},"slug":"my-upload-service","path":"/v1/upload"}'
+```
+
+`transform` — deterministic data ops: `trim`, `split`, `json_extract`, `json_parse`, and numeric `sum`/`subtract`/`multiply`/`divide`/`round`/`min`/`max`/`group_by`, plus `rss_extract_items`.
 ```yaml
 - id: total
   type: transform
   parameters: { op: group_by, key: category, value: amount, aggregate: sum, precision: "2" }
+```
+
+`json_parse` — parse a JSON string selected by `path` into structured JSON.
+```yaml
+- id: parse_embedded_json
+  type: transform
+  parameters:
+    op: json_parse
+    path: "$.payload"
 ```
 
 `assign` — write a workflow variable (often the final output step).
@@ -156,6 +194,19 @@ steps:
     sub_target_role: worker
     sub_param_prompt_prefix: "Process item:"
 ```
+
+For multiple workflow input files, use `items_source: input_file_refs`; each child step receives exactly one current file ref.
+```yaml
+- id: extract_each_file
+  type: foreach
+  parameters:
+    items_source: input_file_refs
+    sub_step_type: tool_call
+    sub_param_tool: document_extract
+    sub_param_arguments: "{}"
+```
+
+Keep `items_source`, `sub_step_type`, and `sub_param_tool` under `parameters`; root-level `items_source` / `sub_param_tool` are not reliably lifted by the parser. Use `sub_param_arguments: "{}"` when the tool should read the per-item file ref instead of treating the file id input as arguments.
 
 ### Full primitive vocabulary (use advanced ones only when needed)
 
@@ -448,6 +499,165 @@ steps:
     type: assign
     parameters: { target: final_summary, value: "$input" }
 ```
+
+### D. Multiple files → extract → upload files
+
+```yaml
+name: extract_files_then_upload_files
+description: Extract text from multiple uploaded files, submit each original file to a NyxID upload service, and return a structured upload summary.
+steps:
+  - id: extract_each_file
+    type: foreach
+    parameters:
+      items_source: input_file_refs
+      sub_step_type: tool_call
+      sub_param_tool: document_extract
+      sub_param_arguments: '{"maxChars":2000}'
+    next: build_submit_requests
+
+  - id: build_submit_requests
+    type: tool_call
+    parameters:
+      tool: code_execute
+      arguments:
+        language: javascript
+        code: |
+          const raw = "${json(json(input))}";
+          const requests = [];
+          const fileRefKeys = [
+            "file_id",
+            "artifact_id",
+            "source_kind",
+            "source_message_id",
+            "source_resource_key",
+            "owner_run_id",
+            "owner_scope_id"
+          ];
+
+          for (const [index, part] of raw.split("\n---\n").filter(part => part.trim()).entries()) {
+            const extracted = JSON.parse(part);
+            const file = extracted.file || {};
+            const fileRef = {};
+            for (const key of fileRefKeys) {
+              if (file[key]) fileRef[key] = file[key];
+            }
+
+            const itemIndex = index + 1;
+            requests.push({
+              file_ref: fileRef,
+              slug: "<upload-service-slug>",
+              path: "<upload-endpoint-path>",
+              method: "POST",
+              file_field_name: "<file-form-field-name>",
+              form: {
+                file_name: file.file_name || "workflow-upload-" + itemIndex + ".bin",
+                size: file.size_bytes ? String(file.size_bytes) : "",
+                source: "multiple-files-" + itemIndex
+              },
+              output: {
+                kind: "provider_file_token",
+                selector: "<response-json-path-for-upload-token>"
+              },
+              max_file_bytes: 31457280
+            });
+          }
+
+          console.log(JSON.stringify(requests));
+    next: parse_submit_requests
+
+  - id: parse_submit_requests
+    type: transform
+    parameters:
+      op: json_parse
+      path: output.stdout
+    next: submit_each_file
+
+  - id: submit_each_file
+    type: foreach
+    parameters:
+      sub_step_type: tool_call
+      sub_param_tool: workflow_file_submit
+    next: build_upload_summary
+
+  - id: build_upload_summary
+    type: tool_call
+    parameters:
+      tool: code_execute
+      arguments:
+        language: javascript
+        code: |
+          const raw = "${json(json(input))}";
+          const uploads = [];
+          const submitResults = [];
+
+          for (const part of raw.split("\n---\n").filter(item => item.trim())) {
+            const submitted = JSON.parse(part);
+            submitResults.push(submitted);
+            if (submitted.output_code) {
+              uploads.push({
+                file_name: submitted.file && submitted.file.file_name ? submitted.file.file_name : "",
+                output_code: submitted.output_code,
+                output_kind: submitted.output_kind || ""
+              });
+            }
+          }
+
+          const summary = {
+            upload_count: uploads.length,
+            uploads,
+            submit_results: submitResults
+          };
+
+          console.log(JSON.stringify(summary));
+    next: parse_upload_summary
+
+  - id: parse_upload_summary
+    type: transform
+    parameters:
+      op: json_parse
+      path: output.stdout
+    next: finish
+
+  - id: finish
+    type: assign
+    parameters:
+      target: final_summary
+      value: '{"run_tag":"multiple-files-upload","uploaded_files":${steps.parse_upload_summary.output}}'
+```
+`extract_each_file` produces one JSON result per file. `build_submit_requests` projects only the stable workflow file-ref identity keys into `file_ref`; keep display metadata such as file name and size in `form` only when the upload service needs it. `parse_submit_requests` turns `code_execute` stdout into a JSON array so `submit_each_file` can upload each original file with `workflow_file_submit`. `build_upload_summary` collects returned provider codes without writing to any vendor-specific record system. Replace the upload service slug, endpoint path, file field name, and response selector before validation.
+
+### E. code_execute → json_parse
+
+```yaml
+name: code_execute_then_parse
+steps:
+  - id: build_json
+    type: tool_call
+    parameters:
+      tool: code_execute
+      arguments:
+        language: javascript
+        code: |
+          console.log(JSON.stringify({"route":"approved","score":91}));
+    next: parse_stdout
+  - id: parse_stdout
+    type: transform
+    parameters:
+      op: json_parse
+      path: output.stdout
+    next: route
+  - id: route
+    type: switch
+    parameters:
+      on: "${steps.parse_stdout.json.route}"
+      branch.approved: finalize
+      branch._default: finalize
+    branches: { approved: finalize, _default: finalize }
+  - id: finalize
+    type: assign
+    parameters: { target: final_summary, value: "${steps.parse_stdout.output}" }
+```
+`code_execute` returns a sandbox envelope; the business JSON is a string at `output.stdout`. `json_parse` promotes that string to structured output so later steps can read `steps.parse_stdout.json.route`.
 
 ---
 
