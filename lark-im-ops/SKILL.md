@@ -1,6 +1,6 @@
 ---
 name: lark-im-ops
-version: "1.0"
+version: "1.1"
 description: Send, reply to, react to, read, and find Lark messages and chats through the bot's NyxID-brokered im/v1 APIs — proactively post to a chat or DM, thread-reply, add or remove emoji reactions, read a single message or pull a chat's history over a time window, search or list the chats the bot is in, and download an image/file from a message. Handles the "content must be a JSON string" footgun and receive_id_type selection, and doubles as the im-scope probe — on a scope 403 it reports the exact missing permission instead of failing silently.
 metadata:
   category: plain
@@ -24,6 +24,9 @@ Use this for any "在群里发一条 / 回复他 / 给某某发个私信 / 给�
 `tenant_access_token` server-side — never ask the user for a token, app secret, or chat id you can
 read from context. Paths are relative to the bot's base URL, so always start the path at
 `/open-apis/...`.
+
+> For multi-message recall, thread reconstruction, or a topic digest with strict anti-fabrication
+> discipline, `lark-chat-recall` specializes the chat-history pull (step 6) below.
 
 ## The one footgun: `content` is a JSON **string**, not an object
 
