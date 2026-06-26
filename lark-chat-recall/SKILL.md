@@ -1,6 +1,6 @@
 ---
 name: lark-chat-recall
-version: "1.1"
+version: "1.2"
 description: Recall and summarize Lark conversations — pull a chat's history over a time window through the real im/v1 history API, reconstruct discussions, and answer "who said what" with quoted evidence. Use for "总结这个群今天聊了什么 / 上周谁提过X / 找一下关于Y的讨论". Requires the bot tenant scope im:message.group_msg; reports the exact missing scope verbatim when absent.
 metadata:
   category: plain
@@ -23,6 +23,10 @@ every claim in your answer must trace to a really-returned message. If history i
 say exactly why (quote the error) — do NOT fill the gap from your own conversation context and
 present it as a search result; clearly label any context-only fallback as "仅基于当前可见上下文,
 非完整历史".
+
+> **Companion skill.** Raw send / reply / react / read one message / chat lookup live in
+> `lark-im-ops`; this skill is the read-only recall + summarize specialization layered on the same
+> `im/v1` history pull. Use im-ops to act on a chat, this to reconstruct one.
 
 ## How to run it
 
