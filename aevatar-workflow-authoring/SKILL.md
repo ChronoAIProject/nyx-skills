@@ -1,7 +1,7 @@
 ---
 name: aevatar-workflow-authoring
 description: Author, validate, and persist an executable aevatar workflow from a natural-language request — use it when the user wants to create, build, set up, or automate a multi-step task as a runnable aevatar workflow (make a workflow that…, automate…, build a pipeline…, set up a recurring…). It generates workflow YAML, dispatch-validates it, then saves it as a reusable workflow that can be re-run and watched in the observatory. Not for running an existing workflow — search for that and start it instead.
-version: "1.2"
+version: "1.3"
 metadata:
   category: tool-based
   tool-list:
@@ -208,6 +208,50 @@ For multiple workflow input files, use `items_source: input_file_refs`; each chi
 
 Keep `items_source`, `sub_step_type`, and `sub_param_tool` under `parameters`; root-level `items_source` / `sub_param_tool` are not reliably lifted by the parser. Use `sub_param_arguments: "{}"` when the tool should read the per-item file ref instead of treating the file id input as arguments.
 
+### Parallelism: concurrent fan-out → merge
+
+Yes — the engine runs branches **concurrently**, and `foreach` / `parallel` / `map_reduce` / `race` are the primitives that express it. Each one dispatches its sub-steps **in parallel** (by default up to **20** at once, hard ceiling **200**; set `max_concurrent_workers` to change the cap and `min_concurrent_workers` for a steady-state floor). The parent step then waits for **all** sub-steps and merges their text outputs joined by `\n---\n`. That fan-out → fan-in *is* the aevatar equivalent of a tool like n8n where many source branches feed one merge node.
+
+There is no free-form DAG: you do **not** hand-draw N parallel branches into a merge node. Instead you pick the primitive whose built-in fan-out matches your shape:
+
+| You want… | Use | How each branch is fed |
+|---|---|---|
+| One input, run by **N workers** concurrently, then optionally vote a winner | `parallel` | every worker gets the **same** `$input` |
+| A **list of items**, run the **same** sub-step on each, then concatenate | `foreach` | the input is **split into items**; each sub-step gets a **different** one |
+| A list of items, process each, then **synthesize all into one** result | `map_reduce` | split → map each (different item) → reduce the merged outputs once |
+| N alternative attempts, take the **first to finish** | `race` | every branch gets the **same** `$input`; first success wins, the rest are discarded |
+
+The n8n "read N sources in parallel → merge" shape is a **list → fan-out → merge**, so it is `foreach` (concatenate the per-item results) or `map_reduce` (synthesize them into one) — **not** `parallel`. `parallel` and `race` feed the *same* input to every branch (ensemble / consensus / first-wins), not a different source per branch.
+
+**Where the item list comes from** (`foreach` / `map_reduce`): the previous step's output, split by `delimiter` (default `\n---\n`) or parsed as a **JSON array**; or an explicit `items:` list; or `items_source: input_file_refs` (one file per item). Produce that list upstream — the run input, an `assign`, or `transform op: rss_extract_items`.
+
+`parallel` — fan one input out to N `llm_call` workers, merge (optionally vote). Sub-steps are **always** `llm_call`; it needs either `workers` (distinct roles) or `target_role` + `parallel_count`.
+```yaml
+- id: critique
+  type: parallel
+  parameters:
+    workers: "reviewer_a,reviewer_b,reviewer_c"   # one llm_call per role; each gets the SAME $input
+    # parallel_count: "3"            # alternative: N copies of target_role instead of distinct workers
+    # max_concurrent_workers: "20"   # default 20, ceiling 200
+    # vote_step_type: vote           # optional: aggregate the N outputs via a consensus rule (see the vote primitive)
+  next: finalize
+```
+
+`map_reduce` — split into items, map each concurrently, then reduce the merged results into one output. The map phase carries **no** per-step parameters, so map is best for `llm_call` analysis driven by the map role's `system_prompt`; `reduce_prompt_prefix` is prepended to the merged outputs before the reduce step.
+```yaml
+- id: analyze_all
+  type: map_reduce
+  parameters:
+    delimiter: "\n---\n"             # how the input splits into items (or pass a JSON array)
+    map_step_type: llm_call
+    map_target_role: analyst         # analyzes every item concurrently — the fan-out
+    reduce_step_type: llm_call
+    reduce_target_role: synthesizer  # runs ONCE on the merged map outputs — the fan-in
+    reduce_prompt_prefix: "Synthesize these analyses into one brief:"
+  next: finalize
+```
+Omit the `reduce_*` fields and you get just the merged map outputs (no synthesis) — that is equivalent to `foreach`.
+
 ### Full primitive vocabulary (use advanced ones only when needed)
 
 | Group | Types |
@@ -219,7 +263,7 @@ Keep `items_source`, `sub_step_type`, and `sub_param_tool` under `parameters`; r
 | Integration | `connector_call` (aliases: `http_get`, `http_post`, `http_put`, `http_delete`, `mcp_call`, `cli_call`), `emit`/`publish` |
 | Human | `human_input`, `human_approval`, `wait_signal` |
 
-Advanced notes: `human_approval`/`wait_signal` suspend the run until a resume/signal event — use them for approvals and long external waits instead of stretching a step past its 600s executor limit. `parallel`/`foreach`/`map_reduce` accept `min_concurrent_workers`/`max_concurrent_workers`. Side-effecting steps may declare `compensation: <step_id>` for saga rollback.
+Advanced notes: `human_approval`/`wait_signal` suspend the run until a resume/signal event — use them for approvals and long external waits instead of stretching a step past its 600s executor limit. `parallel`/`foreach`/`map_reduce` accept `min_concurrent_workers`/`max_concurrent_workers` (see **Parallelism: concurrent fan-out → merge** above for which one to pick and the concurrency defaults). Side-effecting steps may declare `compensation: <step_id>` for saga rollback.
 
 ### Interpolation
 
@@ -234,6 +278,7 @@ Advanced notes: `human_approval`/`wait_signal` suspend the run until a resume/si
 > - **Read an `assign`ed value with the bare `${<target>}`**, not `${steps.<capture-id>.text}`.
 > - **`transform op: split` joins all parts with `\n---\n` and ignores any `index`** — it is for fan-out, not single-element extraction. To use one segment of `a/b` (e.g. an `owner/repo` in a path), pass the whole string where the `/` is already correct rather than splitting it apart.
 > - **`conditional.condition`** is interpolated first; if the result is not literally `true`/`false`, the engine does a substring `$input.Contains(condition)`. Since there is no `contains` function, build "any/all contain token" checks around this: `concat` the inputs into one string in the prior step, then set `condition` to the literal token.
+> - **`parallel` (and `race`) feed every branch the *same* `$input`** and each sub-step is always an `llm_call`. For *different* input per branch — the "N different sources" shape — split a list with `foreach` / `map_reduce` instead. All four merge sub-step outputs with `\n---\n`. `map_reduce`'s map sub-steps receive **no** per-step parameters (drive them via the map role's `system_prompt`); only `foreach` passes `sub_param_*` to each child, so per-item `tool_call` fetches must use `foreach`.
 
 ---
 
@@ -659,6 +704,30 @@ steps:
 ```
 `code_execute` returns a sandbox envelope; the business JSON is a string at `output.stdout`. `json_parse` promotes that string to structured output so later steps can read `steps.parse_stdout.json.route`.
 
+### F. Fan-out in parallel → merge (the n8n "multiple sources → merge" shape)
+
+```yaml
+name: sources_digest
+roles:
+  - id: analyst
+    system_prompt: "Summarize one source's content into 3 bullet highlights."
+  - id: editor
+    system_prompt: "Merge per-source highlights into one digest, deduping overlaps."
+steps:
+  # The N sources arrive as ONE list — a JSON array, or a "\n---\n"-delimited string —
+  # produced upstream (the run input, an assign, or transform op: rss_extract_items).
+  - id: digest
+    type: map_reduce
+    parameters:
+      delimiter: "\n---\n"
+      map_step_type: llm_call
+      map_target_role: analyst         # every source analyzed concurrently — the fan-out
+      reduce_step_type: llm_call
+      reduce_target_role: editor        # one merge over all results — the fan-in
+      reduce_prompt_prefix: "Combine these per-source highlights into one digest:"
+```
+One `map_reduce` step is n8n's "N source branches → merge node": the map phase analyzes every source concurrently (default ≤20 at once), the reduce phase merges them into one result. Want the per-source outputs concatenated with **no** synthesis? Use `foreach` (Example C) and drop the reduce. Need to **fetch** each source first (each item is e.g. a feed URL or file)? Do that with a `foreach` of `sub_step_type: tool_call` — its `sub_param_*` give each fetch its tool + arguments — then pipe the fetched text into this `map_reduce` to analyze-and-merge. (Don't use `map_reduce` for the fetch: its map sub-steps get no per-step parameters.)
+
 ---
 
 ## Self-check before publishing
@@ -669,3 +738,4 @@ steps:
 - [ ] Arithmetic / totals / dedup use `transform`, not `llm_call`.
 - [ ] Every external call uses an existing connector (verified via `nyxid_services`) through `nyxid_proxy` or a typed tool.
 - [ ] One `aevatar_start_workflow` dispatch returned a `run_id` with no parse error — you did **not** wait for/poll `run_finished` (the run finishes async; report the `run_id` + observatory).
+- [ ] Any parallel fan-out uses the right primitive: same input → `parallel` / `race`; a list of different items → `foreach` (concatenate) or `map_reduce` (synthesize). Per-item `tool_call` fetches use `foreach`, not `map_reduce`.
