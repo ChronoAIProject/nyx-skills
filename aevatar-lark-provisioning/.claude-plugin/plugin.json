@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-lark-provisioning",
+  "version": "1.1",
+  "description": "Lark resource provisioning for Aevatar agents: after creating any private doc/Base/sheet/folder for a user, grant the requester full access BEFORE returning the link, with an org-wide (tenant) share fallback when no personal id resolves. Always-on correctness rule."
+}
