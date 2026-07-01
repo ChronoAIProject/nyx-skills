@@ -83,6 +83,21 @@
       ]
     },
     {
+      "name": "aevatar-skill-loading",
+      "source": "./aevatar-skill-loading",
+      "description": "Load authoritative NyxID/Ornn manuals and domain skills via use_skill before platform-specific work, and proactively discover skills (ornn_search_skills) when the user names a skill or a task needs specialized capability.",
+      "version": "1.1",
+      "keywords": [
+        "aevatar",
+        "aevatar-system",
+        "nyxid",
+        "ornn",
+        "skill-loading",
+        "use-skill",
+        "overlay-scope-global"
+      ]
+    },
+    {
       "name": "aevatar-team-builder",
       "source": "./aevatar-team-builder",
       "description": "Build an Aevatar agent team and its members over the REST API. Use when a user wants to \"create a team\", \"add a member\", \"make a workflow member / script member / gagent member\", \"set the team's entry point\", or \"assemble agents into a team\". It creates the team, creates members whose implementation is a workflow (most common), a script, or a hosted gagent, binds each member's concrete implementation (the workflow YAML is attached here), waits for the async binding to succeed, and sets the team entry member. Author the workflow YAML first with the workflow-authoring skill; publish the result as a service with the service-publisher skill.",
