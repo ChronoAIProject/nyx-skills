@@ -470,6 +470,17 @@
       ]
     },
     {
+      "name": "promo-scout",
+      "source": "./promo-scout",
+      "description": "Verify-first promotion intelligence for ANY repo or org. Pulls live GitHub state, runs sshx multi-perspective consensus over it, and returns an evidence-backed board of what is genuinely promotable, how items connect, and what is unverifiable. Use when an agent or operator asks \"what's worth promoting / what connects / what's real\" for a target repo or org.",
+      "version": "2.0",
+      "keywords": [
+        "repo-research",
+        "promotion",
+        "consensus"
+      ]
+    },
+    {
       "name": "public-copy-release-guard",
       "source": "./public-copy-release-guard",
       "description": "Portable checklist for gating public-facing copy before release. Use when captions, posts, manifests, topics, titles, or launch copy must be checked for generic AI wording, leaked internal labels, forbidden experiment or tool names, platform topic allowlists, CTA spam, and unsupported overclaims.",
