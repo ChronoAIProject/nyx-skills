@@ -9,7 +9,7 @@
 A curated multi-skill Claude Code plugin. Edits here are NOT propagated
 back; manage this skillset on Ornn.
 
-- Latest version: `1.3`
+- Latest version: `1.4`
 - Skills bundled: 12
 
 ## Master prompt
@@ -17,6 +17,13 @@ back; manage this skillset on Ornn.
 How an agent should orchestrate the members of this set:
 
 The official skillset consisting of core agent manuals to operate ChronoAI official services.
+
+<!-- ornn:deps:start -->
+```mermaid
+flowchart TD
+  n0["nyxid@0.5"] --> n1["ornn-agent-manual-cli@1.5"]
+```
+<!-- ornn:deps:end -->
 
 ## Skills in this plugin
 

@@ -1,6 +1,6 @@
 {
   "name": "chronoai-service-manual-bundle",
   "displayName": "chronoai-service-manual-bundle",
-  "version": "1.3",
+  "version": "1.4",
   "description": "The official skillset consisting of core agent manuals to operate ChronoAI official services."
 }
