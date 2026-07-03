@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-07-03T06:00:02.696Z`
+- Last synced: `2026-07-03T06:08:30.155Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/fkst-control-plane-operation-manual
+npx skills add ChronoAIProject/nyx-skills/fkst-control-plane-operation-manual
 ```
 
 ## Use

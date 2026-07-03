@@ -1,4 +1,4 @@
-# ornn-skills
+# nyx-skills
 
 Auto-generated, **read-only** mirror of public + system skills from
 [Ornn](https://ornn.chrono-ai.fun).
@@ -6,7 +6,7 @@ Auto-generated, **read-only** mirror of public + system skills from
 ## Install a skill
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/<skill-name>
+npx skills add ChronoAIProject/nyx-skills/<skill-name>
 ```
 
 Each subdirectory carries a `SKILL.md` and any references / scripts /

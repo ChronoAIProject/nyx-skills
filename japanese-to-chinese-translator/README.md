@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-07-03T06:00:05.190Z`
+- Last synced: `2026-07-03T06:08:32.581Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/japanese-to-chinese-translator
+npx skills add ChronoAIProject/nyx-skills/japanese-to-chinese-translator
 ```
 
 ## Use

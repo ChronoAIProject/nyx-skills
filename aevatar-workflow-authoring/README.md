@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.5`
-- Last synced: `2026-07-03T06:00:00.798Z`
+- Last synced: `2026-07-03T06:08:28.276Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/aevatar-workflow-authoring
+npx skills add ChronoAIProject/nyx-skills/aevatar-workflow-authoring
 ```
 
 ## Use

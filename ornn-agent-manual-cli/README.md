@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.5`
-- Last synced: `2026-07-03T06:00:04.765Z`
+- Last synced: `2026-07-03T06:08:32.113Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/ornn-agent-manual-cli
+npx skills add ChronoAIProject/nyx-skills/ornn-agent-manual-cli
 ```
 
 ## Use

@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-07-03T06:00:04.911Z`
+- Last synced: `2026-07-03T06:08:32.257Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/chrono-onboarding
+npx skills add ChronoAIProject/nyx-skills/chrono-onboarding
 ```
 
 ## Use

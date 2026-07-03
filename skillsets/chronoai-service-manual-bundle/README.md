@@ -45,8 +45,8 @@ Each member ships its own `SKILL.md` under `skills/<name>/`.
 ## Install
 
 ```bash
-/plugin marketplace add ChronoAIProject/ornn-skills
-/plugin install chronoai-service-manual-bundle@ornn-skills
+/plugin marketplace add ChronoAIProject/nyx-skills
+/plugin install chronoai-service-manual-bundle@nyx-skills
 ```
 
 > Third-party marketplaces default to auto-update OFF. Enable it in

@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.1`
-- Last synced: `2026-07-03T06:00:00.663Z`
+- Last synced: `2026-07-03T06:08:28.114Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/aevatar-lark-provisioning
+npx skills add ChronoAIProject/nyx-skills/aevatar-lark-provisioning
 ```
 
 ## Use

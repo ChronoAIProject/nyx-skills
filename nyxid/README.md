@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.5`
-- Last synced: `2026-07-03T06:00:04.620Z`
+- Last synced: `2026-07-03T06:08:31.961Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/nyxid
+npx skills add ChronoAIProject/nyx-skills/nyxid
 ```
 
 ## Use

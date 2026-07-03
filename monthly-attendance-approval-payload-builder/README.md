@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.1`
-- Last synced: `2026-07-03T06:00:03.893Z`
+- Last synced: `2026-07-03T06:08:31.296Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/monthly-attendance-approval-payload-builder
+npx skills add ChronoAIProject/nyx-skills/monthly-attendance-approval-payload-builder
 ```
 
 ## Use

@@ -9,12 +9,12 @@
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.2`
-- Last synced: `2026-07-03T06:00:02.969Z`
+- Last synced: `2026-07-03T06:08:30.433Z`
 
 ## Install
 
 ```bash
-npx skills add ChronoAIProject/ornn-skills/lark-docx-ops
+npx skills add ChronoAIProject/nyx-skills/lark-docx-ops
 ```
 
 ## Use
