@@ -159,6 +159,18 @@
       ]
     },
     {
+      "name": "chatgpt-image-short-video",
+      "source": "./chatgpt-image-short-video",
+      "description": "Method for producing short vertical videos from ChatGPT image generation through a fixed browser tab, local TTS narration, timed subtitle burn-in, cover exports, and a manifest. Use when an operator needs a reproducible image-to-short workflow with pinned session consistency, per-beat visual prompts, 1080x1920 safe-area rules, local ffmpeg/PIL assembly, and private access kept outside the skill.",
+      "version": "0.1",
+      "keywords": [
+        "short-video",
+        "image-generation",
+        "subtitles",
+        "media-pipeline"
+      ]
+    },
+    {
       "name": "chrono-onboarding",
       "source": "./chrono-onboarding",
       "description": "Chrono AI 非技术团队 onboarding — 安装 NyxID CLI, 配置 AI 工具 MCP, 克隆战略仓库, 运行每日更新",
