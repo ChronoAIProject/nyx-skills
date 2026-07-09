@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-automation",
+  "version": "1.1",
+  "description": "Aevatar scheduling & workflow automation: scheduled_agent_creator (cron/one-shot), the long-running task automation playbook, workflow creation semantics (Scope Workflow vs Ornn publish), agent_builder lifecycle, and scheduled-run credential lifetimes (5-minute broker token at fire) with a token_expired triage protocol."
+}
