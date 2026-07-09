@@ -21,6 +21,20 @@
       ]
     },
     {
+      "name": "aevatar-channels-delivery",
+      "source": "./aevatar-channels-delivery",
+      "description": "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage for capability tools, LLM route selection slash commands, channel_registrations (staged Lark provisioning), and agent_delivery_targets binding.",
+      "version": "1.1",
+      "keywords": [
+        "aevatar",
+        "aevatar-system",
+        "channels",
+        "lark",
+        "delivery",
+        "nyxid-proxy"
+      ]
+    },
+    {
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
       "description": "Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — \"can aevatar do X\", \"I want a bot that…\", \"build me something that posts to Twitter / reads my GitHub / replies on Telegram\", \"is it possible to…\", \"automate … every day\". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler).",

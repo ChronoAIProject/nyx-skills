@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-channels-delivery",
+  "version": "1.1",
+  "description": "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage for capability tools, LLM route selection slash commands, channel_registrations (staged Lark provisioning), and agent_delivery_targets binding."
+}
