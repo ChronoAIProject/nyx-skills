@@ -1,6 +1,6 @@
 # aevatar-scheduler
 
-> Create and manage cron schedules that fire an Aevatar service on a recurring basis, authenticated as the scope owner via NyxID — over the REST API. Use when a user wants to "schedule", "run on a cron", "set up a recurring run", "run every day/hour/Monday", "automate this service on a timer", "preview a cron", "pause/resume/disable a schedule", or "run it now". It builds the schedule against a published service (identity + endpoint + payload + serving revision), uses scope-owner NyxID auth (which requires the owner's NyxID broker binding), and covers preview, enable/disable, run-now, update, and delete. Publish the service first with the service-publisher skill.
+> Create and manage cron schedules that fire an Aevatar service on a recurring basis, authenticated as the scope owner via NyxID — over the REST API. Use when a user wants to "schedule", "run on a cron", "set up a recurring run", "run every day/hour/Monday", "automate this service on a timer", "preview a cron", "pause/resume/disable a schedule", or "run it now" — or hits token_expired on a scheduled run's late steps. It builds the schedule against a published service (identity + endpoint + payload + serving revision), uses scope-owner NyxID auth (which requires the owner's NyxID broker binding), documents the fire-time credential's fixed 5-minute lifetime and how to design runs around it, and covers preview, enable/disable, run-now, update, and delete. Publish the service first with the service-publisher skill.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.4`
-- Last synced: `2026-07-09T07:00:03.132Z`
+- Latest version: `1.6`
+- Last synced: `2026-07-09T07:26:48.258Z`
 
 ## Install
 
