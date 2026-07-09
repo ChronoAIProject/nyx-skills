@@ -37,8 +37,8 @@
     {
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
-      "description": "Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — \"can aevatar do X\", \"I want a bot that…\", \"build me something that posts to Twitter / reads my GitHub / replies on Telegram\", \"is it possible to…\", \"automate … every day\". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler).",
-      "version": "1.0",
+      "description": "Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — \"can aevatar do X\", \"I want a bot that…\", \"build me something that posts to Twitter / reads my GitHub / replies on Telegram\", \"is it possible to…\", \"automate … every day\", \"let Lark Base trigger a workflow\". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), external HTTP trigger options such as Lark Base automation, how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler).",
+      "version": "1.1",
       "keywords": [
         "aevatar",
         "feasibility",
@@ -67,8 +67,8 @@
     {
       "name": "aevatar-platform-map",
       "source": "./aevatar-platform-map",
-      "description": "Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, or operate anything on Aevatar (\"create an agent team\", \"make a workflow / member\", \"publish or bind a service\", \"register it with NyxID\", \"set up a recurring / cron run\", \"invoke my service\"), wants to know whether something is even possible (\"can Aevatar do X?\", \"能不能用 aevatar 实现\"), or just wants to know what Aevatar can do. It teaches the object model (scope → team → member[workflow|script|gagent] → service → schedule), how to authenticate as a NyxID-bearer REST client, how to resolve your scope, and the two caller modes (client REST vs in-session server-side tools). It does not do the work itself — it routes you to the right companion skill (feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, plus diagnostics probes and the safety-net fallback), held together by the shared `aevatar` tag.",
-      "version": "1.6",
+      "description": "Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, externally trigger, or operate anything on Aevatar (\"create an agent team\", \"make a workflow / member\", \"publish or bind a service\", \"register it with NyxID\", \"set up a recurring / cron run\", \"invoke my service\", \"let Lark Base trigger my workflow\"), wants to know whether something is even possible (\"can Aevatar do X?\", \"能不能用 aevatar 实现\"), or just wants to know what Aevatar can do. It teaches the object model (scope → team → member[workflow|script|gagent] → service → schedule/external trigger), how to authenticate as a NyxID-bearer REST client, how to resolve your scope, and the two caller modes (client REST vs in-session server-side tools). It does not do the work itself — it routes you to the right companion skill (feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, plus diagnostics probes and the safety-net fallback), held together by the shared `aevatar` tag.",
+      "version": "1.7",
       "keywords": [
         "aevatar",
         "control-plane",
@@ -85,7 +85,7 @@
       "name": "aevatar-scheduler",
       "source": "./aevatar-scheduler",
       "description": "Create and manage cron schedules that fire an Aevatar service on a recurring basis, authenticated as the scope owner via NyxID — over the REST API. Use when a user wants to \"schedule\", \"run on a cron\", \"set up a recurring run\", \"run every day/hour/Monday\", \"automate this service on a timer\", \"preview a cron\", \"pause/resume/disable a schedule\", or \"run it now\" — or hits token_expired on a scheduled run's late steps. It builds the schedule against a published service (identity + endpoint + payload + serving revision), uses scope-owner NyxID auth (which requires the owner's NyxID broker binding), documents the fire-time credential's fixed 5-minute lifetime and how to design runs around it, and covers preview, enable/disable, run-now, update, and delete. Publish the service first with the service-publisher skill.",
-      "version": "1.6",
+      "version": "1.7",
       "keywords": [
         "aevatar",
         "schedule",
@@ -99,8 +99,8 @@
     {
       "name": "aevatar-service-publisher",
       "source": "./aevatar-service-publisher",
-      "description": "Publish an Aevatar member, team, or workflow as an invocable service and (host permitting) register it with NyxID, then verify and invoke it — all over the REST API. Use when a user wants to \"publish/bind a service\", \"expose my workflow/team as a service\", \"register it with NyxID\", \"make it callable\", \"get the service slug/URL\", \"invoke my service\", or \"version/deploy/roll out a service\". It covers the simple scope binding, reading back a member's published service, the full account-level service lifecycle (revision → publish → deploy → rollout), how to confirm the NyxID registration (slug + status), and how to invoke an endpoint. Build the team/member first with the team-builder skill.",
-      "version": "1.3",
+      "description": "Publish an Aevatar member, team, or workflow as an invocable service and (host permitting) register it with NyxID, then verify, invoke, or wire external HTTP triggers such as Lark Base automation — all over the REST API. Use when a user wants to \"publish/bind a service\", \"expose my workflow/team as a service\", \"register it with NyxID\", \"make it callable\", \"get the service slug/URL\", \"invoke my service\", \"let Lark Base call my workflow\", \"trigger this workflow from an external webhook\", or \"version/deploy/roll out a service\". It covers the simple scope binding, reading back a member's published service, the full account-level service lifecycle (revision → publish → deploy → rollout), how to confirm the NyxID registration (slug + status), how to invoke an endpoint, and how to distinguish direct NyxID proxy triggering from host-gated externalExposure. Build the team/member first with the team-builder skill.",
+      "version": "1.5",
       "keywords": [
         "aevatar",
         "service",
