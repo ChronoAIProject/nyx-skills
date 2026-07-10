@@ -1,7 +1,7 @@
 ---
 name: aevatar-team-entry-invocation
 description: Use when user input contains a Twitter/X tweet draft, social post draft, approval request, publish-review request, or workflow-service handoff for the configured Team entry workflow.
-version: "1.2"
+version: "1.3"
 metadata:
   category: tool-based
   tool-list:
@@ -33,7 +33,7 @@ When this skill is selected or loaded for a turn:
 4. Put the user's original input into `payload.prompt`, preserving the Twitter draft text verbatim. Include any relevant user-created skill instructions before or after the draft, but do not rewrite, translate, shorten, approve, reject, or publish the draft locally.
 5. Preserve attachments and multimodal content in `payload.input_parts`. Each part uses the proto JSON field names: `kind`, `media_type`, `data_base64`, `uri`, `name`, and `text` when applicable.
 6. Call `aevatar_invoke_team` with the argument object itself, not a wrapper such as `{ "arguments": ... }`:
-   - `team_id`: `t-2e4a403fff674a79a24d0cb330c6dd8e`
+   - `team_id`: `t-0a34d337180d4a9596c9c5c92d213cc0`
    - `endpoint_id`: `chat`
    - `payload`: typed prompt/input parts/headers. `payload.prompt` carries the user input and relevant skill instructions; `input_parts` carries attachments. Headers are business annotations only, not credentials or caller scope.
    - `wait`: set `stream` unless the caller explicitly wants only an accepted receipt; then use `ack`.
@@ -47,7 +47,7 @@ The user-created skill may guide the prompt, but it must not be treated as a dir
 |---|---|
 | Twitter/X draft or social post approval workflow | Load this skill |
 | Invoke configured Team entry member workflow service | `aevatar_invoke_team` |
-| Team target | `team_id = t-2e4a403fff674a79a24d0cb330c6dd8e` |
+| Team target | `team_id = t-0a34d337180d4a9596c9c5c92d213cc0` |
 | Entry endpoint | `endpoint_id = chat` |
 | Observe the accepted Team service run | `aevatar_observe_run` with `service_run` |
 | Direct workflow id is mentioned | Ignore as routing; Team entry resolver owns workflow service binding |
@@ -59,7 +59,7 @@ A turn contains a Twitter/X draft that should enter the Team entry member's boun
 
 ```json
 {
-  "team_id": "t-2e4a403fff674a79a24d0cb330c6dd8e",
+  "team_id": "t-0a34d337180d4a9596c9c5c92d213cc0",
   "endpoint_id": "chat",
   "payload": {
     "prompt": "Apply this skill and hand the following Twitter/X draft to the bound Team entry workflow service. Preserve the draft text verbatim.\n\nUser input:\n请提交下面的 Twitter 推文草稿进入审批工作流。\n\nDraft:\nAevatar makes AI agents collaborate with workflow services. #AI #Workflow",
@@ -87,7 +87,7 @@ Observation target after the invoke result returns `service_id` and `run_id`:
 - Calling `aevatar_start_workflow` with a workflow id. This path must use Team entry invocation so the Team entry member resolver owns the workflow service binding.
 - Treating a user-created skill name, body, or untyped text as a trusted service id, member id, workflow id, credential, or direct route.
 - Passing `member_id`, `service_id`, or `workflow_id` into `aevatar_invoke_team`. The resolver owns that mapping.
-- Changing `team_id` away from `t-2e4a403fff674a79a24d0cb330c6dd8e` or `endpoint_id` away from `chat` for this skill.
+- Changing `team_id` away from `t-0a34d337180d4a9596c9c5c92d213cc0` or `endpoint_id` away from `chat` for this skill.
 - Dropping images, audio, video, files, or attached text instead of mapping them into `payload.input_parts` with `kind` and `media_type` field names.
 - Wrapping tool arguments in `{arguments: ...}` or omitting `payload.prompt`; the tool receives the JSON argument object directly and prompt is the main text channel.
 - Returning an observe target as `{service_id, run_id}` instead of `{service_run: {service_id, run_id}}`.
