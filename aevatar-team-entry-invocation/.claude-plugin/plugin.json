@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-team-entry-invocation",
+  "version": "1.2",
+  "description": "Use when user input contains a Twitter/X tweet draft, social post draft, approval request, publish-review request, or workflow-service handoff for the configured Team entry workflow."
+}
