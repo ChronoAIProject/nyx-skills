@@ -35,6 +35,19 @@
       ]
     },
     {
+      "name": "aevatar-codex-exec-node-setup",
+      "source": "./aevatar-codex-exec-node-setup",
+      "description": "Configure a private NyxID node-backed SSH service so the same NyxID account can run Aevatar workflow codex_exec against a local Codex CLI. Use for node registration, loopback or dedicated SSH target setup, forced-command hardening, service binding, Codex authentication/workspace configuration, end-to-end verification, or diagnosing node_offline, target_not_allowed, missing SSH key, Codex PATH, git-root, and 300-second timeout failures.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "codex-exec",
+        "nyxid",
+        "credential-node",
+        "workflow"
+      ]
+    },
+    {
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
       "description": "Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — \"can aevatar do X\", \"I want a bot that…\", \"build me something that posts to Twitter / reads my GitHub / replies on Telegram\", \"is it possible to…\", \"automate … every day\", \"let Lark Base trigger a workflow\". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), external HTTP trigger options such as Lark Base automation, how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler).",
