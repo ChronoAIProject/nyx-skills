@@ -1,17 +1,22 @@
 ---
 name: aevatar-codex-exec-node-setup
-description: Configure a private NyxID node-backed SSH service so the same NyxID account can run Aevatar workflow codex_exec against a local Codex CLI. Use for node registration, loopback or dedicated SSH target setup, forced-command hardening, service binding, Codex authentication/workspace configuration, end-to-end verification, or diagnosing node_offline, target_not_allowed, missing SSH key, Codex PATH, git-root, and 300-second timeout failures.
-version: "1.1"
+description: Configure and prove a private NyxID node-backed SSH service so the same NyxID account can run Aevatar workflow codex_exec against a local Codex CLI. Use for node registration, loopback or dedicated SSH target setup, forced-command hardening, service binding, Codex authentication/workspace configuration, mandatory public-sample verification, or diagnosing node_offline, target_not_allowed, missing SSH key, Codex PATH, git-root, and 300-second timeout failures.
+version: "2.0"
 metadata:
   category: tool-based
   tool-list:
     - shell
+    - use_skill
+    - aevatar_start_workflow
+    - codex_exec
   tag:
     - aevatar
     - codex-exec
     - nyxid
     - credential-node
     - workflow
+  depends-on:
+    - aevatar-codex-exec-workflow-sample@1.1
 compatibility: macOS or Linux with NyxID CLI, OpenSSH, Codex CLI, and an Aevatar deployment that enables codex_exec
 disable-model-invocation: true
 user-invocable: true
@@ -151,9 +156,38 @@ Keep `service` and `principal` deployment-owned when possible. The caller should
 
 The synchronous NyxID SSH boundary is capped at 300 seconds and captures at most 1 MiB per output stream. Use Aevatar's long-running submit/callback workflow for larger tasks.
 
+## 7. Prove the Aevatar Route With the Public Sample
+
+Do not report the configuration as ready after only checking node status or running `nyxid ssh exec`. Those checks do not prove that Aevatar received the caller's NyxID identity, fetched the Ornn workflow, resolved the private service, and invoked `codex_exec` successfully.
+
+Load the declared public dependency from Ornn and mount its workflow by calling `use_skill` with:
+
+```json
+{
+  "skill": "aevatar-codex-exec-workflow-sample",
+  "mount_workflows": true
+}
+```
+
+After the mount command is accepted, start `codex-exec-check` through Aevatar with the actual service slug and Unix principal:
+
+```json
+{
+  "workflow_id": "codex-exec-check",
+  "inputs": {
+    "prompt": "{\"service\":\"your-service-slug\",\"principal\":\"your-unix-user\"}"
+  },
+  "wait": "stream"
+}
+```
+
+Use the sample's fixed harmless prompt. Do not replace it with a real task during verification. If workflow mounting is unavailable, fetch the published sample from Ornn and submit its workflow as explicit Aevatar inline draft-run input; do not validate with a local copy or a direct SSH call alone.
+
+Treat the route as usable only when the Aevatar workflow result has `exit_code: 0`, `timed_out: false`, and stdout equal to `CODEX_EXEC_READY` after trimming whitespace. Diagnose any other result before declaring completion.
+
 ## Completion Criteria
 
-Finish only when all are true:
+Do not say configured, ready, complete, or usable until all are true:
 
 - The node appears online under the intended NyxID user.
 - The SSH service is private, active, node-bound, and uses `node_key` auth.
@@ -161,3 +195,5 @@ Finish only when all are true:
 - Arbitrary SSH commands are rejected.
 - A harmless Codex prompt succeeds through `nyxid ssh exec`.
 - The workflow uses the service slug and matching Unix principal.
+- The public `aevatar-codex-exec-workflow-sample` dependency is fetched from Ornn and executed through Aevatar under the same NyxID account.
+- The sample result has `exit_code: 0`, `timed_out: false`, and stdout `CODEX_EXEC_READY`.
