@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-workflow-sample
 description: Mount and run a harmless Aevatar codex_exec workflow that verifies a NyxID node-backed SSH service can reach an authenticated Codex CLI. Use when checking a new personal node setup, confirming service and principal routing, or diagnosing a failed codex_exec workflow before running real tasks.
-version: "1.0"
+version: "1.1"
 metadata:
   category: mixed
   output-type: text
