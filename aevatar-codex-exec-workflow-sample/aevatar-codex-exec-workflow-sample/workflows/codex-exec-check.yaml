@@ -1,0 +1,41 @@
+name: codex-exec-check
+description: Verify a NyxID node-backed SSH service can run its local Codex CLI without reading or changing files.
+when_to_use: Use after configuring a private NyxID SSH service and before running real codex_exec tasks.
+steps:
+  - id: capture_request
+    type: assign
+    parameters:
+      target: codex_exec_request
+      value: "$"
+
+  - id: extract_service
+    type: transform
+    parameters:
+      op: json_extract
+      path: service
+
+  - id: capture_service
+    type: assign
+    parameters:
+      target: codex_exec_service_json
+      value: "$"
+
+  - id: restore_request
+    type: assign
+    parameters:
+      target: codex_exec_request
+      value: "${codex_exec_request}"
+
+  - id: extract_principal
+    type: transform
+    parameters:
+      op: json_extract
+      path: principal
+
+  - id: execute
+    type: tool_call
+    timeout_ms: 320000
+    parameters:
+      tool: codex_exec
+      arguments: >-
+        {"service":${codex_exec_service_json},"principal":${input},"prompt":"Do not use tools. Do not inspect, read, create, modify, or delete files. Reply with exactly CODEX_EXEC_READY and no other text.","timeout_secs":300}
