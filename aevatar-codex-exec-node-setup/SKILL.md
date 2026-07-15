@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-node-setup
 description: Configure a private NyxID node-backed SSH service so the same NyxID account can run Aevatar workflow codex_exec against a local Codex CLI. Use for node registration, loopback or dedicated SSH target setup, forced-command hardening, service binding, Codex authentication/workspace configuration, end-to-end verification, or diagnosing node_offline, target_not_allowed, missing SSH key, Codex PATH, git-root, and 300-second timeout failures.
-version: "1.0"
+version: "1.1"
 metadata:
   category: tool-based
   tool-list:
@@ -13,6 +13,8 @@ metadata:
     - credential-node
     - workflow
 compatibility: macOS or Linux with NyxID CLI, OpenSSH, Codex CLI, and an Aevatar deployment that enables codex_exec
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # Configure Aevatar codex_exec
@@ -26,6 +28,7 @@ Do not treat `node_id` as the workflow service. The workflow receives the privat
 ## Guardrails
 
 - Keep the node and SSH service personal. Do not pass `--org` unless the user explicitly wants every authorized org member to reach the machine.
+- Before mutating node, service, daemon, SSH, or startup state, show the chosen owner, profile, target, principal, workspace, and visibility. Continue only when the current user request explicitly authorizes that configuration.
 - Never print or persist a node registration token outside the node config. Capture and consume it in one shell process.
 - Never put a Codex API key, `auth.json`, `CODEX_HOME`, model flag, or sandbox bypass flag in workflow YAML.
 - Restrict the SSH key with a forced-command wrapper. Aevatar may expose `ssh_exec` beside `codex_exec`; the target must reject arbitrary commands independently.
