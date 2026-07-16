@@ -1,7 +1,7 @@
 ---
 name: nyxid-service-maintenance
-description: Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service.
-version: "1.0"
+description: Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service. 中文触发包括“修改 NyxID 服务路由”“更新服务”“轮换凭据”“删除服务”。
+version: "1.1"
 metadata:
   category: tool-based
   tool-list:

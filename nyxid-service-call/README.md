@@ -1,6 +1,6 @@
 # nyxid-service-call
 
-> Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing.
+> Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing. 中文触发包括“调用我的 NyxID 服务”“使用服务”“让服务执行”。
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.0`
-- Last synced: `2026-07-16T08:16:07.209Z`
+- Latest version: `1.1`
+- Last synced: `2026-07-16T09:00:01.837Z`
 
 ## Install
 
