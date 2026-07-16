@@ -1,6 +1,22 @@
 # Verification and Troubleshooting
 
-## End-to-End Probe
+## Managed OpenSandbox failures
+
+| Symptom | Meaning | Check |
+|---|---|---|
+| `managed_sandbox_disabled` / `target_not_configured` | Managed target is not exposed by the host | Ask operations to verify the disabled-by-default Aevatar configuration |
+| `managed_feature_not_enabled` | Authenticated NyxID subject is not allowlisted | Compare the verified NyxID `sub` with `AllowedNyxIdUserIds` |
+| `nyxid_binding_required` / `nyxid_binding_revoked` | Aevatar cannot mint from the user's binding | Repeat normal Aevatar/NyxID login consent |
+| `llm_proxy_scope_missing` | OAuth client or binding predates `llm:proxy` | Refresh the cluster client and user consent; never reuse the inbound bearer |
+| `llm_service_access_missing` | Binding lacks the configured LLM resource | Review NyxID service consent |
+| `managed_capacity_unavailable` | P0 process-local slot is busy | Retry later; do not bypass admission |
+| `sandbox_provisioning_failed` | OpenSandbox control plane, image, quota, or architecture failed | Use the sanitized diagnostic ID and operations runbook |
+| `credential_vault_binding_failed` | Credential Proxy rejected or exposed the binding | Stop and inspect Vault/Proxy configuration without logging tokens |
+| `landlock_preflight_failed` | Required nested isolation is absent or ineffective | Stop rollout; do not fall back to danger-full-access |
+| `codex_jsonl_*` / `codex_terminal_*` | Codex stream was malformed or incomplete | Correlate bounded JSONL with the sanitized diagnostic ID |
+| `sandbox_cleanup_failed` | Sandbox absence could not be proven | Treat as an incident and inspect the process/pod tree |
+
+## Private SSH end-to-end probe
 
 Construct the same fixed command Aevatar uses and call it through NyxID:
 

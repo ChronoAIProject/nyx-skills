@@ -1,6 +1,6 @@
 # aevatar-codex-exec-node-setup
 
-> Configure and prove a private NyxID node-backed SSH service so the same NyxID account can run Aevatar workflow codex_exec against a local Codex CLI. Use for node registration, loopback or dedicated SSH target setup, forced-command hardening, service binding, Codex authentication/workspace configuration, mandatory public-sample verification, or diagnosing node_offline, target_not_allowed, missing SSH key, Codex PATH, git-root, and 300-second timeout failures.
+> Configure and prove Aevatar codex_exec for one NyxID account, choosing either operator-managed OpenSandbox or a private NyxID node-backed SSH service. Use for managed allowlist/binding readiness, node registration, forced-command hardening, service binding, Codex authentication/workspace configuration, mandatory public-sample verification, or diagnosing managed sandbox and private SSH failures.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `2.0`
-- Last synced: `2026-07-16T10:00:02.889Z`
+- Latest version: `3.0`
+- Last synced: `2026-07-16T10:39:00.900Z`
 
 ## Install
 
