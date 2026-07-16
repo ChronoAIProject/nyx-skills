@@ -1,7 +1,7 @@
 ---
 name: nyxid-service-discovery
-description: Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it.
-version: "1.0"
+description: Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it. 中文触发包括“我有哪些 NyxID 服务”“查看服务列表”“服务状态”。
+version: "1.1"
 metadata:
   category: tool-based
   tool-list:
