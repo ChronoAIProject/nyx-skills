@@ -527,8 +527,8 @@
     {
       "name": "nyxid-service-call",
       "source": "./nyxid-service-call",
-      "description": "Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing.",
-      "version": "1.0",
+      "description": "Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing. 中文触发包括“调用我的 NyxID 服务”“使用服务”“让服务执行”。",
+      "version": "1.1",
       "keywords": [
         "nyxid",
         "services",
@@ -541,8 +541,8 @@
     {
       "name": "nyxid-service-connect",
       "source": "./nyxid-service-connect",
-      "description": "Connect, add, reconnect, or repair a NyxID service through NyxID's secure credential and provider OAuth surfaces, then grant the current Aevatar developer app incremental access to that connected service. Use when a user wants a new NyxID service, sees a missing-connection or missing-credential error, needs provider OAuth, or must authorize an already connected service for NyxID Chat without exposing secrets to the model.",
-      "version": "1.0",
+      "description": "Connect, add, reconnect, or repair a NyxID service through NyxID's secure credential and provider OAuth surfaces, then grant the current Aevatar developer app incremental access to that connected service. Use when a user wants a new NyxID service, sees a missing-connection or missing-credential error, needs provider OAuth, or must authorize an already connected service for NyxID Chat without exposing secrets to the model. 中文触发包括“连接新的 NyxID 服务”“新增服务”“授权服务”。",
+      "version": "1.1",
       "keywords": [
         "nyxid",
         "services",
@@ -555,8 +555,8 @@
     {
       "name": "nyxid-service-discovery",
       "source": "./nyxid-service-discovery",
-      "description": "Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it.",
-      "version": "1.0",
+      "description": "Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it. 中文触发包括“我有哪些 NyxID 服务”“查看服务列表”“服务状态”。",
+      "version": "1.1",
       "keywords": [
         "nyxid",
         "services",
@@ -568,8 +568,8 @@
     {
       "name": "nyxid-service-maintenance",
       "source": "./nyxid-service-maintenance",
-      "description": "Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service.",
-      "version": "1.0",
+      "description": "Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service. 中文触发包括“修改 NyxID 服务路由”“更新服务”“轮换凭据”“删除服务”。",
+      "version": "1.1",
       "keywords": [
         "nyxid",
         "services",
