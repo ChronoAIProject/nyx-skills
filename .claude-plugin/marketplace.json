@@ -525,6 +525,61 @@
       ]
     },
     {
+      "name": "nyxid-service-call",
+      "source": "./nyxid-service-call",
+      "description": "Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing.",
+      "version": "1.0",
+      "keywords": [
+        "nyxid",
+        "services",
+        "invocation",
+        "proxy",
+        "openapi",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "nyxid-service-connect",
+      "source": "./nyxid-service-connect",
+      "description": "Connect, add, reconnect, or repair a NyxID service through NyxID's secure credential and provider OAuth surfaces, then grant the current Aevatar developer app incremental access to that connected service. Use when a user wants a new NyxID service, sees a missing-connection or missing-credential error, needs provider OAuth, or must authorize an already connected service for NyxID Chat without exposing secrets to the model.",
+      "version": "1.0",
+      "keywords": [
+        "nyxid",
+        "services",
+        "connect",
+        "oauth",
+        "credentials",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "nyxid-service-discovery",
+      "source": "./nyxid-service-discovery",
+      "description": "Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it.",
+      "version": "1.0",
+      "keywords": [
+        "nyxid",
+        "services",
+        "discovery",
+        "aevatar",
+        "broker"
+      ]
+    },
+    {
+      "name": "nyxid-service-maintenance",
+      "source": "./nyxid-service-maintenance",
+      "description": "Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service.",
+      "version": "1.0",
+      "keywords": [
+        "nyxid",
+        "services",
+        "maintenance",
+        "routing",
+        "credentials",
+        "aevatar"
+      ]
+    },
+    {
       "name": "ornn-agent-manual-cli",
       "source": "./ornn-agent-manual-cli",
       "description": "The manual an AI agent loads to operate Ornn — the model-agnostic skill-lifecycle API (an npm-style registry + CLI for agent skills) — via the NyxID CLI (`nyxid proxy request ornn-api …`). Load and follow this skill WHENEVER the user asks to do anything with Ornn skills or skillsets. Skills: search Ornn or find a skill, pull or install a skill (or a specific version), run a skill, build and upload a skill, publish a new version, make a skill public / private / shared, run or read a security audit, deprecate or delete a version, diff two versions, check usage analytics, bind a skill to a NyxID service, link a skill to GitHub or sync from source, manage npm-style dist-tags, or transfer skill ownership. Skillsets — curated multi-skill bundles with a required master prompt: bundle skills into a set, create or publish a skillset, resolve its closure in one call, export a skillset as a Claude Code marketplace plugin, transfer skillset ownership, or diagnose why a shared skillset isn't visible (visibility derives from its member skills). Also load it to check your quota or pick an LLM model before an SSE call, and on phrases like 'share my skill', 'bundle these skills', or 'export as a Claude Code plugin'. Once loaded, the agent runs the whole search → pull → execute → build → upload → share lifecycle with no further setup — this is the authoritative Ornn↔agent contract, paired with references/api-reference.md (full per-endpoint catalogue + error legend).",
