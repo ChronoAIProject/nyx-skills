@@ -1,0 +1,5 @@
+{
+  "name": "nyxid-service-maintenance",
+  "version": "1.0",
+  "description": "Maintain an existing NyxID service by inspecting and updating labels, endpoints, active state, direct or node routing, health, external-key metadata, and deletion, while sending all credential rotation or repair through NyxID's secure UI. Use when a user asks to edit, reroute, enable, disable, repair, rotate credentials for, diagnose, or remove a connected NyxID service."
+}
