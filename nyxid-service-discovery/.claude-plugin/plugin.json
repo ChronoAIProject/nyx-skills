@@ -1,0 +1,5 @@
+{
+  "name": "nyxid-service-discovery",
+  "version": "1.0",
+  "description": "Inventory and inspect NyxID services available to the current authenticated user across connected instances, the service catalog, proxy availability, and LLM routes. Use when a user asks what services they have, what can be added, whether a service is connected, active, healthy, or callable, which personal or organization source owns it, or needs exact service details before connecting, invoking, or maintaining it."
+}
