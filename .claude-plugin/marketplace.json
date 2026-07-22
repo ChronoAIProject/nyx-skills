@@ -291,22 +291,6 @@
       ]
     },
     {
-      "name": "fkst-control-plane-operation-manual",
-      "source": "./fkst-control-plane-operation-manual",
-      "description": "Operational manual for an AI agent driving the fkst CONTROL PLANE (fkst-control-plane) over its HTTP API, exclusively through the NyxID CLI credential proxy (`nyxid proxy request …`). Covers the five core user flows — create a GitHub repo under my account, bootstrap a repo's `.fkst/` directory, trigger a fkst-substrate session with my input arguments, check the status of all my substrate sessions, and stop/terminate a specific session — with the EXACT request body and response shape for every call so the agent never has to guess. Invoke when the user says \"create a repo via the control plane\", \"bootstrap .fkst\", \"trigger a substrate session\", \"start/stop a fkst session\", \"check my sessions\", or \"drive the fkst control plane through nyxid\".",
-      "version": "0.1",
-      "keywords": [
-        "fkst",
-        "control-plane",
-        "fkst-substrate",
-        "sessions",
-        "goals",
-        "repos",
-        "nyxid",
-        "http-api"
-      ]
-    },
-    {
       "name": "github-via-nyxid",
       "source": "./github-via-nyxid",
       "description": "Operate a user's GitHub account through NyxID's credential-brokering proxy (service slug api-github) — read and write repositories, files, issues, pull requests, commits, branches, Actions, gists and anything else the GitHub REST API exposes, all on the user's behalf and without ever handling a raw token. NyxID injects the user's GitHub credential server-side. Use when an agent needs to read from or act on GitHub for a user who has connected their GitHub account in NyxID.",
