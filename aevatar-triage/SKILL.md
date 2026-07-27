@@ -1,19 +1,20 @@
 ---
 name: aevatar-triage
-description: Use AFTER something goes wrong while using Aevatar — a user hits an error, failure, or confusing behavior and you must find whether it lives in Aevatar, NyxID, or Ornn, then act. Triggers - "aevatar is erroring", "why did my workflow fail", "my scheduled run did not fire", "my bot does not reply", "connector 401/403", "skill won't pull/upload", "is this an aevatar, nyxid, or ornn bug", "file an issue", "am I using this right". It attributes the failure by tracing the request path, pulls that layer's real public source for a code-grounded root cause citing file and line, then branches - draft and, only on explicit user confirmation, file a precise GitHub issue when behavior violates the layer's published contract, or explain the correct usage from the code when it is a usage mistake. The after-it-breaks counterpart to aevatar-feasibility-advisor; never auto-files, de-dups first, never claims a root cause without a code citation. Works locally (git + gh) and server-side (nyxid_proxy + api-github).
-version: "1.3"
+description: Use AFTER something goes wrong while using Aevatar — a user hits an error, failure, or confusing behavior and you must find whether it lives in Aevatar, NyxID, or Ornn, then act. Triggers - "aevatar is erroring", "why did my workflow fail", "my scheduled run did not fire", "my bot does not reply", "connector 401/403", "my scheduled run hit token_expired", "skill won't pull/upload", "this endpoint 404s but I think it exists", "is this an aevatar, nyxid, or ornn bug", "file an issue", "am I using this right". It reads credentialSourceKind before interpreting any scheduled-run credential failure (dedicated Agent Keys are not fire-time broker tokens and must not be diagnosed with the 300 s TTL), and probes the live OpenAPI surface before calling a 404 a defect, since some contracts exist in code but are not deployed. It attributes the failure by tracing the request path, pulls that layer's real public source for a code-grounded root cause citing file and line, then branches - draft and, only on explicit user confirmation, file a precise GitHub issue when behavior violates the layer's published contract, or explain the correct usage from the code when it is a usage mistake. The after-it-breaks counterpart to aevatar-feasibility-advisor; never auto-files, de-dups first, never claims a root cause without a code citation. Works locally (git + gh) and server-side (nyxid_proxy + api-github).
+version: "1.4"
 metadata:
   category: plain
   tag:
     - aevatar
     - triage
     - diagnostics
-    - debugging
     - root-cause
     - issue
     - nyxid
     - ornn
     - support
+    - agent-key
+    - credentials
 ---
 
 # Aevatar triage — find the layer, read the code, then report or guide
@@ -73,25 +74,68 @@ typically flows `your agent -> Aevatar runtime -> NyxID proxy -> third-party`, a
 | **scheduled run stopped firing** (fired before; `nextFireAt` frozen in the past, `fireCount` flat, `failureCount=0`, empty `lastError`) | **Aevatar** (scheduler / actor not re-armed across pod churn) | compare to peer schedules; pod `startTime` / `restartCount`; is it still enabled? did a deploy/restart line up with the last good fire? |
 | **scheduled run never fires, or fires but errors on credential** | **Aevatar scheduler ⨯ NyxID** (binding) | is it enabled and is `nextFireAt` computed? `lastError` like "binding not found" / "exactly one credential source" -> the *fired call's* invocation credential (scope-owner broker binding) |
 | **schedule fires (`fireCount` climbs) but the real-world effect never happens** | **Aevatar** (the fired call's path / credential) | dispatch success ≠ effect — check the external side-effect out-of-band; the proxy can hand back `{"error":true}` inside a `200` |
-| **scheduled run starts fine, then late steps hit `token_expired` ~5 min after fire** | **by design (NyxID broker TTL)** | the run's caller credential is minted once at fire and pinned to `BROKER_ACCESS_TTL_SECS = 300` (NyxID `backend/src/services/oauth_broker_service.rs`) — fast-revocation design, not a bug; correlate failure onset with **fire time** (per-run ~5 min mark ⇒ broker TTL) vs a fixed wall-clock time (⇒ something else); fix by shortening the run / front-loading NyxID-authenticated steps, not by retrying |
+| **scheduled run starts fine, then late steps hit `token_expired`** | **depends entirely on `credentialSourceKind` — read it before you theorize** | see *Scheduled-run credentials are not one thing* below. `nyxid_binding_exchange` ⇒ the fire-time broker token (`BROKER_ACCESS_TTL_SECS = 300`, NyxID `backend/src/services/oauth_broker_service.rs`) is the right hypothesis. `scheduled_invocation_agent_key` ⇒ it is **not** the 300 s broker TTL and a ~5-6 min correlation is coincidence, not evidence |
 | **inbound bot doesn't reply** (Lark/Telegram) | **cross-layer — walk it** | did NyxID relay webhook fire? is the bot connector connected? did the Aevatar channel run start (observatory)? credential = the *sender's* NyxID, present and live? |
 | **`/whoami` says "bound" but tool calls get `credential_denied`** | **NyxID** (grant revoked — false green) | live token-exchange returns `invalid_grant` while the local readmodel still reads "bound"; whoami checks only the local mirror, not the live grant |
 | approval prompt stuck | **NyxID approvals + Aevatar suspension** | NyxID approval request id; Aevatar workflow wait/suspend state |
 | skill search/pull/upload/generate fails | **Ornn** | which `/api/v1/skill...` route? validator violations? version format? |
+| **`404` on a control-plane route you believe exists** (e.g. `…/agent-profiles`) | **could be "resource missing" OR "capability not deployed" — these are different verdicts** | probe the *surface*, not the resource: `GET /api/openapi.json` and check whether the **complete** route family is advertised. Family absent ⇒ the deployment does not expose that contract; a single 404 proves nothing either way. See *Deployment-gated capabilities* below |
 
 **Do not stop at the first match.** Gather the disambiguating evidence and *eliminate* — a plausible
 first guess that you haven't excluded the alternatives for is not an attribution.
+
+**Scheduled-run credentials are not one thing.** "It was a scheduled run" tells you nothing about
+its credential. Read `credentialSourceKind` off the run/automation record **first**, then pick the
+diagnosis. Applying the wrong class's lifetime is the single most common wrong verdict in this area:
+
+| `credentialSourceKind` | What the run actually holds | How to diagnose a `token_expired` / 401 |
+|---|---|---|
+| `nyxid_binding_exchange` (generic `/api/schedules` with a NyxID binding source) | A short-lived bearer exchanged from the stored binding at fire time | The 300 s broker TTL is a legitimate hypothesis. Confirm with the actual token's `exp − iat` (numbers only) or the repo constant. Fix is run shape: front-load authenticated steps or split the schedule |
+| `scheduled_invocation_agent_key` (Studio Team member automation, scheduled skill agents) | A **dedicated, restricted Agent Key**. Raw material lives only in `ISecretVault`; the run borrows a durable credential *reference* and resolves it through the Vault **at each use**, fail-closed | **Do not cite the 300 s broker TTL.** Check, in order: key `credentialExpiresAtUtc`; Vault resolution and reference integrity; `credentialGeneration` (did a reauthorization replace it mid-flight?); `authorizationStatus`; `lastAuthorizationErrorCode`; exact service/node grants vs what the failing step called; `revocationPending` / `nyxIdRevocationStatus` / `vaultRevocationStatus`; then the **downstream** service's own token |
+
+A failure landing near the five-minute mark under `scheduled_invocation_agent_key` is **not**
+self-evidently the broker TTL — that number belongs to a different credential class. Treating the
+coincidence as proof is exactly the confident-but-wrong attribution this skill exists to prevent.
+
+Two more independent dimensions not to conflate: credential health (`authorizationStatus == active`)
+and firing state (`enabled == true`). A paused automation keeps its active key; an expired key does
+not disable firing. Either can be true without the other.
+
+**Deployment-gated capabilities.** Some contracts exist in the codebase — and in design docs — but
+are not exposed by the running build. **Agent Profile management is currently one of them.** So:
+
+- A `404` from a profile route is **not** a deployment probe. Probe the surface: does
+  `GET /api/openapi.json` advertise the *complete* `agent-profiles` route family (create, get,
+  draft, draft skill upsert/remove, `:validate`, `:publish`, plus public discovery)? Require the
+  whole family — a partial or mixed-version host is not a safe mutation surface.
+- Family **absent** ⇒ verdict is "capability not deployed here," not a defect and not user error.
+  Say so plainly and stop; do not file an issue and do not suggest a workflow/member/service as a
+  substitute resource.
+- Family **present** and a specific profile still 404s ⇒ now it genuinely means missing or
+  invisible-to-this-caller. Check slug and scope.
+- **Feature-branch source cannot establish what production exposes.** Reading `feature/integrate`
+  and finding the endpoint proves only that the code exists. The live OpenAPI is the authority for
+  what is deployed. This is the same discipline as pinning code to the deployed image.
+
+Profile-specific status codes, once the family is present: `428` = you never sent `If-Match`
+(go read the ETag); `412` = stale ETag (reread and **rebuild** the mutation, never blind-replay);
+`422` = publish-side validation, read the typed diagnostics; `503` = Ornn resolution / ingress
+proof / actor dispatch unavailable; `202` = accepted for dispatch only, never committed or
+published. A published profile that no workflow, schedule, channel, or existing conversation uses
+is the **expected consumer boundary**, not a failed publish.
 
 **Token lifetimes: read, never recall.** The stack holds several credential classes with wildly
 different TTLs — interactive login access token (`JWT_ACCESS_TTL_SECS`, deployment config; code
 default 900 s, production instances often set hours), broker/delegated tokens (fixed 300 s,
 `oauth_broker_service.rs` / `crypto/jwt.rs`), service-account tokens (`SA_TOKEN_TTL_SECS`, default
-3600 s), non-expiring NyxID API keys. Two statements like "the token lives 8 hours" and "the run
-credential lives 5 minutes" can both be true — about different classes — so a TTL claim that
-doesn't name its token class is not evidence. Before attributing any expiry: decode the JWT
-actually involved and report `exp − iat` (numbers only, never the token), or cite the owning
-repo's constant. A lifetime quoted from memory is the classic source of confident-but-wrong
-attributions here.
+3600 s), non-expiring NyxID API keys, and **dedicated scheduled-invocation Agent Keys** (Vault-held,
+policy-governed expiry — a scheduled skill agent's default projected lifetime is ~90 days, not
+minutes). Two statements like "the token lives 8 hours" and "the run credential lives 5 minutes"
+can both be true — about different classes — so a TTL claim that doesn't name its token class is
+not evidence. Before attributing any expiry: decode the JWT actually involved and report
+`exp − iat` (numbers only, never the token), cite the owning repo's constant, or — for an Agent
+Key — read the automation's `credentialExpiresAtUtc` and `credentialGeneration`. A lifetime quoted
+from memory is the classic source of confident-but-wrong attributions here.
 
 ## Step 3 — Pull the repo and reach a code-grounded root cause
 
@@ -248,6 +292,10 @@ own local tools.
 - **Negative control before "systemic."** Count the success case too; one failure with no observed
   successes is not evidence of a platform-wide break.
 - **Citing a memory/doc is not applying it.** Re-derive the verdict from the evidence in front of you.
+- **Read `credentialSourceKind` before any scheduled-credential verdict.** A dedicated Agent Key
+  is not a fire-time broker token; quoting the 300 s TTL at it is a wrong attribution, not a shortcut.
+- **A 404 is not a deployment probe.** Check the live OpenAPI for the complete route family before
+  deciding whether a contract is missing, undeployed, or simply invisible to this caller.
 - **Never fabricate** a root cause, an issue link, a version, or a connector slug.
 - **External-repo issues only when behavior violates the layer's published contract.**
 - **Attribute by reading + elimination**, not first-match — exclude the alternatives.
