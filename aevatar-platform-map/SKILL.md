@@ -1,19 +1,20 @@
 ---
 name: aevatar-platform-map
-description: Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, externally trigger, or operate anything on Aevatar ("create an agent team", "make a workflow / member", "publish or bind a service", "register it with NyxID", "set up a recurring / cron run", "invoke my service", "let Lark Base trigger my workflow"), wants to know whether something is even possible ("can Aevatar do X?", "能不能用 aevatar 实现"), or just wants to know what Aevatar can do. It teaches the object model (scope → team → member[workflow|script|gagent] → service → schedule/external trigger), how to authenticate as a NyxID-bearer REST client, how to resolve your scope, and the two caller modes (client REST vs in-session server-side tools). It does not do the work itself — it routes you to the right companion skill (feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, plus diagnostics probes and the safety-net fallback), held together by the shared `aevatar` tag.
-version: "1.7"
+description: Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, externally trigger, or operate anything on Aevatar ("create an agent team", "make a workflow / member", "publish or bind a service", "register it with NyxID", "set up a recurring / cron run", "schedule my team member workflow", "invoke my service"), wants to configure an agent's identity ("create an agent profile", "set my agent's purpose/instructions", "bind a skill to my agent", "limit my agent's tools"), wants to know whether something is even possible ("can Aevatar do X?", "能不能用 aevatar 实现"), or just wants to know what Aevatar can do. It teaches the two independent resource surfaces — build/operate (scope → team → member[workflow|script|gagent] → service → schedule/external trigger) and Agent Profile (ownerHandle/profileSlug → opaque profileId → draft → published snapshot) — NyxID-brokered auth and scope resolution, the two caller modes (client REST vs in-session tools), how to route the three distinct scheduling resources to their right owner, and how to detect a deployment-gated capability before promising it. It routes rather than builds — feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, agent-profile-management, triage, plus probes and the fallback — held together by the `aevatar` tag and published as the versioned `aevatar-platform` Ornn skillset.
+version: "1.8"
 metadata:
   category: plain
   tag:
     - aevatar
     - control-plane
-    - overview
     - routing
     - nyxid
     - team
     - workflow
     - service
     - schedule
+    - agent-profile
+    - agent-key
 ---
 
 # Aevatar control plane — the map
@@ -25,21 +26,30 @@ self-contained, so you can also jump straight in once you know the step.
 
 **What Aevatar is.** A control plane driven entirely over REST at
 `https://aevatar-console-backend-api.aevatar.ai`. Everything hangs off your **scope** (your NyxID
-subject id), and a request almost always walks one chain:
+subject id), across **two independent resource surfaces**:
 
 ```
-scope → team → member (workflow | script | gagent) → service → schedule / external trigger
+build & operate :  scope → team → member (workflow | script | gagent) → service → schedule / external trigger
+Agent Profile   :  ownerHandle/profileSlug → opaque profileId → draft → published snapshot
 ```
 
-**Settle three things before you route** (each has a full section below — this is the checklist):
-1. **Is it even feasible?** For anything non-trivial, start with **`aevatar-feasibility-advisor`** —
+Most requests walk the first chain. **"Who is this agent and what may it do?"** walks the second —
+see *The Agent Profile surface*. They are **not** two phases of one lifecycle: `profileId`,
+`workflowId`, `memberId`, `publishedServiceId`, and a conversation actor id are five distinct
+identities, and creating a Profile creates no workflow, member, team, service, or schedule.
+
+**Settle four things before you route** (each has a full section below — this is the checklist):
+1. **Which surface and which resource owner is this?** Build/operate or Agent Profile — and if it's
+   a schedule, *which of the three* scheduling resources owns it (see *Scheduling is three
+   resources*). Routing to the wrong owner makes everything downstream wrong.
+2. **Is it even feasible?** For anything non-trivial, start with **`aevatar-feasibility-advisor`** —
    it says whether the goal is possible and what must be in place first (which NyxID connector to
-   configure, what's host-gated, what's impossible + the alternative). Don't build something that
-   can't ship.
-2. **Which caller mode are you in?** A plain-REST **client** holding a NyxID bearer, or the model
+   configure, what's host-gated, what's simply not deployed, what's impossible + the alternative).
+   Don't build something that can't ship.
+3. **Which caller mode are you in?** A plain-REST **client** holding a NyxID bearer, or the model
    running **in-session** with server-side tools? Only `aevatar-workflow-authoring` needs the
    server-side tools; everything else is REST either way. See *Two caller modes*.
-3. **Carry the honesty rules** into every hand-off — you make real HTTP calls (no magic
+4. **Carry the honesty rules** into every hand-off — you make real HTTP calls (no magic
    server-side action), most steps are async (read state back, never trust a bare 2xx), and NyxID
    registration is host-gated. See *Honesty rules*.
 
@@ -63,6 +73,51 @@ scope  (= your NyxID subject id; your private workspace; everything hangs off it
 The lifecycle the user almost always wants:
 **author a workflow → wrap it in a member → group members into a team → publish as a
 service (register to NyxID) → schedule it.**
+
+## The Agent Profile surface (separate from everything above)
+
+An **Agent Profile** defines an agent's *identity and authority ceiling*: display name, purpose,
+instructions, an ordered set of **exact** Ornn skill bindings (`{skillGuid, literalVersion,
+expectedName, expectedPublisherId}` — never a name, never `latest`), and the **maximum** tool
+policy any turn may hold. It has its own lifecycle — `create → get (strong ETag) → mutate draft /
+skill bindings → validate → publish snapshot → reread` — and its own concurrency protocol.
+
+Route **all** of it to **`aevatar-agent-profile-management`**: creating or editing a profile,
+setting purpose/instructions, binding skills, choosing `ALWAYS` / `ROUTED` /
+`DEFAULT_FOR_UNMATCHED_TURN` activation, defining tool ceilings, validating, publishing, or
+explaining a profile ETag / validation / publication / binding behavior. Do **not** improvise it
+from the team/member/service routes.
+
+**It is deployment-gated — detect before you promise.** Profile management ships in the codebase
+but a given deployment may not expose it. Before any profile work: in-session, require the exact
+`agent_profiles` tool in your tool list; as a REST client, require the **complete**
+`agent-profiles` route family in `GET /api/openapi.json` (a single route, or a 404 on one profile,
+proves nothing). If absent, say the deployment does not expose Agent Profile management and
+**stop** — never substitute a workflow/member/service to look like you succeeded.
+
+Two honesty facts to carry: **publication is not runtime binding** (a published profile binds only
+to *newly created* NyxID direct conversations admitted by a **host-owned** rollout — existing
+conversations never hot-upgrade), and **workflows, teams, services, schedules, channels, and
+AgentRuns are not profile consumers.**
+
+## Scheduling is three resources, not one
+
+"Run it on a schedule" has three different owners. Route by **who owns the thing being run**, not
+by whichever API you already know:
+
+| Scheduling… | Owner | Canonical entry | Credential |
+|---|---|---|---|
+| An already-bound **Studio Team member** workflow | `scope → team → member` | `aevatar_schedule_member_workflow`, or `/api/scopes/{scopeId}/teams/{teamId}/members/{memberId}/automations` | Dedicated **Agent Key** |
+| An independent **scheduled Ornn skill agent** or **one-shot reminder** | Scheduled agent / catalog actors | `scheduled_agent_creator`, then `agent_builder` | Dedicated **Agent Key** |
+| A **raw service invocation or actor envelope** | Generic platform schedule actor | Generic `/api/schedules` | Typed source; may be a NyxID binding exchange |
+
+Generic `/api/schedules` remains supported, but it is **not** the canonical path for a Team member
+automation and must not be used as a fallback when the owner is a Team member. `aevatar-scheduler`
+owns the member-automation and generic paths; `aevatar-automation` owns the scheduled skill agent.
+
+Never convert between identities by route position, prefix, equality, or a familiar-looking string.
+`memberId`, draft `workflowId`, `publishedServiceId`, UserService ID, catalog service ID, schedule
+ID, Agent Key ID, and `profileId` are all distinct.
 
 ## Authenticate (every request)
 
@@ -118,10 +173,13 @@ endpoints (they are not).
 |---|---|---|
 | **Decide if a goal is even possible** + what must be in place first (use FIRST, before building) | `aevatar-feasibility-advisor` | read-only `GET /api/v1/services`, `GET /api/v1/catalog` (NyxID) |
 | **Triage a failure** — is it an aevatar / nyxid / ornn problem? read the code, then file an issue or get authoritative usage guidance (use AFTER something breaks) | `aevatar-triage` | reads repos via `gh` or `nyxid_proxy` `api-github`; `gh issue` |
+| Define **who an agent is** — purpose, instructions, exact skill bindings, activation mode, tool ceiling; validate/publish a profile | `aevatar-agent-profile-management` | `/api/scopes/{id}/agent-profiles/*` (`:validate`, `:publish`), `GET /api/agent-profiles/{ownerHandle}/{profileSlug}`, or the in-session `agent_profiles` tool — **detect the surface first** |
 | Turn an idea into a runnable **workflow YAML** | `aevatar-workflow-authoring` | server-side tools `aevatar_start_workflow`/`ornn_publish_skill`, **or** client REST `…/workflow/draft-run` + ornn zip publish (see *Two caller modes*) |
 | Create a **team**, create **members** (workflow/script/gagent), bind them, set the entry member | `aevatar-team-builder` | `/api/scopes/{id}/teams`, `/members`, `/members/{id}/binding` |
 | **Publish** a member/team **as a service** and **register it to NyxID**; verify it | `aevatar-service-publisher` | `/api/scopes/{id}/binding`, `/api/services/*`, `/members/{id}/published-service` |
-| Run it on a **cron schedule** (authenticated as you) | `aevatar-scheduler` | `/api/schedules`, `:run-now`, `:enable`, `:disable` |
+| Run a **Team member workflow** on a schedule (dedicated Agent Key) | `aevatar-scheduler` | `aevatar_schedule_member_workflow` / `/api/scopes/{id}/teams/{teamId}/members/{memberId}/automations` |
+| Run an independent **scheduled skill agent** or one-shot reminder | `aevatar-automation` | `scheduled_agent_creator`, then `agent_builder` |
+| Run a **raw service invocation** on a cron (generic platform schedule) | `aevatar-scheduler` | `/api/schedules`, `:run-now`, `:enable`, `:disable` |
 | Trigger an existing workflow from an external HTTP sender such as **Lark Base** | `aevatar-feasibility-advisor` first, then `aevatar-service-publisher` | NyxID `/api/v1/proxy/s/aevatar/api/scopes/{scopeId}/members/{memberId}/invoke/...`, host-managed `/api/workflow-webhooks/{routeKey}` if configured |
 | **Invoke**, watch **runs**, observe | (this map + service-publisher's invoke section) | `/invoke/{endpointId}`, `/runs/*`, `/api/workflow/observatory/*` |
 
@@ -132,15 +190,23 @@ minimal bootstrap above.
 
 ## The full aevatar skill collection
 
-ornn has no separate "collection" object — the aevatar capability set is held together by
-a shared **`aevatar` tag** and indexed by this map. An ornn skill search for **`aevatar`**
-returns the whole family as one set; load whichever member you need with `use_skill`. This
-map is the canonical entry point; the rest are pulled on demand.
+The family is published as a real, versioned Ornn **skillset**, `aevatar-platform`, whose
+immutable revisions pin each member to an exact literal version — and it is *also* held together
+by the shared **`aevatar` tag**, so an ornn skill search for **`aevatar`** still returns the set.
+Load whichever member you need with `use_skill`. This map is the canonical entry point; the rest
+are pulled on demand. (Note the skillset is a *routing* collection — it is **not** the trust
+closure of a published Agent Profile, which pins its own exact skill GUIDs and is sealed
+server-side at publish time.)
 
 **Scope first — feasibility** (`category: plain`, public)
 - `aevatar-feasibility-advisor` — *use before building*: is the goal possible, what are its
   prerequisites (which NyxID connector to configure, what's host-gated), and what's impossible
   + the alternative. Teaches the connector-vs-channel split and the prerequisite matrix.
+
+**Define the agent — Agent Profile** (`category: plain`, public)
+- `aevatar-agent-profile-management` — the profile resource surface: purpose, instructions,
+  exact Ornn skill bindings, activation modes, tool ceilings, strong-ETag mutation, validate,
+  publish. Teaches capability detection first, and that publication is not runtime binding.
 
 **Diagnose & report — triage** (`category: plain`)
 - `aevatar-triage` — *use after something breaks*: attribute a failure across aevatar / NyxID /
@@ -152,7 +218,7 @@ map is the canonical entry point; the rest are pulled on demand.
 - `aevatar-platform-map` — *this map*: object model, auth + scope bootstrap, routing.
 - `aevatar-team-builder` — create teams; create + bind members (workflow/script/gagent); set the entry member.
 - `aevatar-service-publisher` — publish a member/team/workflow as a service; verify NyxID registration; invoke.
-- `aevatar-scheduler` — cron schedules that fire a service (scope-owner NyxID auth).
+- `aevatar-scheduler` — Team member automations (dedicated Agent Key) and generic platform cron schedules.
 
 **Author a workflow** (`category: tool-based`, public)
 - `aevatar-workflow-authoring` — turn a request into a validated, persisted workflow YAML
@@ -172,6 +238,9 @@ map is the canonical entry point; the rest are pulled on demand.
   (no `aevatar` tag), but part of how this family degrades safely.
 
 ## The golden path, end to end
+
+This is the **build/operate** path. Agent Profile work does not enter it at any step — it has its
+own lifecycle in `aevatar-agent-profile-management`.
 
 0. **Scope check (do this first)** — confirm the goal is feasible and collect its
    prerequisites (connectors to configure, host-gated pieces, hard limits) —
@@ -203,10 +272,22 @@ map is the canonical entry point; the rest are pulled on demand.
   webhook senders can often trigger an existing member/team by calling the NyxID proxy for
   `aevatar` with a NyxID API key and an explicit scope path. Host externalExposure is only
   for turning the Aevatar service itself into a reusable NyxID connector/slug.
-- **Many steps are async.** Bindings, deployments, and runs settle over time. Read state
-  back (binding run status, invocation readiness, run timeline) instead of assuming
-  success from a 2xx.
-- **Never fabricate ids.** Always use the ids returned by the create/bind responses.
+- **Many steps are async, and `202` is admission only.** Bindings, deployments, runs, Agent Key
+  provisioning, and Profile mutations all settle over time. A `202 Accepted` never proves commit,
+  credential issuance, vault write, projection visibility, publication, cron fire, or success —
+  read state back (binding run status, a newer authoritative `stateVersion`, invocation readiness,
+  run timeline) instead of trusting a bare 2xx.
+- **Detect deployment-gated capabilities.** Agent Profile management exists in the codebase but
+  may not be exposed by the running deployment. Probe the surface (tool list, or the complete
+  route family in `GET /api/openapi.json`) before promising it — and report its absence honestly
+  instead of building a different resource.
+- **Never hand out or ask for secret material.** Agent Keys are vault-held; skills expose only
+  typed references, key IDs, expiry, authorization facts, and generation. Never ask a user to paste
+  a key, and never print tokens, vault references, ciphertext, or permission digests.
+- **Never fabricate ids.** Always use the ids returned by the create/bind responses. Never treat
+  `profileId`, `workflowId`, `memberId`, `publishedServiceId`, a UserService ID, a catalog service
+  ID, a schedule ID, an Agent Key ID, or a conversation actor id as interchangeable, and never
+  parse an opaque id for meaning.
 
 ## If you get stuck
 
