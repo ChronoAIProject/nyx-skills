@@ -634,6 +634,19 @@
         "source-fidelity",
         "public-copy"
       ]
+    },
+    {
+      "name": "verify-codex-exec",
+      "source": "./verify-codex-exec",
+      "description": "Use when a user asks whether managed codex_exec is available for their current account, requests a codex_exec readiness check, or wants to run the canonical managed Codex smoke test.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "codex",
+        "managed-sandbox",
+        "smoke-test",
+        "diagnostics"
+      ]
     }
   ]
 }
