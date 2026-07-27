@@ -1,7 +1,7 @@
 ---
 name: aevatar-feasibility-advisor
-description: Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — "can aevatar do X", "I want a bot that…", "build me something that posts to Twitter / reads my GitHub / replies on Telegram", "is it possible to…", "automate … every day", "let Lark Base trigger a workflow". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), external HTTP trigger options such as Lark Base automation, how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler).
-version: "1.1"
+description: Decide — honestly — whether a thing the user wants to build on Aevatar is possible, what its prerequisites are, or why it cannot be done, BEFORE anyone starts building. Use this first whenever a user describes a goal rather than a concrete artifact — "can aevatar do X", "I want a bot that…", "build me something that posts to Twitter / reads my GitHub / replies on Telegram", "is it possible to…", "automate … every day", "let Lark Base trigger a workflow", "can I give my agent a fixed persona / attach skills to it / hard-limit its tools". It teaches the one hard premise (every third-party capability is brokered by NyxID), the two distinct surfaces (outbound connector vs inbound channel), external HTTP trigger options such as Lark Base automation, how to check what is actually connectable, the prerequisite for each capability class, what is host-gated (and so not self-serve), and what is genuinely impossible without new NyxID/Aevatar platform work — so you can negotiate scope and give the user a straight answer plus next steps instead of over-promising. It also separates the three different reasons a capability can be unavailable — not connected (user fixes), host-gated (host fixes), and not deployed (needs a build that exposes it) — so "agent profile" style asks get a straight answer instead of a guess. It scopes; it does not build (hand off to workflow-authoring / team-builder / service-publisher / scheduler / agent-profile-management).
+version: "1.2"
 metadata:
   category: plain
   tag:
@@ -13,6 +13,7 @@ metadata:
     - prerequisites
     - advisor
     - negotiation
+    - agent-profile
 ---
 
 # Aevatar feasibility advisor
@@ -22,7 +23,32 @@ Before you (or the user) commit to building something on Aevatar, answer three q
 alternative?* This skill exists so you negotiate scope up front instead of discovering a
 hard blocker halfway through. It only **advises** — once a plan is feasible, hand off to
 `aevatar-workflow-authoring` → `aevatar-team-builder` → `aevatar-service-publisher` →
-`aevatar-scheduler` (see `aevatar-platform-map`).
+`aevatar-scheduler`, or to `aevatar-agent-profile-management` for the Agent Profile surface
+(see `aevatar-platform-map`).
+
+## Three different reasons a thing can be unavailable — never blur them
+
+They have different owners and different fixes. Collapsing them into "it's host-gated" is the most
+common wrong answer here.
+
+| Reason | What it looks like | Who fixes it |
+|---|---|---|
+| **Not connected** | The connector is in `/api/v1/catalog` but missing from `/api/v1/services` | **The user**, self-serve |
+| **Host-gated** | The capability is deployed and works, but a host policy governs one aspect (NyxID external exposure; Agent Profile *rollout admission*) | **The host** — not you, not the user |
+| **Not deployed** | The capability's whole API surface is absent from the running build | **The host**, by deploying a build that exposes it |
+
+"Not deployed" is the one people get wrong most: the feature exists in the codebase and in design
+docs, so it *sounds* available. **Probe the live surface, never a branch or a memory** —
+`GET /api/openapi.json` and check whether the complete route family is advertised.
+
+**Agent Profile is currently the live example.** Owner Profile management (create, edit draft, bind
+exact Ornn skills, validate, publish) is an **owner-managed** capability — an authenticated user
+manages their *own* profile; it is not host-only configuration. But it is **deployment-gated**, and
+today production advertises **no** `agent-profiles` routes at all. So the honest answer to "can I
+give my agent a fixed persona with pinned skills and a hard tool ceiling?" is: *the product models
+exactly that, it is yours to manage rather than the host's, but this deployment does not currently
+expose the contract — here is the probe, and here is what works today instead.* Do not report it as
+host-owned config, and do not report it as impossible.
 
 ## The one premise: NyxID is the universal gateway
 
@@ -97,6 +123,8 @@ exists or doesn't without checking it.** The examples below are illustrative, no
 | **Publish** a workflow/team as an **invocable service** in-scope | ✅ Yes | Just bind it (`aevatar-service-publisher`). Usable within the user's scope immediately. |
 | An external automation **triggers an existing Aevatar workflow** (e.g. Lark Base row status changed → HTTP request → run member workflow) | ✅ Usually, without service externalExposure | Use the external system's HTTP action to call the NyxID proxy for the existing `aevatar` service with a NyxID API key (`proxy` scope), targeting an explicit `/api/scopes/{scopeId}/members/{memberId}/invoke/...` or `/teams/{teamId}/invoke/...` path. This is an external trigger, not a NyxID connector registration. See `aevatar-service-publisher`. |
 | Have that service **registered as a NyxID-brokered connector** (callable by others/externally) | ⚠️ Host-gated | The **host** must enable external exposure (`GAgentService:ExternalExposure: Enabled=true` + `RegisterAllPublishedServices` or an opt-in policy). You **cannot** turn this on as a client — verify `externalExposure` on the service and, if empty, tell the user to ask the host. |
+| Give an agent a **fixed persona + pinned Ornn skills + an enforced tool ceiling** (an Agent Profile) | ⚠️ Modelled, owner-managed, but **not deployed today** | Probe `GET /api/openapi.json` for the complete `agent-profiles` route family. Absent ⇒ the deployment does not expose it; say so and offer the workflow-instructions version as the interim. Present ⇒ it is **yours** to create/validate/publish via `aevatar-agent-profile-management`, no host action needed for management itself. |
+| Have a published Profile actually **drive a running agent** | ⚠️ Host-gated, and narrow | Publication is not runtime binding. Only *newly created* NyxID direct conversations admitted by a **host-owned rollout** consume a Profile; existing conversations never hot-upgrade, and workflows/teams/services/schedules/channels/AgentRuns are not consumers at all. |
 | **Schedule** a recurring run (cron) | ⚠️ Yes, with a binding | The scope owner needs a durable **NyxID broker binding** — i.e. an interactive **console** NyxID login, not just a CLI token. Without it, schedule creation 400s ("Authenticated NyxID owner binding is required"). |
 | A service backed by an **arbitrary custom agent / actor type** | ⚠️ Constrained | Member implementations are `workflow`, `script`, or **registered** `gagent` kinds (`GET /api/scopes/gagent-types`). You can't point a service at an arbitrary actor; wrap custom logic in a workflow or script, or use a registered gagent kind. |
 | A genuinely **new service *shape*** (e.g. streaming/WebSocket/gRPC endpoint, a runtime kind beyond workflow/script/gagent) | ❌ Not currently | Service endpoints are unary **HTTP** over the fixed implementation kinds. A new shape needs Aevatar platform work. |
@@ -151,6 +179,12 @@ Give the user a straight answer in this shape — never a vague "maybe":
   member workflow by sending an HTTPS request to NyxID's `aevatar` proxy with a NyxID API key,
   targeting `/api/scopes/{scopeId}/members/{memberId}/invoke/chat:stream`. ExternalExposure is
   only needed if you want this workflow registered as a reusable NyxID connector/slug."
+- ⚠️ **Yes in the product, but not in this deployment** — "Aevatar models exactly that: an Agent
+  Profile with a purpose, instructions, an always-on skill, a billing-triggered skill, and a hard
+  tool ceiling — and it would be **yours** to manage, not the host's. But this deployment
+  advertises no `agent-profiles` routes, so I can't create one today. What I *can* build now is
+  the same behavior expressed in a workflow member with on-demand skill discovery; the pinned-skill
+  and enforced-ceiling guarantees need a build that exposes the contract."
 - ❌ **Not as described** — "An auto-replying **Twitter bot** isn't possible: there's no inbound
   Twitter channel on Aevatar (only Lark and Telegram). What *is* possible: a workflow that
   **posts** to X on a schedule (via the `api-twitter` connector), or an inbound bot on **Telegram**
@@ -164,7 +198,14 @@ alternative when you say no.
 - **Check the live catalog/services** before claiming a connector exists or not. Examples in
   this doc are illustrative and can drift.
 - **Connector ≠ channel.** Outbound API access never implies an inbound bot.
-- **Never promise host-gated outcomes** (NyxID registration, anything needing host config) or
-  features that need platform work — surface them as dependencies, not done deals.
+- **Never promise host-gated outcomes** (NyxID registration, Agent Profile rollout admission,
+  anything needing host config) or features that need platform work — surface them as
+  dependencies, not done deals.
+- **Distinguish not-connected / host-gated / not-deployed.** Each has a different owner and a
+  different fix. Probe the live OpenAPI before calling a capability available or unavailable —
+  source on a feature branch proves the code exists, never that production exposes it.
+- **Don't quietly substitute a different resource.** If the user asked for an Agent Profile and the
+  contract isn't deployed, say that and offer the nearest alternative explicitly — never build a
+  workflow member and present it as the profile they asked for.
 - If you genuinely can't determine feasibility from the catalog + this matrix, say what you'd
   need to confirm rather than guessing.
