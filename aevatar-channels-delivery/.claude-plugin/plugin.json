@@ -1,5 +1,5 @@
 {
   "name": "aevatar-channels-delivery",
-  "version": "1.1",
-  "description": "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage for capability tools, LLM route selection slash commands, channel_registrations (staged Lark provisioning), and agent_delivery_targets binding."
+  "version": "1.2",
+  "description": "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage that identifies the typed credential source before interpreting the failure (a dedicated scheduled-invocation Agent Key is vault-held and late-resolved per use — never diagnose it with the 300-second broker TTL), LLM route selection slash commands, channel_registrations (staged Lark provisioning), agent_delivery_targets binding, and a strict never-emit-secret-material policy."
 }

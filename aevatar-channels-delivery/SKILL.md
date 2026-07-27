@@ -1,7 +1,7 @@
 ---
 name: aevatar-channels-delivery
-description: "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage for capability tools, LLM route selection slash commands, channel_registrations (staged Lark provisioning), and agent_delivery_targets binding."
-version: "1.1"
+description: "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage that identifies the typed credential source before interpreting the failure (a dedicated scheduled-invocation Agent Key is vault-held and late-resolved per use — never diagnose it with the 300-second broker TTL), LLM route selection slash commands, channel_registrations (staged Lark provisioning), agent_delivery_targets binding, and a strict never-emit-secret-material policy."
+version: "1.2"
 metadata:
   category: plain
   tag:
@@ -28,20 +28,44 @@ metadata:
 **Channel Bots** — Use `nyxid_proxy` with a Telegram/Discord bot's slug to send messages. For Telegram: POST `/sendMessage` with `{"chat_id":"...","text":"..."}`.
 
 **Credential honesty on `token_expired`/401** — `nyxid_proxy` and `code_execute` authenticate with
-the CALLER credential of the current run or session, and different callers hold different token
-classes with wildly different lifetimes: an interactive login token lives for hours
-(deployment-config `JWT_ACCESS_TTL_SECS`), while a scheduled run's caller credential is a broker
-token minted at fire time with a fixed 300-second TTL (see `aevatar-automation` →
-"Scheduled-run credentials" for the full verified table and code citations). When a capability
-tool returns `token_expired` or 401:
-- Do not name a lifetime you did not read from the actual JWT (`exp − iat`) or from the owning
-  repo's source. Numbers recalled from memory are the #1 source of wrong diagnoses here.
+the CALLER credential of the current run or session, and different callers hold different
+credential classes with wildly different lifetimes. **Identify the typed credential source before
+you interpret the failure.** For a run, that means reading `credentialSourceKind` off the run or
+automation record first — "it was scheduled" tells you nothing on its own:
+
+| Caller | Credential class | Lifetime |
+|---|---|---|
+| Interactive session | Login access token | Hours (deployment-config `JWT_ACCESS_TTL_SECS`) |
+| Run with `credentialSourceKind = scheduled_invocation_agent_key` (Studio Team member automation, scheduled skill agents) | **Dedicated, restricted Agent Key.** Raw material lives only in `ISecretVault`; the run borrows a durable credential *reference* and late-resolves it through the Vault **at each use**, fail-closed | Policy-governed (a scheduled skill agent's default projected expiry is ~90 days) — **not minutes** |
+| Run with `credentialSourceKind = nyxid_binding_exchange` (generic `/api/schedules` with a NyxID binding source) | Short-lived bearer exchanged from the binding at fire | 300 s fixed (see `aevatar-automation` → "Token classes" for citations) |
+
+When a capability tool returns `token_expired` or 401:
+- Do not name a lifetime you did not read from the actual JWT (`exp − iat`), from the owning
+  repo's source, or from the record's `credentialExpiresAtUtc`. Numbers recalled from memory are
+  the #1 source of wrong diagnoses here.
 - Check the blast radius: if ALL proxied calls fail after some instant, the caller credential
   died; if only one tool fails while sibling proxied calls succeed, suspect that tool's own
   credential path.
-- In scheduled runs, `token_expired` on steps starting ~5 minutes after fire is expected platform
-  behavior (fast-revocation design), not corruption — redesign the schedule (shorter run,
-  front-load proxied steps, split the pipeline) instead of retrying blindly.
+- **Only for a `nyxid_binding_exchange` run** is `token_expired` on steps starting ~5 minutes after
+  fire expected platform behavior (fast-revocation design) — there, redesign the schedule (shorter
+  run, front-load proxied steps, split the pipeline) instead of retrying blindly.
+- **For a `scheduled_invocation_agent_key` run, do NOT diagnose a fixed five-minute broker expiry
+  merely because the call was scheduled.** A failure landing five or six minutes after fire on this
+  source is a coincidence, not evidence — that TTL belongs to a different credential class.
+  Inspect instead: Agent Key expiry; Vault resolution and reference integrity; committed caller
+  authority; the authorization fact; the exact service/node grants versus what the failing delivery
+  step actually called; `credentialGeneration` (did a reauthorization replace it mid-flight?);
+  `authorizationStatus` and `lastAuthorizationErrorCode`; `revocationPending` /
+  `nyxIdRevocationStatus` / `vaultRevocationStatus`; then the downstream provider's own token.
+  Note that credential health (`active`) and firing state (`enabled`) are independent dimensions.
+
+**Never emit secret material** in any diagnosis, log excerpt, artifact, issue text, or message: no
+raw Agent Key, bearer/access/refresh/delegation/service-account token, Vault reference or
+ciphertext, permission digest, unfiltered API-key inventory, authorization header, channel
+provisioning secret (Lark `app_secret`, `verification_token`, relay API key), or any partial,
+prefix, or truncated fragment of one — truncated secrets are still secrets. Stable resource IDs may
+be reported for management or cleanup, but never as secret material and never to derive another
+identity.
 
 ### Aevatar-specific tool details
 
