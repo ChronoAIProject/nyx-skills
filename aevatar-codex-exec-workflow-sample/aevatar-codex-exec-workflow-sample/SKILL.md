@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-workflow-sample
 description: Mount and run harmless Aevatar workflows that prove codex_exec works through either the operator-managed chrono-sandbox/gVisor target or a private NyxID node-backed SSH target. Use after managed eligibility and required NyxID UserServices are ready, or after configuring a personal SSH node; also use when diagnosing typed managed or private-route failures before real tasks.
-version: "3.0"
+version: "3.1"
 metadata:
   category: mixed
   output-type: text
@@ -37,7 +37,13 @@ Configuration, health, UserService, node-online, and direct SDK/SSH checks are p
 - Never place tokens, keys, `auth.json`, `CODEX_HOME`, local paths, model flags, images, providers, or sandbox flags in workflow input.
 - Do not mix target fields. Managed requires `target.kind=managed_sandbox` plus `workspace.kind=empty_git`; private requires nested `target.private_ssh` and no workspace.
 - Managed callers cannot choose a repository, workspace path, image, model, provider, credential, shell, Codex profile, approval policy, or sandbox flags.
-- Run through Aevatar as the native NyxID account being verified. Do not provision a key, pass a raw token, or poll a credential read model before the normal managed proof.
+- Run through Aevatar as the native NyxID account being verified. Never pass a raw token. Before
+  the managed proof, use the explicit authenticated credential lifecycle: `POST
+  /api/managed-codex/credential`, then `GET /api/managed-codex/credential`. Continue only when
+  `execution_ready=true` and `execution_readiness_reason=ready`; `status=active` alone is
+  insufficient.
+- Normal `codex_exec` execution is credential-read-only. It never provisions, reconciles, rotates,
+  repairs, or retries credentials.
 
 ## Mount
 
@@ -53,6 +59,14 @@ Call `use_skill` with workflow mounting enabled:
 Wait for the mount command to be accepted. Read-model visibility can propagate asynchronously. If mounting is unavailable, fetch this exact public Ornn version and submit the corresponding YAML under `assets/` as explicit inline draft-run input; state clearly that it was an inline run.
 
 ## Managed proof
+
+Prepare and prove in this order:
+
+1. Authenticated `POST /api/managed-codex/credential` idempotently provisions or reconciles the
+   committed credential descriptor.
+2. `GET /api/managed-codex/credential` reads projected status. Stop unless
+   `execution_ready=true` and `execution_readiness_reason=ready`, even when `status=active`.
+3. Mount and run the canary below. Do not loop ordinary `codex_exec` calls as a repair mechanism.
 
 Start the canonical workflow without caller-controlled routing:
 
@@ -86,6 +100,17 @@ Success requires all of:
 - a non-empty sanitized `diagnostic_id`.
 
 `elapsed_ms` may be present but is not required for success. Treat a missing required field, extra model text, or any typed failure as a failed verification.
+
+Keep the complete deadline chain ordered so each outer layer can observe the inner timeout:
+
+- chrono-sandbox/Codex execution: `timeout_secs=180`;
+- Aevatar managed request: `300` seconds;
+- NyxID/ingress: at least `315` seconds;
+- NyxID client: `330` seconds;
+- workflow canary step: at least `360` seconds (`timeout_ms=360000` in the bundled workflow).
+
+In short: `180s < 300s < >=315s < 330s < >=360s`. Do not shrink the workflow canary to the old
+200-second budget.
 
 ## Private SSH proof
 
@@ -126,7 +151,10 @@ Preserve the exact typed error and sanitized `diagnostic_id`, if present. Do not
 - `target_not_configured` or `managed_target_disabled`: the Aevatar host does not expose the selected managed target; repair host configuration.
 - `managed_feature_not_enabled`: the native NyxID subject is outside the current managed rollout; repair eligibility, not a sandbox.
 - `managed_user_services_unavailable`: the user does not have the required directly owned active `chrono-sandbox` and usable `chrono-llm-public` UserServices; repair NyxID service readiness.
-- `managed_credential_unavailable`: Aevatar could not resolve its per-user managed invocation credential; inspect Aevatar credential descriptor and secret-vault readiness without exposing the secret.
+- `managed_credential_unavailable`: Aevatar could not resolve its per-user managed invocation
+  credential. Re-run the explicit authenticated credential `POST`, read `GET`, and continue only
+  when execution readiness is true; ordinary execution does not repair it. Inspect descriptor and
+  secret-vault readiness without exposing the secret.
 - `managed_proxy_authorization_denied`: NyxID denied the exact proxy request; inspect user/service ownership and the current internal delegation scope.
 - `managed_proxy_target_unavailable`: the exact `chrono-sandbox` UserService or `/codex/execute` route is unavailable.
 - `managed_proxy_timeout`: the NyxID proxy/chrono-sandbox request timed out. Preserve the diagnostic evidence and inspect that transport boundary first.

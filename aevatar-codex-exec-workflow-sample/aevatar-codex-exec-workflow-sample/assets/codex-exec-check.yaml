@@ -4,7 +4,7 @@ when_to_use: Use after managed codex_exec is enabled for the account and before 
 steps:
   - id: execute
     type: tool_call
-    timeout_ms: 200000
+    timeout_ms: 360000
     parameters:
       tool: codex_exec
       arguments: >-
