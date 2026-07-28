@@ -1,7 +1,7 @@
 ---
 name: aevatar-feasibility-advisor
 description: Use before building when a user asks whether Aevatar can achieve a goal, what prerequisites it has, or why it is unavailable. Triggers include bots and third-party APIs, inbound channels, external HTTP triggers, schedules, service exposure, Agent Profiles and tool ceilings, and bounded managed or private-host codex_exec work. It distinguishes outbound connectors from inbound channels and separates not connected, host-gated, not deployed, and genuinely unsupported outcomes. It chooses managed_sandbox versus private_ssh without promising repository, model, credential, runtime, or deployment capabilities the caller does not control, then routes feasible work to the owning Aevatar skill.
-version: "1.3"
+version: "1.4"
 metadata:
   category: plain
   tag:
@@ -80,23 +80,16 @@ getting exact `CODEX_EXEC_READY` through Aevatar:
 - Private proof: the original NyxID SSH result has `exit_code=0`, `timed_out=false`, and trimmed
   stdout exactly `CODEX_EXEC_READY`.
 
-After choosing a target, use `aevatar-codex-exec-node-setup` for its exact typed contract and any
-setup or repair, then `aevatar-codex-exec-workflow-sample` for the mandatory proof. Load
-`aevatar-workflow-authoring` only after the target contract is chosen and proven. Never ask a
-managed caller to provision a key, pass a raw token, select runtime internals, or repair Landlock,
-Bubblewrap, Credential Vault substitution, or a credential proxy; those are not the current
-managed runtime.
+After choosing `managed_sandbox`, explicitly call authenticated `POST /api/managed-codex/credential` to provision or reconcile, then read `GET /api/managed-codex/credential`. Proceed only when `execution_ready=true` and `execution_readiness_reason=ready`; `status=active` alone is insufficient. Normal `codex_exec` is credential-read-only and never provisions, reconciles, rotates, repairs, or retries after a credential failure. The caller never supplies or sees the key. Then use `aevatar-codex-exec-workflow-sample` for the mandatory proof and load `aevatar-workflow-authoring` only after it succeeds. Preserve the deadline chain: chrono execution 180s < Aevatar managed request 300s < NyxID/ingress at least 315s < NyxID client 330s < workflow canary at least 360s. Landlock, Bubblewrap, sandbox-side Credential Vault substitution, and a credential proxy are not repair paths for the managed runtime.
 
 ## The one premise: NyxID is the universal gateway
 
 Aevatar holds **no third-party credentials and talks to no external service directly.**
-Every external capability is brokered by **NyxID**. That single fact drives every
-feasibility answer below. It splits into **two surfaces that people constantly conflate** —
-get this right first:
+Every external capability is brokered by **NyxID**. That single fact drives every feasibility answer below. Keep inbound channels separate from three outbound invocation modes:
 
 | Surface | What it gives you | How it's used | Supported set |
 |---|---|---|---|
-| **Connector** (outbound) | Your workflow/agent **calls** a third-party API (read data, post, act) | `nyxid_proxy` tool (or a typed connector tool) with the service `slug` | Anything in the NyxID **catalog** (see below) — broad |
+| **Connector** (outbound) | Your workflow/agent **calls** a third-party API (read data, post, act) | Raw `nyxid_proxy` requires exact `service_id + slug + path`; an interactive `nyxid_service_operation__*` requires enumerated `user_service_id` plus its emitted schema; a compiled workflow calls `nyxid_proxy` with a copied `capability.nyxid_operation` selector and only admitted runtime values (`path_params/query/headers/body/response_mode`) | Anything in the NyxID **catalog** (see below) — broad |
 | **Channel** (inbound) | A third-party chat platform **delivers user messages to your agent**, which replies **in that platform** | An Aevatar **channel module** + NyxID relay webhook | **Narrow** — only platforms with a built module |
 
 > **The trap:** "I want a Twitter bot." A Twitter *connector* (`api-twitter`) exists, so your
@@ -155,7 +148,7 @@ exists or doesn't without checking it.** The examples below are illustrative, no
 | Pure LLM / text / transform / branching pipeline | ✅ Always | Author a workflow (`aevatar-workflow-authoring`). No external anything. |
 | Bounded one-shot Codex work that can start from empty Git | ✅ With the managed target | Choose `managed_sandbox`; require internal eligibility, the user's own usable `chrono-sandbox` and `chrono-llm-public` UserServices, `workspace.kind=empty_git`, timeout ≤ 180 seconds, and the public `CODEX_EXEC_READY` proof. |
 | Codex work requiring an existing private repository or host Codex configuration | ✅ With the private target | Choose `private_ssh`; require the user's hardened NyxID SSH service, fixed principal/workspace and working host Codex setup, no request `workspace`, timeout ≤ 300 seconds, and the private public-sample proof. |
-| **Call** a third-party API (read/post): GitHub, Slack, Google, X/Twitter, Reddit, a custom HTTP API… | ✅ If the connector is in the catalog | User **connects the `api-*` connector in NyxID** (OAuth for `user` mode, or supplies a token for `admin` mode — per the catalog entry). Then the workflow calls it via `nyxid_proxy`. |
+| **Call** a third-party API (read/post): GitHub, Slack, Google, X/Twitter, Reddit, a custom HTTP API… | ✅ If the connector is in the catalog | User **connects the `api-*` connector in NyxID** (OAuth for `user` mode, or supplies a token for `admin` mode — per the catalog entry). Then use the invocation mode matching the surface; never paste raw route fields into a compiled admitted workflow call. |
 | A connector that is **NOT in the catalog** | ⚠️ Only if it's a plain HTTP API | If it speaks HTTP + a supported `auth_method`, NyxID can add it (platform/admin work — not self-serve). If not HTTP, ❌. |
 | **Inbound bot** that replies in-platform: **Lark / Telegram** | ✅ Yes | Connect the bot connector (`api-lark-bot` / `api-telegram-bot`) **and** register the channel (channel-admin / `channel_registrations`); NyxID provisions the webhook to Aevatar's relay. |
 | **Inbound bot** on a platform with a connector but **no channel module** (Discord, Slack, X, …) | ❌ Not self-serve | Outbound calls work, but inbound-reply needs a new Aevatar **channel module** + relay wiring = Aevatar platform work. Offer the outbound-only version as the alternative. |
