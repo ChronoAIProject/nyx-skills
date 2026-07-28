@@ -1,7 +1,7 @@
 ---
 name: aevatar-platform-map
 description: Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.
-version: "1.9"
+version: "1.10"
 metadata:
   category: plain
   tag:
@@ -185,6 +185,17 @@ endpoints (they are not).
 `codex_exec` is also an **in-session capability tool**, not a Studio lifecycle stage and not an
 HTTP endpoint. Before placing it in workflow YAML, select and verify its exact managed or private
 target contract through the Codex-specific skills below. Do not invent a REST path for the tool.
+
+## Current in-session invocation shapes
+
+Keep these modes separate; they share credentials but not caller-owned fields:
+
+- **Raw one-off HTTP:** call `nyxid_proxy` with exact `service_id + slug + path`; optional fields are `method`, `body`, non-sensitive `headers`, and `response_mode`. Example: `{"service_id":"us-gh-7","slug":"api-github","path":"/user","method":"GET"}`.
+- **Interactive operation:** call the request-local `nyxid_service_operation__*` name emitted by the current catalog. Pass the enumerated `user_service_id` and only fields in that dynamic operation schema; never derive the tool name from a slug.
+- **Compiled workflow operation:** the YAML step calls `nyxid_proxy` and carries a copied `capability.nyxid_operation` selector. Its admission proof owns UserService, slug, operation ID, method, path template, digest, schemas, and response policy. Runtime arguments may contain only admitted `path_params`, `query`, `headers`, `body`, and `response_mode`; never repeat route or proof fields.
+- **Studio member:** call `aevatar_invoke_member` with `{"member_id":"m-alpha","payload":{"prompt":"hello"}}`; `endpoint_id` is optional and defaults to `chat`. Never substitute a draft `workflowId` or `publishedServiceId` for `member_id`.
+
+For managed `codex_exec`, normal execution is credential-read-only. Explicitly `POST /api/managed-codex/credential` to provision/reconcile, then read `GET /api/managed-codex/credential` and proceed only when `execution_ready=true` and `execution_readiness_reason=ready`; lifecycle `status=active` alone is insufficient. Do not retry the canary expecting normal execution to repair credentials. Preserve the deadline chain: chrono 180s < Aevatar managed request 300s < NyxID/ingress at least 315s < NyxID client 330s < workflow canary at least 360s.
 
 ## Which skill for which task (router)
 

@@ -1,7 +1,7 @@
 ---
 name: aevatar-triage
 description: Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.
-version: "1.5"
+version: "1.6"
 metadata:
   category: plain
   tag:
@@ -75,16 +75,20 @@ the deployed revision and live evidence:
 
 | Stable codes | First investigation surface | What to establish |
 |---|---|---|
-| `target_not_configured`, `managed_target_disabled`, `managed_feature_not_enabled`, `managed_identity_unavailable`, `managed_user_authorization_unavailable` | Aevatar host composition, tool admission, and Application caller authority | Is the target registered/enabled, is the exact native NyxID user eligible, and is current-user authorization present when transparent readiness needs it? |
+| `target_not_configured`, `managed_target_disabled`, `managed_feature_not_enabled`, `managed_identity_unavailable`, `managed_user_authorization_unavailable` | Aevatar host composition, tool admission, and Application caller authority | Is the target registered/enabled, is the exact native NyxID user eligible, and can the authenticated user call the explicit managed-credential lifecycle API? |
 | `managed_user_services_unavailable`, `nyxid_identity_mismatch` | Aevatar readiness plus the user's NyxID service inventory | Does the authenticated owner directly own exactly one usable `chrono-sandbox` and one usable `chrono-llm-public` UserService? Never infer this owner from `scopeId` or another identity. |
-| `managed_credential_untracked_key_exists`, `managed_credential_mutation_in_progress`, `managed_credential_commit_timeout`, `managed_credential_cleanup_pending`, `managed_credential_persistence_pending`, `managed_credential_vault_unavailable`, `managed_credential_unavailable`, `managed_credential_invalid` | Aevatar managed-credential actor/projection, distributed mutation lease, and `ISecretVault` boundary | Did a committed descriptor become visible, does its typed secret reference resolve, and did the one bounded transparent repair finish? Do not ask for or manually copy the raw key. |
+| `managed_credential_untracked_key_exists`, `managed_credential_mutation_in_progress`, `managed_credential_commit_timeout`, `managed_credential_cleanup_pending`, `managed_credential_persistence_pending`, `managed_credential_vault_unavailable`, `managed_credential_unavailable`, `managed_credential_invalid` | Aevatar managed-credential actor/projection, distributed mutation lease, and `ISecretVault` boundary | Did the explicit authenticated credential operation commit, did its descriptor become visible, and does its typed secret reference resolve? Do not ask for or manually copy the raw key. |
 | `managed_proxy_authorization_denied`, `managed_proxy_target_unavailable`, `managed_proxy_timeout`, `managed_proxy_unavailable` | Managed transport across NyxID and the user's exact `chrono-sandbox` route | `managed_proxy_timeout` means the bounded managed transport wait ended; correlate Aevatar timing with NyxID and chrono-sandbox using the sanitized `diagnostic_id`. It is not evidence to repair local sandbox tooling. |
 | `managed_response_invalid`, `managed_response_too_large` | chrono-sandbox terminal contract and Aevatar bounded response parser | Did `/codex/execute` return the fixed complete shape within the response limit? Preserve bounded diagnostics, never the raw upstream body. |
 | `managed_execution_nonzero_exit`, `managed_execution_cancelled`, `managed_execution_failed` | chrono-sandbox fixed command/JSONL/cleanup and the immutable runner image | Distinguish caller cancellation, runner/model failure, malformed JSONL, and cleanup failure without adding caller-selected command/model/sandbox flags. |
 
 For the requested contrasts: `managed_credential_unavailable` is first an **Aevatar committed
-credential / secret-resolution readiness** failure; it may trigger one normal transparent repair
-and is not proof of a NyxID OAuth revocation. Private `node_offline` is a **NyxID SSH node route**
+credential / secret-resolution readiness** failure and is not proof of a NyxID OAuth revocation.
+Prepare it explicitly through an authenticated `POST /api/managed-codex/credential`, then read
+`GET /api/managed-codex/credential`; continue only when `execution_ready=true` and
+`execution_readiness_reason=ready`. `status=active` alone is insufficient. Normal `codex_exec`
+execution is credential-read-only: it never provisions, reconciles, rotates, repairs, or retries
+credentials. Private `node_offline` is a **NyxID SSH node route**
 failure: inspect node daemon connectivity, last heartbeat, and service binding, not managed
 credentials or chrono-sandbox. Other private failures (`target_not_allowed`, missing SSH key,
 host-key mismatch, wrapper exit 126, host Codex login, wrong Git workspace) stay in the NyxID or
@@ -344,6 +348,26 @@ Use the runtime **`nyxid_proxy` tool** (not the `nyxid` CLI), `slug=api-github`,
   `GET /search/code?q=...+repo:owner/repo` (repos are public; raw fetch also works).
 - de-dup: `GET /search/issues?q=repo:owner/repo+is:issue+<keywords>`.
 - file (confirmed only): `POST /repos/{owner}/{repo}/issues`.
+
+Raw diagnostics require the exact connected UserService plus its slug and relative path. For the
+canonical authenticated GitHub identity probe, call:
+
+```json
+{
+  "service_id": "us-gh-7",
+  "slug": "api-github",
+  "path": "/user",
+  "method": "GET"
+}
+```
+
+Do not confuse this raw call with a compiled workflow operation. In a compiled workflow, an
+admission proof owns UserService, slug, operation ID, method, path template, digest, schemas, and
+response policy. The step-level selector stays in `capability.nyxid_operation`. Runtime
+`nyxid_proxy.arguments` may contain only admitted `path_params`, `query`, `headers`, `body`, and
+`response_mode`. `NYXID_OPERATION_ARGUMENT_NOT_SUPPORTED` for `slug`, `path`, `method`, or similar
+route/proof fields is an **Aevatar admission-bound runtime argument rejection before HTTP
+dispatch**. Remove those fields from `nyxid_proxy.arguments`; do not move or forge the proof.
 
 **Credential reality — be honest about it.** Under a relayed/in-session call, every tool runs on the
 **sender's own NyxID identity**, not the bot owner's. So filing an issue operates the **sender's**
