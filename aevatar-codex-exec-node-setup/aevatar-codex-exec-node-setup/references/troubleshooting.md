@@ -12,7 +12,7 @@ Preserve only the typed code and sanitized `diagnostic_id`. Never request a raw 
 | `managed_target_disabled` | Managed Codex is disabled in deployment configuration | Ask operations to verify `Enabled` and the internal rollout configuration |
 | `managed_feature_not_enabled` | The authenticated native NyxID user is not eligible | Compare the verified user ID with the configured `Allowlist`, or confirm the internal `All` policy |
 | `managed_identity_unavailable` | Aevatar lacks an exact native NyxID identity for this call | Re-authenticate through the normal Aevatar/NyxID path; do not infer identity from another ID |
-| `managed_user_authorization_unavailable` | Transparent credential creation or repair lacks the current user's authorization | Retry from an authenticated user call; do not supply or log the bearer manually |
+| `managed_user_authorization_unavailable` | The explicit credential mutation lacks the current user's authorization | Call the credential lifecycle from an authenticated user request; do not supply or log the bearer manually |
 
 ### NyxID readiness and credential
 
@@ -22,18 +22,18 @@ Preserve only the typed code and sanitized `diagnostic_id`. Never request a raw 
 | `nyxid_identity_mismatch` | The authenticated identity does not own the authorization used for readiness | Stop and sign in as the intended native NyxID user |
 | `managed_credential_untracked_key_exists` | NyxID has conflicting active managed invocation keys | Escalate for controlled reconciliation using the sanitized diagnostic evidence |
 | `managed_credential_mutation_in_progress` | Another credential mutation owns the per-user lease | Retry after the in-flight mutation reaches a terminal state |
-| `managed_credential_commit_timeout` | Readiness did not commit within its bounded mutation deadline | Retry once; if repeated, correlate the sanitized diagnostic with credential lifecycle logs |
+| `managed_credential_commit_timeout` | The explicit credential mutation did not commit within its bounded deadline | Read status before deciding whether a retry is safe; if repeated, correlate the sanitized diagnostic with credential lifecycle logs |
 | `managed_credential_cleanup_pending` | Obsolete key cleanup has not completed | Retry later; do not create another key |
 | `managed_credential_persistence_pending` | A successful remote change is not yet durably recorded | Retry later and preserve the typed code for reconciliation |
 | `managed_credential_vault_unavailable` | Aevatar's internal `ISecretVault` could not persist or resolve the invocation key | Ask operations to repair Aevatar secret storage; this is not sandbox-side injection |
-| `managed_credential_unavailable` | The committed invocation credential cannot be used | Let the normal invocation attempt its bounded transparent repair; then escalate the sanitized code if it repeats |
+| `managed_credential_unavailable` | The committed invocation credential cannot be used | Authenticated `POST /api/managed-codex/credential`, then `GET`; continue only when `execution_ready=true` and reason is `ready` |
 | `managed_credential_invalid` | The committed credential descriptor violates the managed contract | Escalate for controlled credential reconciliation; never edit or expose raw secret material |
 
 ### Proxy and chrono transport
 
 | Code | Meaning | Check |
 |---|---|---|
-| `managed_proxy_authorization_denied` | NyxID or chrono-sandbox rejected the invocation authority | Let Aevatar attempt its one transparent repair; if repeated, inspect the UserService policy and sanitized diagnostic |
+| `managed_proxy_authorization_denied` | NyxID or chrono-sandbox rejected the invocation authority | Inspect the exact UserService policy and sanitized diagnostic; normal execution does not rotate or repair credentials |
 | `managed_proxy_target_unavailable` | The exact personal `chrono-sandbox` proxy target cannot be resolved | Verify the user's active `chrono-sandbox` UserService and deployment route |
 | `managed_proxy_timeout` | NyxID proxy or chrono-sandbox did not return within the bounded transport wait | Correlate the sanitized diagnostic at NyxID/chrono-sandbox; do not repair local sandbox tooling |
 | `managed_proxy_unavailable` | NyxID proxy or chrono-sandbox is temporarily unavailable or capacity-limited | Retry later and escalate repeated failures with the sanitized diagnostic |

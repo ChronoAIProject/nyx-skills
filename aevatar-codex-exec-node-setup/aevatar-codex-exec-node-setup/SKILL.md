@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-node-setup
 description: Configure and prove Aevatar codex_exec for one NyxID account, choosing operator-managed chrono-sandbox/gVisor for bounded empty-workspace work or private NyxID node-backed SSH for a fixed host workspace. Use for managed eligibility and UserService readiness, private node/SSH hardening, mandatory public-sample verification, or diagnosing typed managed and private-route failures.
-version: "4.0"
+version: "4.1"
 metadata:
   category: tool-based
   tool-list:
@@ -18,7 +18,7 @@ metadata:
     - credential-node
     - workflow
   depends-on:
-    - aevatar-codex-exec-workflow-sample@3.0
+    - aevatar-codex-exec-workflow-sample@3.1
 compatibility: NyxID CLI and an Aevatar deployment that exposes codex_exec; private SSH additionally requires macOS or Linux, OpenSSH, Codex CLI, and Git
 disable-model-invocation: true
 user-invocable: true
@@ -28,7 +28,10 @@ user-invocable: true
 
 Choose exactly one target before changing state:
 
-- `managed_sandbox`: use for bounded one-shot work in an operator-selected, empty, ephemeral Git workspace. Aevatar transparently ensures the eligible native NyxID user's invocation credential, calls that user's exact `chrono-sandbox` UserService, and receives a structured terminal result. No personal node or local Codex login is needed.
+- `managed_sandbox`: use for bounded one-shot work in an operator-selected, empty, ephemeral Git
+  workspace. Explicitly prepare the eligible native NyxID user's invocation credential before
+  normal execution; Aevatar then calls that user's exact `chrono-sandbox` UserService and receives
+  a structured terminal result. No personal node or local Codex login is needed.
 - `private_ssh`: use when work must access a user-owned fixed Git workspace, host files, or host Codex configuration. The user owns the private NyxID node, SSH service, principal, forced-command wrapper, and Codex authentication.
 
 Never mix fields between targets. Do not report either target as ready until its public Ornn sample succeeds through Aevatar with exact `CODEX_EXEC_READY`.
@@ -37,7 +40,10 @@ Never mix fields between targets. Do not report either target as ready until its
 
 - Never print, copy, or persist NyxID tokens, SSH private keys, Codex credentials, or `auth.json` into workflow input, logs, issue comments, or image layers.
 - Never let a workflow choose an image, provider, model flag, shell fragment, approval policy, workspace path, or sandbox bypass.
-- Never ask a normal managed caller to provision a key, call the diagnostic credential lifecycle API, poll credential status, or supply a raw token. The normal first invocation performs credential readiness transparently.
+- Never ask a caller to supply a raw key or token. Use the authenticated managed-credential
+  lifecycle explicitly: `POST /api/managed-codex/credential`, then
+  `GET /api/managed-codex/credential`. Normal `codex_exec` is credential-read-only and never
+  provisions, reconciles, rotates, repairs, or retries credentials.
 - Keep a private node and SSH service personal unless the user explicitly authorizes organization ownership.
 - For private SSH, use a dedicated SSH key, pinned host key, forced command, fixed Git workspace, and Codex `workspace-write`; never add a dangerous sandbox bypass.
 
@@ -51,7 +57,10 @@ Require only these managed prerequisites:
 2. Managed Codex is enabled with `RolloutBoundary=InternalOnly`, and the user is eligible through `Eligibility.Mode=Allowlist` or the internal `All` policy.
 3. That user directly owns exactly one active, usable `chrono-sandbox` UserService and has exactly one usable `chrono-llm-public` route.
 4. Operations deployed the approved immutable runner digest under gVisor with fixed resource, output, timeout, and cleanup bounds.
-5. The public `aevatar-codex-exec-workflow-sample@3.0` managed proof returns exact `CODEX_EXEC_READY` through Aevatar.
+5. The explicit credential lifecycle reports `execution_ready=true` with
+   `execution_readiness_reason=ready`; `status=active` alone is insufficient.
+6. The public `aevatar-codex-exec-workflow-sample@3.1` managed proof returns exact
+   `CODEX_EXEC_READY` through Aevatar.
 
 Confirm only the user-facing identity and service inventory before the proof:
 
@@ -61,9 +70,20 @@ nyxid whoami
 nyxid service list
 ```
 
-Do not require a personal node, local Codex login, caller-managed OpenSandbox key, separate LLM consent, Landlock installation, or sandbox-side credential injection. If transparent readiness fails, classify the typed failure in [troubleshooting.md](references/troubleshooting.md); do not pre-provision as a workaround.
+Do not require a personal node, local Codex login, caller-managed OpenSandbox key, separate LLM
+consent, Landlock installation, or sandbox-side credential injection. Prepare the managed
+credential through the authenticated lifecycle API, then classify any typed failure in
+[troubleshooting.md](references/troubleshooting.md).
 
 ### 2. Credential and delegation boundary
+
+Prepare, read, and prove in this order:
+
+1. Authenticated `POST /api/managed-codex/credential` idempotently provisions or reconciles the
+   committed descriptor.
+2. `GET /api/managed-codex/credential` reads status. Stop unless `execution_ready=true` and
+   `execution_readiness_reason=ready`, even if `status=active`.
+3. Run the managed public canary. Do not loop normal execution hoping it will repair readiness.
 
 - Aevatar keeps its persistent per-user NyxID invocation key behind `ISecretVault`. The key is never placed in the chrono request body.
 - The user's exact `chrono-sandbox` UserService terminates that invocation key at NyxID and injects a five-minute internal delegation token.
@@ -84,6 +104,10 @@ The runtime-written Codex profile fixes the provider, model, retry bounds, appro
 ### 4. Managed workflow proof
 
 Mount the public dependency and run `codex-exec-check` with no caller-controlled routing. Follow its evaluation contract exactly. Success requires `status=succeeded`, `target=managed_sandbox`, trimmed `output=CODEX_EXEC_READY`, `exit_code=0`, and a non-empty sanitized `diagnostic_id`; `elapsed_ms` is optional. Health and direct chrono-sandbox checks are prerequisites, not this Aevatar identity-path proof.
+
+Preserve the deadline hierarchy: chrono-sandbox/Codex `180s` < Aevatar managed request `300s` <
+NyxID/ingress `>=315s` < NyxID client `330s` < workflow canary `>=360s`
+(`timeout_ms=360000`).
 
 ## Private SSH target
 
@@ -195,7 +219,7 @@ Mount the public dependency and run `codex-exec-private-ssh-check` with the actu
 
 ## Mandatory public-sample procedure
 
-For either target, load the declared public dependency, `aevatar-codex-exec-workflow-sample@3.0`, from Ornn:
+For either target, load the declared public dependency, `aevatar-codex-exec-workflow-sample@3.1`, from Ornn:
 
 ```json
 {
