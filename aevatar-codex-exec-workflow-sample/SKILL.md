@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-workflow-sample
-description: Mount and run harmless Aevatar workflows that prove codex_exec works through either the operator-managed OpenSandbox target or a private NyxID node-backed SSH target. Use after configuring managed access or a personal node, before real tasks, and when diagnosing identity, allowlist, binding, sandbox, service, principal, or Codex runner failures.
-version: "2.0"
+description: Mount and run harmless Aevatar workflows that prove codex_exec works through either the operator-managed chrono-sandbox/gVisor target or a private NyxID node-backed SSH target. Use after managed eligibility and required NyxID UserServices are ready, or after configuring a personal SSH node; also use when diagnosing typed managed or private-route failures before real tasks.
+version: "3.0"
 metadata:
   category: mixed
   output-type: text
@@ -14,27 +14,30 @@ metadata:
     - aevatar
     - codex-exec
     - nyxid
-    - opensandbox
+    - chrono-sandbox
     - verification
     - workflow
 ---
 
 # Verify Aevatar codex_exec
 
-Mount this skill from Ornn and run exactly one bundled workflow for the configured target:
+## Choose exactly one proof
 
-- `codex-exec-check`: canonical managed OpenSandbox proof; no caller input.
-- `codex-exec-private-ssh-check`: private node-backed SSH proof; accepts only service and principal routing.
+Mount this skill from Ornn and run one bundled workflow for the configured target:
 
-Configuration, health, node-online, and direct SDK/SSH checks are prerequisites, not completion evidence. Report `codex_exec` as usable only after the selected Aevatar workflow returns exact `CODEX_EXEC_READY`.
+- `codex-exec-check`: canonical managed chrono-sandbox/gVisor proof with no caller routing.
+- `codex-exec-private-ssh-check`: private NyxID node-backed SSH proof with only service and principal routing.
+
+Configuration, health, UserService, node-online, and direct SDK/SSH checks are prerequisites, not completion evidence. Report `codex_exec` as usable only after the selected Aevatar workflow returns exact `CODEX_EXEC_READY` under that target's result contract.
 
 ## Guardrails
 
 - Fetch the public skill from Ornn. Do not validate only a local workflow copy.
 - Keep the fixed probe prompt. Do not replace it with a real task.
 - Never place tokens, keys, `auth.json`, `CODEX_HOME`, local paths, model flags, images, providers, or sandbox flags in workflow input.
-- Do not mix managed and private fields. Managed requires `target.kind=managed_sandbox` plus `workspace.kind=empty_git`; private requires nested `target.private_ssh` and no workspace.
-- Run through Aevatar as the NyxID account being verified.
+- Do not mix target fields. Managed requires `target.kind=managed_sandbox` plus `workspace.kind=empty_git`; private requires nested `target.private_ssh` and no workspace.
+- Managed callers cannot choose a repository, workspace path, image, model, provider, credential, shell, Codex profile, approval policy, or sandbox flags.
+- Run through Aevatar as the native NyxID account being verified. Do not provision a key, pass a raw token, or poll a credential read model before the normal managed proof.
 
 ## Mount
 
@@ -47,7 +50,7 @@ Call `use_skill` with workflow mounting enabled:
 }
 ```
 
-Wait for the mount command to be accepted. Read-model visibility can propagate asynchronously. If mounting is unavailable, fetch this public Ornn version and submit the YAML under `assets/` as explicit inline draft-run input; state clearly that it was an inline run.
+Wait for the mount command to be accepted. Read-model visibility can propagate asynchronously. If mounting is unavailable, fetch this exact public Ornn version and submit the corresponding YAML under `assets/` as explicit inline draft-run input; state clearly that it was an inline run.
 
 ## Managed proof
 
@@ -63,7 +66,7 @@ Start the canonical workflow without caller-controlled routing:
 }
 ```
 
-The workflow owns this exact tool payload:
+The workflow owns this exact `codex_exec` payload:
 
 ```json
 {
@@ -74,15 +77,15 @@ The workflow owns this exact tool payload:
 }
 ```
 
-Success requires the managed result to contain all of:
+Success requires all of:
 
-- `status` equal to `succeeded`
-- `target` equal to `managed_sandbox`
-- `output` equal to `CODEX_EXEC_READY` after trimming
-- `exit_code` equal to `0`
-- a non-empty sanitized `diagnostic_id`
+- `status` equal to `succeeded`;
+- `target` equal to `managed_sandbox`;
+- `output` equal to `CODEX_EXEC_READY` after trimming;
+- `exit_code` equal to `0`;
+- a non-empty sanitized `diagnostic_id`.
 
-Treat missing fields, extra model text, or any typed failure as a failed verification.
+`elapsed_ms` may be present but is not required for success. Treat a missing required field, extra model text, or any typed failure as a failed verification.
 
 ## Private SSH proof
 
@@ -98,18 +101,41 @@ Start the private workflow with exactly the environment-owned service and Unix p
 }
 ```
 
-Pass the SSH UserService slug or UUID, never a node ID. Success requires `exit_code: 0`, `timed_out: false`, and stdout equal to `CODEX_EXEC_READY` after trimming.
+The workflow owns this target shape and deliberately has no `workspace`:
 
-## Diagnose
+```json
+{
+  "target": {
+    "kind": "private_ssh",
+    "private_ssh": {
+      "service": "your-service-slug",
+      "principal": "your-unix-user"
+    }
+  },
+  "prompt": "Reply with exactly CODEX_EXEC_READY",
+  "timeout_secs": 300
+}
+```
 
-Preserve the structured error and classify it before changing configuration:
+Pass the SSH UserService slug or UUID, never a node ID. Success requires the NyxID SSH response to have `exit_code=0`, `timed_out=false`, and stdout equal to `CODEX_EXEC_READY` after trimming. Private SSH output is returned as the original NyxID SSH response; it is not converted into the managed `status/target/diagnostic_id` JSON shape.
 
-- managed disabled/allowlist: ask the Aevatar operator to enable the target for the authenticated NyxID subject.
-- `nyxid_binding_required`, revoked binding, or `llm_proxy_scope_missing`: repeat the normal Aevatar/NyxID login consent; never forward the reusable caller bearer into the sandbox.
-- managed capacity/provisioning/Credential Vault failures: inspect the deployment and redacted diagnostic ID.
-- Landlock/isolation failure: stop; do not weaken the sandbox.
-- `sandbox_cleanup_failed`: treat as an operations incident.
-- `node_offline`, service, target, principal, key, or host-key failures: repair the private NyxID node route.
-- Codex PATH, login, Git root, or timeout failures: repair the fixed private runner wrapper.
+## Diagnose by boundary
 
-Use `aevatar-codex-exec-node-setup` for setup and detailed repair. Never declare readiness from configuration inspection alone.
+Preserve the exact typed error and sanitized `diagnostic_id`, if present. Do not request raw tokens, raw upstream bodies, `auth.json`, agent-key values, or an unredacted runner environment.
+
+- `target_not_configured` or `managed_target_disabled`: the Aevatar host does not expose the selected managed target; repair host configuration.
+- `managed_feature_not_enabled`: the native NyxID subject is outside the current managed rollout; repair eligibility, not a sandbox.
+- `managed_user_services_unavailable`: the user does not have the required directly owned active `chrono-sandbox` and usable `chrono-llm-public` UserServices; repair NyxID service readiness.
+- `managed_credential_unavailable`: Aevatar could not resolve its per-user managed invocation credential; inspect Aevatar credential descriptor and secret-vault readiness without exposing the secret.
+- `managed_proxy_authorization_denied`: NyxID denied the exact proxy request; inspect user/service ownership and the current internal delegation scope.
+- `managed_proxy_target_unavailable`: the exact `chrono-sandbox` UserService or `/codex/execute` route is unavailable.
+- `managed_proxy_timeout`: the NyxID proxy/chrono-sandbox request timed out. Preserve the diagnostic evidence and inspect that transport boundary first.
+- `managed_proxy_unavailable`: the proxy/chrono service is temporarily unavailable or capacity-limited.
+- `managed_response_invalid` or `managed_response_too_large`: chrono-sandbox violated the bounded terminal-response contract.
+- `managed_execution_nonzero_exit`: the one-shot Codex runner reached a terminal non-zero exit; inspect sanitized runner diagnostics.
+- Private `node_offline`, service, target, principal, key, or host-key errors belong to the user's NyxID SSH route.
+- Private Codex PATH, login, Git-root, wrapper, or timeout errors belong to the selected host and fixed runner wrapper.
+
+The managed workload runs under gVisor, which is the current isolation boundary. Codex runs inside it with the fixed runtime profile. Landlock, Bubblewrap, sandbox-side Credential Vault substitution, and a TLS credential proxy are not deployed in this runtime and are not repair paths for these failures.
+
+Use `aevatar-codex-exec-node-setup` for detailed setup or repair after locating the boundary. Never declare readiness from configuration inspection alone.

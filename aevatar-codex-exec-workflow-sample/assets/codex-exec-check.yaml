@@ -1,5 +1,5 @@
 name: codex-exec-check
-description: Verify that the authenticated NyxID account can execute Codex in the operator-managed OpenSandbox target.
+description: Verify that the authenticated eligible NyxID account can execute Codex through Aevatar's operator-managed chrono-sandbox/gVisor target.
 when_to_use: Use after managed codex_exec is enabled for the account and before running real tasks.
 steps:
   - id: execute

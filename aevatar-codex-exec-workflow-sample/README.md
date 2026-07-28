@@ -1,6 +1,6 @@
 # aevatar-codex-exec-workflow-sample
 
-> Mount and run harmless Aevatar workflows that prove codex_exec works through either the operator-managed OpenSandbox target or a private NyxID node-backed SSH target. Use after configuring managed access or a personal node, before real tasks, and when diagnosing identity, allowlist, binding, sandbox, service, principal, or Codex runner failures.
+> Mount and run harmless Aevatar workflows that prove codex_exec works through either the operator-managed chrono-sandbox/gVisor target or a private NyxID node-backed SSH target. Use after managed eligibility and required NyxID UserServices are ready, or after configuring a personal SSH node; also use when diagnosing typed managed or private-route failures before real tasks.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `2.0`
-- Last synced: `2026-07-28T02:34:49.309Z`
+- Latest version: `3.0`
+- Last synced: `2026-07-28T02:46:37.942Z`
 
 ## Install
 
