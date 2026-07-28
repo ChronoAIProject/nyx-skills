@@ -1,7 +1,7 @@
 ---
 name: aevatar-triage
-description: Use AFTER something goes wrong while using Aevatar — a user hits an error, failure, or confusing behavior and you must find whether it lives in Aevatar, NyxID, or Ornn, then act. Triggers - "aevatar is erroring", "why did my workflow fail", "my scheduled run did not fire", "my bot does not reply", "connector 401/403", "my scheduled run hit token_expired", "skill won't pull/upload", "this endpoint 404s but I think it exists", "is this an aevatar, nyxid, or ornn bug", "file an issue", "am I using this right". It reads credentialSourceKind before interpreting any scheduled-run credential failure (dedicated Agent Keys are not fire-time broker tokens and must not be diagnosed with the 300 s TTL), and probes the live OpenAPI surface before calling a 404 a defect, since some contracts exist in code but are not deployed. It attributes the failure by tracing the request path, pulls that layer's real public source for a code-grounded root cause citing file and line, then branches - draft and, only on explicit user confirmation, file a precise GitHub issue when behavior violates the layer's published contract, or explain the correct usage from the code when it is a usage mistake. The after-it-breaks counterpart to aevatar-feasibility-advisor; never auto-files, de-dups first, never claims a root cause without a code citation. Works locally (git + gh) and server-side (nyxid_proxy + api-github).
-version: "1.4"
+description: Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.
+version: "1.5"
 metadata:
   category: plain
   tag:
@@ -12,7 +12,7 @@ metadata:
     - issue
     - nyxid
     - ornn
-    - support
+    - codex-exec
     - agent-key
     - credentials
 ---
@@ -41,6 +41,82 @@ You make real calls and read real code — **no guessing, no fabricated root cau
 
 These three repos and layers are this skill's subject — name them freely. Do **not** hardcode any
 user's private business / workflow / skill names.
+
+## `codex_exec` has two request paths — locate the exact boundary
+
+Do not force `codex_exec` into the generic three-layer table. Its two targets share the typed
+Aevatar tool but have different transports, credentials, isolation, results, and owners:
+
+```text
+managed_sandbox:
+  Aevatar tool/admission
+    -> Aevatar Application credential readiness
+    -> NyxID exact personal UserService proxy
+    -> chrono-sandbox POST /codex/execute
+    -> one-shot OpenSandbox workload under gVisor
+    -> fixed Codex runner
+
+private_ssh:
+  Aevatar private_ssh adapter
+    -> NyxID SSH UserService and node
+    -> fixed host/principal wrapper
+    -> host Codex CLI and fixed workspace
+```
+
+`gVisor` is the managed isolation boundary. Codex runs inside it with its inner sandbox disabled.
+There is no managed Landlock/Bubblewrap preflight, sandbox-side Credential Vault substitution, or
+TLS credential proxy to repair. This does **not** mean Aevatar has no secret store: the managed
+readiness path legitimately resolves its persistent invocation key through Aevatar `ISecretVault`.
+
+### Stable managed failure groups
+
+Use the stable code to select the first investigation surface, then still prove the root cause with
+the deployed revision and live evidence:
+
+| Stable codes | First investigation surface | What to establish |
+|---|---|---|
+| `target_not_configured`, `managed_target_disabled`, `managed_feature_not_enabled`, `managed_identity_unavailable`, `managed_user_authorization_unavailable` | Aevatar host composition, tool admission, and Application caller authority | Is the target registered/enabled, is the exact native NyxID user eligible, and is current-user authorization present when transparent readiness needs it? |
+| `managed_user_services_unavailable`, `nyxid_identity_mismatch` | Aevatar readiness plus the user's NyxID service inventory | Does the authenticated owner directly own exactly one usable `chrono-sandbox` and one usable `chrono-llm-public` UserService? Never infer this owner from `scopeId` or another identity. |
+| `managed_credential_untracked_key_exists`, `managed_credential_mutation_in_progress`, `managed_credential_commit_timeout`, `managed_credential_cleanup_pending`, `managed_credential_persistence_pending`, `managed_credential_vault_unavailable`, `managed_credential_unavailable`, `managed_credential_invalid` | Aevatar managed-credential actor/projection, distributed mutation lease, and `ISecretVault` boundary | Did a committed descriptor become visible, does its typed secret reference resolve, and did the one bounded transparent repair finish? Do not ask for or manually copy the raw key. |
+| `managed_proxy_authorization_denied`, `managed_proxy_target_unavailable`, `managed_proxy_timeout`, `managed_proxy_unavailable` | Managed transport across NyxID and the user's exact `chrono-sandbox` route | `managed_proxy_timeout` means the bounded managed transport wait ended; correlate Aevatar timing with NyxID and chrono-sandbox using the sanitized `diagnostic_id`. It is not evidence to repair local sandbox tooling. |
+| `managed_response_invalid`, `managed_response_too_large` | chrono-sandbox terminal contract and Aevatar bounded response parser | Did `/codex/execute` return the fixed complete shape within the response limit? Preserve bounded diagnostics, never the raw upstream body. |
+| `managed_execution_nonzero_exit`, `managed_execution_cancelled`, `managed_execution_failed` | chrono-sandbox fixed command/JSONL/cleanup and the immutable runner image | Distinguish caller cancellation, runner/model failure, malformed JSONL, and cleanup failure without adding caller-selected command/model/sandbox flags. |
+
+For the requested contrasts: `managed_credential_unavailable` is first an **Aevatar committed
+credential / secret-resolution readiness** failure; it may trigger one normal transparent repair
+and is not proof of a NyxID OAuth revocation. Private `node_offline` is a **NyxID SSH node route**
+failure: inspect node daemon connectivity, last heartbeat, and service binding, not managed
+credentials or chrono-sandbox. Other private failures (`target_not_allowed`, missing SSH key,
+host-key mismatch, wrapper exit 126, host Codex login, wrong Git workspace) stay in the NyxID or
+user-owned host boundary named by the failure.
+
+### Codex evidence and source selection
+
+Preserve the exact typed code/error text, target kind, authenticated native NyxID subject,
+workflow/run/step/tool-call correlation IDs when available, timestamp and elapsed/deadline facts,
+sanitized `diagnostic_id`, deployed Aevatar image/commit, deployed chrono-sandbox managed revision,
+and runner image digest. Keep raw operational evidence access-controlled.
+
+Never request or expose raw access/delegation tokens, Agent Keys, authorization headers,
+`auth.json`, secret references or Vault locators, unredacted process environments, raw upstream
+bodies, or private prompt/output/repository data. A sanitized `diagnostic_id` is correlation
+evidence, not proof of a particular root cause.
+
+Read the repository that owns the failing boundary, always at the deployed ref:
+
+- Aevatar tool admission, Application readiness, typed result/failure mapping:
+  `aevatarAI/aevatar`.
+- NyxID authorization, exact UserService routing, delegation, node, or SSH:
+  `ChronoAIProject/NyxID`, after confirming Aevatar used the current typed contract.
+- `/codex/execute`, gVisor workload creation, fixed command/profile, JSONL classification,
+  timeouts, and confirmed cleanup: the **deployed chrono-sandbox managed revision**. Do not use a
+  default branch that lacks that surface.
+- Runner contents/profile: Aevatar `containers/codex-runner` plus the deployed immutable digest.
+- Private host wrapper, Codex login/config, and workspace: the user's target configuration.
+
+After locating the boundary, use `aevatar-codex-exec-node-setup` for repair and
+`aevatar-codex-exec-workflow-sample` for the mandatory post-repair `CODEX_EXEC_READY` proof.
+Configuration inspection or a direct chrono/SSH success alone does not close the incident.
 
 ## Step 1 — Capture the symptom precisely (don't theorize yet)
 

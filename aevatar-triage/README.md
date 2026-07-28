@@ -1,6 +1,6 @@
 # aevatar-triage
 
-> Use AFTER something goes wrong while using Aevatar — a user hits an error, failure, or confusing behavior and you must find whether it lives in Aevatar, NyxID, or Ornn, then act. Triggers - "aevatar is erroring", "why did my workflow fail", "my scheduled run did not fire", "my bot does not reply", "connector 401/403", "my scheduled run hit token_expired", "skill won't pull/upload", "this endpoint 404s but I think it exists", "is this an aevatar, nyxid, or ornn bug", "file an issue", "am I using this right". It reads credentialSourceKind before interpreting any scheduled-run credential failure (dedicated Agent Keys are not fire-time broker tokens and must not be diagnosed with the 300 s TTL), and probes the live OpenAPI surface before calling a 404 a defect, since some contracts exist in code but are not deployed. It attributes the failure by tracing the request path, pulls that layer's real public source for a code-grounded root cause citing file and line, then branches - draft and, only on explicit user confirmation, file a precise GitHub issue when behavior violates the layer's published contract, or explain the correct usage from the code when it is a usage mistake. The after-it-breaks counterpart to aevatar-feasibility-advisor; never auto-files, de-dups first, never claims a root cause without a code citation. Works locally (git + gh) and server-side (nyxid_proxy + api-github).
+> Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.4`
-- Last synced: `2026-07-28T03:00:07.686Z`
+- Latest version: `1.5`
+- Last synced: `2026-07-28T03:48:24.539Z`
 
 ## Install
 
