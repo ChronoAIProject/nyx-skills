@@ -1,7 +1,7 @@
 ---
 name: firecrawl-via-nyxid
 description: Teach an aevatar agent to run Firecrawl web-research/agent jobs through NyxID (submit, poll, then read the result).
-version: "1.1"
+version: "1.2"
 metadata:
   category: plain
   tag: [firecrawl, web-scraping, web-research, nyxid, aevatar]
@@ -37,38 +37,63 @@ POST /api/v1/keys
 
 This is a one-time setup step performed by the owner — **the agent does not do this** and never sees the key. After connecting, NyxID injects the key on every brokered request.
 
-**How the agent checks it is available.** Confirm `api-firecrawl` appears in the connected-services list before calling it:
-
-- Server-side tool: `nyxid_services` with `{"action":"list"}`, or
-- REST: `GET /api/v1/services`
+**How the agent checks it is available.** Call `nyxid_service_inventory` with `{}` and confirm an
+exact connected UserService whose slug is `api-firecrawl`. In a channel sender turn this tool is
+list-only and accepts no hand-written ID; elsewhere use only the schema emitted for that request.
 
 Look for an entry whose slug is `api-firecrawl`. If it is **absent**, Firecrawl is not connected yet — the agent cannot call it until the owner connects it (above). Surface that to the user rather than failing silently.
 
 ## How to call it
 
-There are two interchangeable ways to invoke Firecrawl. Both go through NyxID; both inject the key automatically.
+There are three distinct invocation modes. All go through NyxID and inject the key, but their
+caller-owned fields are different. Never translate one mode by copying its route fields into
+another.
 
-### (a) Typed tool calls (preferred when present)
+### (a) Interactive request-local operation tools
 
-NyxID publishes an `x-aevatar-tool` OpenAPI overlay (live at `GET {NYX}/api/v1/catalog-specs/firecrawl/openapi.json`) that aevatar auto-discovers and materializes into typed workflow/agent tools. By the NyxID connected-service naming convention `nyxid_{service_slug}__{operation}`, the two operations become:
+NyxID publishes an `x-aevatar-tool` OpenAPI overlay that Aevatar discovers for each exact
+UserService. The final request's dynamic schema and tool catalog are the authority. Operation tool
+names are request-local, do not embed the slug, and require an enumerated `user_service_id`:
 
-- **submit** → `nyxid_api-firecrawl__agent` (writes — `readOnly: false`)
-- **poll** → `nyxid_api-firecrawl__agent_status` (read-only — `readOnly: true`)
+- **submit** → `nyxid_service_operation__agent`
+- **poll** → `nyxid_service_operation__agent_status` when that exact name is emitted
 
-> Confirm the exact tool names by listing your available tools, since hyphen handling in the slug may be normalized in your environment.
+For the submit operation whose dynamic schema requires `user_service_id` and `body`, call:
 
-Call `nyxid_api-firecrawl__agent` with the submit arguments, take the returned `id`, then call `nyxid_api-firecrawl__agent_status` with `{ "id": "<id>" }` and repeat until the status is terminal.
+```json
+{
+  "tool": "nyxid_service_operation__agent",
+  "arguments": {
+    "user_service_id": "us-fc-7",
+    "body": {
+      "prompt": "Find ACME Cloud pricing tiers",
+      "model": "spark-1-mini",
+      "maxCredits": 2500
+    }
+  }
+}
+```
 
-### (b) Raw `nyxid_proxy` tool call (always works, name-stable)
+Pass only fields in the emitted operation schema. Take the returned `id`, then use the emitted
+poll operation schema until the status is terminal.
 
-When typed tools are not present, or you want a name-stable path, use the generic `nyxid_proxy` tool. It is the most reliable option and reaches **every** Firecrawl endpoint on the same slug.
+### (b) Raw one-off `nyxid_proxy`
+
+Raw calls own their route. They require the exact connected `service_id`, `slug`, and relative
+`path`; method, body, allowed non-sensitive headers, and response mode are optional.
 
 Submit:
 
 ```json
 {
   "tool": "nyxid_proxy",
-  "arguments": "{\"slug\":\"api-firecrawl\",\"path\":\"/v2/agent\",\"method\":\"POST\",\"body\":{\"prompt\":\"...\",\"model\":\"spark-1-mini\"}}"
+  "arguments": {
+    "service_id": "us-fc-7",
+    "slug": "api-firecrawl",
+    "path": "/v2/agent",
+    "method": "POST",
+    "body": {"prompt": "...", "model": "spark-1-mini"}
+  }
 }
 ```
 
@@ -77,11 +102,38 @@ Poll (substitute the `id` returned from submit):
 ```json
 {
   "tool": "nyxid_proxy",
-  "arguments": "{\"slug\":\"api-firecrawl\",\"path\":\"/v2/agent/<id>\",\"method\":\"GET\"}"
+  "arguments": {
+    "service_id": "us-fc-7",
+    "slug": "api-firecrawl",
+    "path": "/v2/agent/<id>",
+    "method": "GET"
+  }
 }
 ```
 
 The same slug also reaches the other operations for non-agent use — e.g. `path: "/v2/scrape"`, `/v2/crawl`, `/v2/search`, `/v2/map`, `/v2/extract`.
+
+### (c) Compiled workflow admitted operation
+
+The workflow step calls `nyxid_proxy`, but its copied step-level `capability.nyxid_operation` and
+server-owned admission proof own the UserService, slug, operation ID, method, path template,
+contract digest, schemas, and response policy. Runtime arguments contain only admitted
+`path_params`, `query`, `headers`, `body`, and `response_mode`. A compiled submit is:
+
+```yaml
+- id: submit
+  type: tool_call
+  capability:
+    nyxid_operation:
+      user_service_id: us-fc-7
+      operation_id: agent
+  parameters:
+    tool: nyxid_proxy
+    arguments: '{"body":{"prompt":"Find ACME Cloud pricing tiers","model":"spark-1-mini","maxCredits":2500}}'
+```
+
+Do not put `service_id`, `user_service_id`, `operation_id`, `slug`, `path`, `method`, a digest, or
+schema fields in runtime `arguments`.
 
 ### Request and response shapes (the agent operation)
 
@@ -126,27 +178,34 @@ The Firecrawl agent is **asynchronous**: a submit returns immediately with a job
 
 ### In a single agent turn
 
-1. Call `nyxid_api-firecrawl__agent` (or the `nyxid_proxy` submit) with your prompt → get `id`.
-2. Call `nyxid_api-firecrawl__agent_status` (or the `nyxid_proxy` poll) with that `id`.
+1. Call the emitted `nyxid_service_operation__agent` or a correctly shaped raw `nyxid_proxy`
+   submit with your prompt → get `id`.
+2. Call the emitted poll operation or a correctly shaped raw `nyxid_proxy` poll with that `id`.
 3. If `status` is `processing`, wait briefly and poll again. When `status` is `completed`, read `data`; on `failed`/`cancelled`, report the failure.
 
 ### In an aevatar workflow
 
 Model it as: a `tool_call` submit → a `while` loop that polls with a `delay` between iterations → a `switch` on `status` to a terminal branch. **Do not hand-roll the loop from memory** — the engine's exact step syntax is easy to get wrong. Start from the canonical templates below and adapt them.
 
-The one shape worth memorizing is the NyxID call itself. In real aevatar DSL a `tool_call` step puts `tool`/`arguments` **under `parameters:`**, interpolation uses `${...}`, and you read a JSON field of a prior step's result with `${steps.<id>.json.<field>}`:
+For an admitted NyxID operation, copy the exact listed selector into step-level `capability` and
+put only current operation values under `parameters.arguments`. Interpolation uses `${...}`, and
+you read a JSON field of a prior step's result with `${steps.<id>.json.<field>}`:
 
 ```yaml
 - id: submit
   type: tool_call
+  capability:
+    nyxid_operation:
+      user_service_id: us-fc-7
+      operation_id: agent
   parameters:
     tool: nyxid_proxy
-    arguments: '{"slug":"api-firecrawl","path":"/v2/agent","method":"POST","body":{"prompt":"Find ACME Cloud pricing tiers","model":"spark-1-mini","maxCredits":2500}}'
+    arguments: '{"body":{"prompt":"Find ACME Cloud pricing tiers","model":"spark-1-mini","maxCredits":2500}}'
   next: poll
 # the submitted job id is then available as ${steps.submit.json.id}
 ```
 
-Other real-DSL facts you will need: branching is `switch` with `parameters: { on: "...", branch.<key>: <step-id> }` plus a `branches:` map; `delay` takes `parameters: { duration_ms: "5000" }` (string value); a poll step's path interpolates the id, e.g. `"/v2/agent/${steps.submit.json.id}"`. For the **full** submit → poll-loop → branch wiring, reuse the canonical templates rather than rewriting the loop.
+Other real-DSL facts you will need: branching is `switch` with `parameters: { on: "...", branch.<key>: <step-id> }` plus a `branches:` map; `delay` takes `parameters: { duration_ms: "5000" }` (string value); an admitted poll step puts the returned ID in the exact runtime slot declared by its operation schema, commonly `path_params`. For the **full** submit → poll-loop → branch wiring, reuse the canonical templates rather than rewriting the loop.
 
 ### Canonical templates and engine caps
 
@@ -166,7 +225,7 @@ Engine caps to respect: `delay` ≤ **5 minutes** (`duration_ms`), `while` ≤ *
 ## Quick recap
 
 1. Owner connects `api-firecrawl` once in NyxID (`POST /api/v1/keys`).
-2. Agent confirms `api-firecrawl` is in the connected-services list.
-3. Submit a natural-language prompt (`model: spark-1-mini`, a `maxCredits` cap, optional `urls`/`schema`) → get `id`.
+2. Agent confirms an exact `api-firecrawl` UserService through the available inventory schema.
+3. Select raw, interactive, or compiled mode and use only that mode's fields; submit a natural-language prompt (`model: spark-1-mini`, a `maxCredits` cap, optional `urls`/`schema`) → get `id`.
 4. Poll `agent_status` / `GET /v2/agent/{id}` until `status` is terminal; read `data` on `completed`.
 5. In workflows, use a `tool_call` submit → `while` + `delay` poll → `switch` on `status`, or reuse the canonical `firecrawl_agent_async_*` templates.
