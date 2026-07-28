@@ -1,11 +1,13 @@
 ---
 name: aevatar-workflow-authoring
 description: Author, validate, and persist an executable aevatar workflow from a natural-language request — use it when the user wants to create, build, set up, or automate a multi-step task as a runnable aevatar workflow (make a workflow that…, automate…, build a pipeline…, set up a recurring…). It generates workflow YAML, dispatch-validates it, then saves it as a reusable workflow that can be re-run and watched in the observatory. Not for running an existing workflow — search for that and start it instead.
-version: "1.5"
+version: "2.1"
 metadata:
   category: tool-based
   tool-list:
     - nyxid_services
+    - list_external_workflow_capabilities
+    - inspect_external_workflow_capability_readiness
     - aevatar_start_workflow
     - ornn_publish_skill
   tag:
@@ -31,7 +33,7 @@ Everything you need is in this document — the DSL, the engine rules, the tools
 
 1. **Confirm the intent is authoring.** The user wants a *new* runnable workflow. If they want to run something that already exists, stop and search for it instead.
 2. **Clarify just enough.** Pin down: the trigger/input, the ordered steps, the desired output, and which external services (if any) are involved. Ask only what you cannot reasonably infer; do not over-interrogate.
-3. **Inventory connectors (only if external calls are needed).** Call `nyxid_services` with `{"action":"list"}` to see what the user actually has connected. If a step needs a connector the user does not have, say so plainly and stop or degrade — never author a step against a connector that does not exist.
+3. **Discover the exact external operation (only if external calls are needed).** Call `list_external_workflow_capabilities` with `{}` (or `max_results`) and copy one descriptor's exact `selector`. Then call `inspect_external_workflow_capability_readiness` with that `selector` plus `execution_mode: "interactive"` for a current user run or `"durable"` for a scheduled/background run. If readiness is blocked, report its typed blocker; never reconstruct a selector from a display slug or author a route that was not listed.
 4. **Author the YAML.** Apply the DSL below and obey every rule in **Engine rules (must obey)**. Prefer the reliable-core primitives; use advanced primitives only when the task truly needs them.
 5. **Validate by dispatching one test run — fire-and-observe, do NOT wait for completion.** Call `aevatar_start_workflow` **once** with the draft inline (`workflow_yamls`). It returns in a second or two with a `run_id` and a status like `accepted`/`streaming` — **that return is your structural pass** (the YAML parsed and dispatched). If instead it returns a parse/validation/4xx error, fix the YAML and retry (cap **2**). **Never poll or wait for `run_finished`, and never re-invoke `aevatar_start_workflow` to "check status"** — the run continues asynchronously and is watchable in the observatory; looping on it stalls the turn.
 6. **Persist as a reusable workflow.** Once the draft dispatches without a parse error, call `ornn_publish_skill` with the final workflow in `workflow_yamls` (see **Persisting**). This creates a private skill in the user's account containing the workflow.
@@ -116,9 +118,13 @@ steps:
 ```yaml
 - id: fetch
   type: tool_call
+  capability:
+    nyxid_operation:
+      user_service_id: <copied-user-service-id>
+      operation_id: <listed-operation-id>
   parameters:
     tool: nyxid_proxy
-    arguments: '{"slug":"my-http-service","path":"/v1/items","method":"GET"}'
+    arguments: '{"query":{}}'
 ```
 
 `code_execute` — run deterministic Python/JavaScript/TypeScript/Bash in the sandbox.
@@ -286,17 +292,45 @@ Advanced notes: `human_approval`/`wait_signal` suspend the run until a resume/si
 
 ## Accessing external services
 
-There are two distinct mechanisms. Pick the one that matches what the user actually has connected — they are separate subsystems.
+There are three NyxID invocation modes plus a separate host-connector subsystem. Do not mix their fields.
 
-- **nyxid-brokered services (the common case in this scenario).** A user connecting through nyxid has services exposed as nyxid connectors. Call them with a `tool_call` on the `nyxid_proxy` tool, passing a JSON string in `arguments`:
-  ```yaml
-  - id: call_api
-    type: tool_call
-    parameters:
-      tool: "nyxid_proxy"
-      arguments: '{"slug":"<service-slug>","path":"/v1/resource","method":"POST","body":{"k":"v"}}'
+- **Raw current-turn `nyxid_proxy`.** First select an exact UserService instance. The call requires `service_id + slug + path`; method defaults to GET. Optional fields are `body`, non-sensitive `headers`, and `response_mode`:
+  ```json
+  {
+    "service_id": "<selected-user-service-id>",
+    "slug": "<service-slug>",
+    "path": "/v1/resource",
+    "method": "POST",
+    "body": {"k": "v"}
+  }
   ```
-  Read fields back with `${steps.call_api.json.<field>}`. Discover available slugs first with `nyxid_services` `{"action":"list"}`; if the needed slug is absent, tell the user and stop or degrade. Note: `connector_call` does **not** reach nyxid services — it only resolves connectors registered in the workflow connector registry, a different subsystem.
+  This is a direct current-turn tool call, not workflow YAML.
+- **Interactive connected-service operation.** Use the request-local `nyxid_service_operation__*` tool name emitted in the current tool catalog. Supply the enumerated `user_service_id` plus only fields present in that operation's dynamic schema. Never derive the tool name from a slug or reuse a tool name from another request.
+- **Compiled workflow operation.** Call `list_external_workflow_capabilities`, copy the exact descriptor `selector`, inspect it for the required execution mode, and persist it beside the step as `capability.nyxid_operation`:
+  ```json
+  {
+    "selector": {
+      "nyx_id_operation": {
+        "user_service_id": "us-lark-7",
+        "operation_id": "get-message"
+      }
+    },
+    "execution_mode": "interactive"
+  }
+  ```
+  Pass that whole object to `inspect_external_workflow_capability_readiness`; `nyx_id_operation` is required and must not be flattened.
+  ```yaml
+  - id: fetch_message
+    type: tool_call
+    capability:
+      nyxid_operation:
+        user_service_id: us-lark-7
+        operation_id: get-message
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"path_params":{"message_id":"m-42"}}'
+  ```
+  The compiler's admission proof owns UserService identity, slug, operation ID, method, path template, digest, schemas, and response policy. Runtime `arguments` may contain only admitted `path_params`, `query`, `headers`, `body`, and `response_mode`. Do not send `service_id`, `user_service_id`, `slug`, `path`, `method`, `operation_id`, or a contract digest in `arguments`.
 - **Registered workflow connectors.** If the capability is a connector registered in the workflow connector registry, call it with `connector_call` and authorize it on the role:
   ```yaml
   roles:
@@ -496,9 +530,13 @@ roles:
 steps:
   - id: fetch
     type: tool_call
+    capability:
+      nyxid_operation:
+        user_service_id: <copied-user-service-id>
+        operation_id: <listed-operation-id>
     parameters:
       tool: nyxid_proxy
-      arguments: '{"slug":"<service-slug>","path":"/v1/items","method":"GET"}'
+      arguments: '{"query":{}}'
     next: classify
   - id: classify
     type: llm_call
@@ -741,6 +779,6 @@ One `map_reduce` step is n8n's "N source branches → merge node": the map phase
 - [ ] Any date/time the logic needs is injected via input, not assumed.
 - [ ] No hardcoded `model:` unless the user demanded one.
 - [ ] Arithmetic / totals / dedup use `transform`, not `llm_call`.
-- [ ] Every external call uses an existing connector (verified via `nyxid_services`) through `nyxid_proxy` or a typed tool.
+- [ ] Every workflow external call copied an exact listed selector, passed readiness for its execution mode, and puts only runtime operation values in `nyxid_proxy.arguments`; raw current-turn proxy calls use exact `service_id + slug + path`.
 - [ ] One `aevatar_start_workflow` dispatch returned a `run_id` with no parse error — you did **not** wait for/poll `run_finished` (the run finishes async; report the `run_id` + observatory).
 - [ ] Any parallel fan-out uses the right primitive: same input → `parallel` / `race`; a list of different items → `foreach` (concatenate) or `map_reduce` (synthesize). Per-item `tool_call` fetches use `foreach`, not `map_reduce`.
