@@ -1,12 +1,11 @@
 ---
 name: aevatar-platform-map
-description: Entry point, panorama, and router for the entire Aevatar skill family — load this FIRST whenever someone wants to build, run, publish, schedule, externally trigger, or operate anything on Aevatar ("create an agent team", "make a workflow / member", "publish or bind a service", "register it with NyxID", "set up a recurring / cron run", "schedule my team member workflow", "invoke my service"), wants to configure an agent's identity ("create an agent profile", "set my agent's purpose/instructions", "bind a skill to my agent", "limit my agent's tools"), wants to know whether something is even possible ("can Aevatar do X?", "能不能用 aevatar 实现"), or just wants to know what Aevatar can do. It teaches the two independent resource surfaces — build/operate (scope → team → member[workflow|script|gagent] → service → schedule/external trigger) and Agent Profile (ownerHandle/profileSlug → opaque profileId → draft → published snapshot) — NyxID-brokered auth and scope resolution, the two caller modes (client REST vs in-session tools), how to route the three distinct scheduling resources to their right owner, and how to detect a deployment-gated capability before promising it. It routes rather than builds — feasibility-advisor, workflow-authoring, team-builder, service-publisher, scheduler, agent-profile-management, triage, plus probes and the fallback — held together by the `aevatar` tag and published as the versioned `aevatar-platform` Ornn skillset.
-version: "1.8"
+description: Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.
+version: "1.9"
 metadata:
   category: plain
   tag:
     - aevatar
-    - control-plane
     - routing
     - nyxid
     - team
@@ -15,6 +14,7 @@ metadata:
     - schedule
     - agent-profile
     - agent-key
+    - codex-exec
 ---
 
 # Aevatar control plane — the map
@@ -24,19 +24,34 @@ work yourself. Your job: orient the agent (object model, auth, caller mode), the
 *one* companion skill that owns the step the user is on. Read this map first; each spoke is
 self-contained, so you can also jump straight in once you know the step.
 
-**What Aevatar is.** A control plane driven entirely over REST at
-`https://aevatar-console-backend-api.aevatar.ai`. Everything hangs off your **scope** (your NyxID
-subject id), across **two independent resource surfaces**:
+**What Aevatar is.** A control plane whose client surface is driven over REST at
+`https://aevatar-console-backend-api.aevatar.ai`, with separate in-session capabilities exposed as
+tools. Build/operate resources are owned under a **scope** (the NyxID subject id); Agent Profile is
+an independent resource surface:
 
 ```
-build & operate :  scope → team → member (workflow | script | gagent) → service → schedule / external trigger
-Agent Profile   :  ownerHandle/profileSlug → opaque profileId → draft → published snapshot
+scope
+  ├── teams → members                         authority and ownership
+  ├── workflow drafts / definitions           workflowId
+  ├── member implementation editor            .../members/{memberId}/workflow
+  ├── published callable services             publishedServiceId
+  ├── schedules / external triggers           target callable contracts
+  └── run / read-model observability           reports committed and materialized facts
+
+Agent Profile
+  └── ownerHandle/profileSlug → opaque profileId → draft / published snapshot
 ```
 
-Most requests walk the first chain. **"Who is this agent and what may it do?"** walks the second —
-see *The Agent Profile surface*. They are **not** two phases of one lifecycle: `profileId`,
-`workflowId`, `memberId`, `publishedServiceId`, and a conversation actor id are five distinct
-identities, and creating a Profile creates no workflow, member, team, service, or schedule.
+These are associations between independently identified resources, not phases of one global
+lifecycle. **"Who is this agent and what may it do?"** belongs to Agent Profile; it is not a
+workflow/member/service operation. Creating a Profile creates no workflow, member, team, service,
+or schedule.
+
+`memberId`, `workflowId`, and `publishedServiceId` are separate identities. Never pass a
+`workflowId` to a member API, a `memberId` to a workflow-draft API, or either as a
+`publishedServiceId`. Resolve every conversion from an explicit backend contract/read model,
+never from equality, prefixes, or route position. `profileId`, schedule IDs, Agent Key IDs,
+UserService IDs, catalog service IDs, and conversation actor IDs are distinct again.
 
 **Settle four things before you route** (each has a full section below — this is the checklist):
 1. **Which surface and which resource owner is this?** Build/operate or Agent Profile — and if it's
@@ -70,9 +85,9 @@ scope  (= your NyxID subject id; your private workspace; everything hangs off it
   └── external trigger  Lark Base / webhook / external cron calls the service invoke path
 ```
 
-The lifecycle the user almost always wants:
-**author a workflow → wrap it in a member → group members into a team → publish as a
-service (register to NyxID) → schedule it.**
+Workflow authoring, member ownership/binding, service publication, and scheduling may be composed
+for one goal, but no step changes one resource identity into another. Keep every returned ID in
+its own typed slot and follow the explicit association returned by the backend.
 
 ## The Agent Profile surface (separate from everything above)
 
@@ -167,12 +182,21 @@ dry-run a workflow with `POST /api/scopes/{scopeId}/workflow/draft-run` (body
 surface your tool list actually supports — do not try to call the server-side tools as HTTP
 endpoints (they are not).
 
+`codex_exec` is also an **in-session capability tool**, not a Studio lifecycle stage and not an
+HTTP endpoint. Before placing it in workflow YAML, select and verify its exact managed or private
+target contract through the Codex-specific skills below. Do not invent a REST path for the tool.
+
 ## Which skill for which task (router)
 
 | You want to… | Use the skill | Key endpoints |
 |---|---|---|
 | **Decide if a goal is even possible** + what must be in place first (use FIRST, before building) | `aevatar-feasibility-advisor` | read-only `GET /api/v1/services`, `GET /api/v1/catalog` (NyxID) |
 | **Triage a failure** — is it an aevatar / nyxid / ornn problem? read the code, then file an issue or get authoritative usage guidance (use AFTER something breaks) | `aevatar-triage` | reads repos via `gh` or `nyxid_proxy` `api-github`; `gh issue` |
+| Assess whether **Codex fits the task** and select managed versus private | `aevatar-feasibility-advisor` | read-only contract decision; no Codex call yet |
+| Configure or repair managed/private **`codex_exec`** | `aevatar-codex-exec-node-setup` | in-session `codex_exec`; managed UserService readiness or private NyxID SSH route |
+| Run the canonical **Codex readiness proof** | `aevatar-codex-exec-workflow-sample` | `use_skill` + `aevatar_start_workflow`; exact `CODEX_EXEC_READY` contract |
+| Author a workflow containing **`codex_exec`** | first `aevatar-codex-exec-node-setup`, then `aevatar-workflow-authoring` | load the exact tool contract before writing workflow YAML |
+| Diagnose a **`codex_exec` failure** | first `aevatar-triage`; use `aevatar-codex-exec-node-setup` only after the failing boundary is known | typed code + sanitized diagnostic evidence |
 | Define **who an agent is** — purpose, instructions, exact skill bindings, activation mode, tool ceiling; validate/publish a profile | `aevatar-agent-profile-management` | `/api/scopes/{id}/agent-profiles/*` (`:validate`, `:publish`), `GET /api/agent-profiles/{ownerHandle}/{profileSlug}`, or the in-session `agent_profiles` tool — **detect the surface first** |
 | Turn an idea into a runnable **workflow YAML** | `aevatar-workflow-authoring` | server-side tools `aevatar_start_workflow`/`ornn_publish_skill`, **or** client REST `…/workflow/draft-run` + ornn zip publish (see *Two caller modes*) |
 | Create a **team**, create **members** (workflow/script/gagent), bind them, set the entry member | `aevatar-team-builder` | `/api/scopes/{id}/teams`, `/members`, `/members/{id}/binding` |
@@ -214,6 +238,13 @@ server-side at publish time.)
   (confirmation-gated) for a genuine platform defect, or give authoritative, code-grounded usage
   guidance for a misuse. The after-it-breaks counterpart to `aevatar-feasibility-advisor`.
 
+**Select, configure, and prove Codex** (`category: tool-based`, public)
+- `aevatar-codex-exec-node-setup` — choose and configure the exact `managed_sandbox` or
+  `private_ssh` contract, preserve their different ownership and isolation boundaries, and repair
+  failures only after attribution.
+- `aevatar-codex-exec-workflow-sample` — run the harmless published managed or private readiness
+  workflow and require exact `CODEX_EXEC_READY` evidence before real work.
+
 **Build & operate — the control-plane family** (client REST, `category: plain`, public)
 - `aevatar-platform-map` — *this map*: object model, auth + scope bootstrap, routing.
 - `aevatar-team-builder` — create teams; create + bind members (workflow/script/gagent); set the entry member.
@@ -237,15 +268,17 @@ server-side at publish time.)
   hand the original problem back to the calling agent instead of failing opaquely. Generic
   (no `aevatar` tag), but part of how this family degrades safely.
 
-## The golden path, end to end
+## One build/operate composition example
 
-This is the **build/operate** path. Agent Profile work does not enter it at any step — it has its
-own lifecycle in `aevatar-agent-profile-management`.
+This example associates several resources for one common goal; it is not a global product
+lifecycle, and none of its IDs are aliases. Agent Profile work is not part of this composition.
 
 0. **Scope check (do this first)** — confirm the goal is feasible and collect its
    prerequisites (connectors to configure, host-gated pieces, hard limits) —
    `aevatar-feasibility-advisor`. Skip only when the ask is obviously in-scope.
-1. **Author** the workflow YAML — `aevatar-workflow-authoring`.
+1. If the workflow needs `codex_exec`, first choose/configure its target with
+   `aevatar-codex-exec-node-setup`, prove it with `aevatar-codex-exec-workflow-sample`, then
+   **author** the workflow YAML with `aevatar-workflow-authoring`.
 2. **Create team** — `POST /api/scopes/{scopeId}/teams {displayName}`.
 3. **Create + bind a workflow member** — `POST /api/scopes/{scopeId}/members`, then
    `PUT /api/scopes/{scopeId}/members/{memberId}/binding` (carries the YAML). The bind is
