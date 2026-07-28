@@ -1,7 +1,7 @@
 ---
 name: github-via-nyxid
 description: Operate a user's GitHub account through NyxID's credential-brokering proxy (service slug api-github) — read and write repositories, files, issues, pull requests, commits, branches, Actions, gists and anything else the GitHub REST API exposes, all on the user's behalf and without ever handling a raw token. NyxID injects the user's GitHub credential server-side. Use when an agent needs to read from or act on GitHub for a user who has connected their GitHub account in NyxID.
-version: "1.0"
+version: "1.1"
 license: MIT
 metadata:
   category: plain
@@ -37,8 +37,10 @@ only ever send your **NyxID** bearer; you never see, request, or log the GitHub 
 
 ## 1. Preflight — confirm GitHub is connected
 
-Before the first call, confirm the user has the `api-github` service connected in NyxID.
-List the user's connected services and check for the slug `api-github`:
+Before the first call, confirm the user has the `api-github` service connected in NyxID. In an
+Aevatar turn, call the available `nyxid_service_inventory` with `{}` and select an exact
+`user_service_id`; use only the schema emitted for that request. The CLI and raw HTTP remain
+operator alternatives:
 
 - CLI: `nyxid service list --output json` → look for an entry with `"slug": "api-github"`.
 - Raw HTTP: `GET https://nyx-api.chrono-ai.fun/api/v1/services` with `Authorization: Bearer <NYXID_TOKEN>`.
@@ -67,13 +69,64 @@ appended to the service base URL `https://api.github.com`, so paths are **relati
 standard GitHub REST v3 — e.g. `/user`, `/repos/{owner}/{repo}/issues`. Do not put a host
 or a GitHub token in the request.
 
-Use whichever proxy mechanism your runtime gives you — all three hit the same proxy:
+For Aevatar tool calls, keep these three invocation modes separate. They hit the same NyxID proxy,
+but do not accept the same fields.
 
-**a) In-agent NyxID proxy tool** (e.g. a `nyxid_proxy` workflow tool, or the NyxID MCP
-proxy tool): call it with `service = api-github`, the HTTP `method`, the relative `path`,
-and an optional JSON `body`.
+**a) Raw one-off `nyxid_proxy`.** The raw caller owns the route and must send exact
+`service_id + slug + path`; `method`, `body`, allowed non-sensitive headers, and response mode are
+optional. To read the connected account:
 
-**b) Raw HTTP** (any runtime that holds a NyxID bearer):
+```json
+{
+  "tool": "nyxid_proxy",
+  "arguments": {
+    "service_id": "us-gh-7",
+    "slug": "api-github",
+    "path": "/user",
+    "method": "GET"
+  }
+}
+```
+
+**b) Interactive request-local operation.** Call the exact `nyxid_service_operation__*` tool
+emitted by the current request. Its dynamic schema requires an enumerated `user_service_id` and
+only the operation fields declared by the exact UserService OpenAPI. For an emitted `get_user`
+operation with no other parameters:
+
+```json
+{
+  "tool": "nyxid_service_operation__get_user",
+  "arguments": {"user_service_id": "us-gh-7"}
+}
+```
+
+Do not derive the tool name from `api-github`, reuse it in another request, or add route fields not
+present in the emitted schema.
+
+**c) Compiled workflow admitted operation.** The step calls `nyxid_proxy`, copies the exact
+selector into step-level `capability.nyxid_operation`, and supplies only admitted runtime values.
+For an admission that owns `get-user`, `GET`, UserService `us-gh-7`, slug, and `/user`:
+
+```yaml
+- id: read_user
+  type: tool_call
+  capability:
+    nyxid_operation:
+      user_service_id: us-gh-7
+      operation_id: get-user
+  parameters:
+    tool: nyxid_proxy
+    arguments: '{}'
+```
+
+The server-owned proof also owns the contract digest, schemas, and response policy. Runtime
+`arguments` may contain only admitted `path_params`, `query`, `headers`, `body`, and
+`response_mode`; never put `service_id`, `user_service_id`, `operation_id`, `slug`, `path`,
+`method`, or proof fields there.
+
+Outside the Aevatar tool surface, operators may still use the lower-level transports below:
+
+**Raw HTTP** (any runtime that holds a NyxID bearer):
 
 ```
 {METHOD} https://nyx-api.chrono-ai.fun/api/v1/proxy/s/api-github/{path}
@@ -81,7 +134,7 @@ Authorization: Bearer <NYXID_TOKEN>
 Content-Type: application/json          # for write bodies
 ```
 
-**c) NyxID CLI:**
+**NyxID CLI:**
 
 ```bash
 nyxid proxy request api-github /user -m GET
