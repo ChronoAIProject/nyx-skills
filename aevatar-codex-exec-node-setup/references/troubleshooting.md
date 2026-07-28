@@ -1,20 +1,52 @@
 # Verification and Troubleshooting
 
-## Managed OpenSandbox failures
+## Managed failures by boundary
 
-| Symptom | Meaning | Check |
+Preserve only the typed code and sanitized `diagnostic_id`. Never request a raw upstream response, NyxID key, bearer, delegation token, or process environment.
+
+### Host and admission
+
+| Code | Meaning | Check |
 |---|---|---|
-| `managed_sandbox_disabled` / `target_not_configured` | Managed target is not exposed by the host | Ask operations to verify the disabled-by-default Aevatar configuration |
-| `managed_feature_not_enabled` | Authenticated NyxID subject is not allowlisted | Compare the verified NyxID `sub` with `AllowedNyxIdUserIds` |
-| `nyxid_binding_required` / `nyxid_binding_revoked` | Aevatar cannot mint from the user's binding | Repeat normal Aevatar/NyxID login consent |
-| `llm_proxy_scope_missing` | OAuth client or binding predates `llm:proxy` | Refresh the cluster client and user consent; never reuse the inbound bearer |
-| `llm_service_access_missing` | Binding lacks the configured LLM resource | Review NyxID service consent |
-| `managed_capacity_unavailable` | P0 process-local slot is busy | Retry later; do not bypass admission |
-| `sandbox_provisioning_failed` | OpenSandbox control plane, image, quota, or architecture failed | Use the sanitized diagnostic ID and operations runbook |
-| `credential_vault_binding_failed` | Credential Proxy rejected or exposed the binding | Stop and inspect Vault/Proxy configuration without logging tokens |
-| `landlock_preflight_failed` | Required nested isolation is absent or ineffective | Stop rollout; do not fall back to danger-full-access |
-| `codex_jsonl_*` / `codex_terminal_*` | Codex stream was malformed or incomplete | Correlate bounded JSONL with the sanitized diagnostic ID |
-| `sandbox_cleanup_failed` | Sandbox absence could not be proven | Treat as an incident and inspect the process/pod tree |
+| `target_not_configured` | This Aevatar host did not register the managed target | Ask operations to verify host composition |
+| `managed_target_disabled` | Managed Codex is disabled in deployment configuration | Ask operations to verify `Enabled` and the internal rollout configuration |
+| `managed_feature_not_enabled` | The authenticated native NyxID user is not eligible | Compare the verified user ID with the configured `Allowlist`, or confirm the internal `All` policy |
+| `managed_identity_unavailable` | Aevatar lacks an exact native NyxID identity for this call | Re-authenticate through the normal Aevatar/NyxID path; do not infer identity from another ID |
+| `managed_user_authorization_unavailable` | Transparent credential creation or repair lacks the current user's authorization | Retry from an authenticated user call; do not supply or log the bearer manually |
+
+### NyxID readiness and credential
+
+| Code | Meaning | Check |
+|---|---|---|
+| `managed_user_services_unavailable` | The user's required `chrono-sandbox` or `chrono-llm-public` UserService is absent, ambiguous, inactive, or unusable | Inspect only the user's service inventory and ownership; do not provision a key manually |
+| `nyxid_identity_mismatch` | The authenticated identity does not own the authorization used for readiness | Stop and sign in as the intended native NyxID user |
+| `managed_credential_untracked_key_exists` | NyxID has conflicting active managed invocation keys | Escalate for controlled reconciliation using the sanitized diagnostic evidence |
+| `managed_credential_mutation_in_progress` | Another credential mutation owns the per-user lease | Retry after the in-flight mutation reaches a terminal state |
+| `managed_credential_commit_timeout` | Readiness did not commit within its bounded mutation deadline | Retry once; if repeated, correlate the sanitized diagnostic with credential lifecycle logs |
+| `managed_credential_cleanup_pending` | Obsolete key cleanup has not completed | Retry later; do not create another key |
+| `managed_credential_persistence_pending` | A successful remote change is not yet durably recorded | Retry later and preserve the typed code for reconciliation |
+| `managed_credential_vault_unavailable` | Aevatar's internal `ISecretVault` could not persist or resolve the invocation key | Ask operations to repair Aevatar secret storage; this is not sandbox-side injection |
+| `managed_credential_unavailable` | The committed invocation credential cannot be used | Let the normal invocation attempt its bounded transparent repair; then escalate the sanitized code if it repeats |
+| `managed_credential_invalid` | The committed credential descriptor violates the managed contract | Escalate for controlled credential reconciliation; never edit or expose raw secret material |
+
+### Proxy and chrono transport
+
+| Code | Meaning | Check |
+|---|---|---|
+| `managed_proxy_authorization_denied` | NyxID or chrono-sandbox rejected the invocation authority | Let Aevatar attempt its one transparent repair; if repeated, inspect the UserService policy and sanitized diagnostic |
+| `managed_proxy_target_unavailable` | The exact personal `chrono-sandbox` proxy target cannot be resolved | Verify the user's active `chrono-sandbox` UserService and deployment route |
+| `managed_proxy_timeout` | NyxID proxy or chrono-sandbox did not return within the bounded transport wait | Correlate the sanitized diagnostic at NyxID/chrono-sandbox; do not repair local sandbox tooling |
+| `managed_proxy_unavailable` | NyxID proxy or chrono-sandbox is temporarily unavailable or capacity-limited | Retry later and escalate repeated failures with the sanitized diagnostic |
+
+### Terminal contract
+
+| Code | Meaning | Check |
+|---|---|---|
+| `managed_response_invalid` | chrono-sandbox returned a malformed or incomplete terminal contract | Inspect bounded chrono-sandbox diagnostics without requesting raw secrets |
+| `managed_response_too_large` | The bounded response limit was exceeded | Reduce task output; use a private artifact path for large results |
+| `managed_execution_nonzero_exit` | The fixed Codex process exited unsuccessfully | Use the sanitized diagnostic to inspect runner/model failure; do not change caller-controlled flags |
+| `managed_execution_cancelled` | The caller cancelled the managed execution | Retry only if the original task is still wanted |
+| `managed_execution_failed` | Aevatar caught an unclassified terminal managed failure | Correlate the sanitized code and diagnostic across Aevatar, NyxID, and chrono-sandbox |
 
 ## Private SSH end-to-end probe
 
