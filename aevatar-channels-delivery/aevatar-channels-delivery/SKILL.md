@@ -1,7 +1,7 @@
 ---
 name: aevatar-channels-delivery
 description: "Aevatar channel & delivery how-to: capability tools (code_execute, nyxid_proxy, GitHub PAT fallback, channel bots), token_expired/401 credential triage that identifies the typed credential source before interpreting the failure (a dedicated scheduled-invocation Agent Key is vault-held and late-resolved per use — never diagnose it with the 300-second broker TTL), LLM route selection slash commands, channel_registrations (staged Lark provisioning), agent_delivery_targets binding, and a strict never-emit-secret-material policy."
-version: "1.2"
+version: "1.3"
 metadata:
   category: plain
   tag:
@@ -17,9 +17,18 @@ metadata:
 
 **`code_execute`** — Execute Python, JavaScript, TypeScript, or Bash in a sandboxed environment. Returns stdout, stderr, and exit code. Use this for calculations, data processing, format conversion, testing code snippets, etc.
 
-**`nyxid_proxy`** — Make HTTP requests to any connected service. NyxID injects credentials automatically.
-- Omit slug → discover all proxyable services with proxy URLs
-- Provide slug + path + method + body → make the proxied request
+**`nyxid_service_inventory`** — In a channel sender turn, list that sender's exact connected-service
+inventory with `{}`. This request-local channel exposure is list-only: do not hand-write a
+`user_service_id`, and do not use `nyxid_proxy` as an inventory call.
+
+**`nyxid_proxy`** — Make an admitted or raw request without exposing credentials. Keep its two
+shapes distinct:
+- Raw one-off call: require exact `service_id + slug + path`; `method`, `body`, allowed
+  non-sensitive headers, and response mode are optional.
+- Compiled workflow operation: keep copied `user_service_id + operation_id` only in the
+  step-level `capability.nyxid_operation`. Runtime `arguments` contain only admitted
+  `path_params`, `query`, `headers`, `body`, and `response_mode`; never repeat service, slug,
+  operation ID, method, path template, digest, or schema.
 
 **Critical**: Proxy paths are relative to the service's base URL (shown in `<connected-services>`). Do NOT duplicate version prefixes already in the base URL. For NyxID-specific service paths, OAuth/device/API-key connection flows, error code semantics, and conventions, **load `use_skill(skill="nyxid")` first** instead of guessing.
 
@@ -104,6 +113,28 @@ Add events: `im.message.receive_v1`, `card.action.trigger`.
 For advanced Lark API operations outside the current relay reply, prefer typed tools: `lark_messages_send`, `lark_messages_batch_get`, `lark_messages_reactions_list`, `lark_messages_reactions_delete`, `lark_chats_lookup`, `lark_sheets_append_rows`, `lark_approvals_list`, `lark_approvals_act`.
 
 For inbound Lark relay turns that represent a fresh user message, do **not** call `lark_messages_reply` or `lark_messages_react` to deliver the answer. Produce the final text reply directly; the channel runtime will send it through the Nyx relay reply token.
+
+When that turn needs a sender-scoped inventory followed by a compiled admitted Lark read, use the
+actual channel tool first, then pass only the operation value to the admitted proxy step. For an
+admission that already owns UserService `us-lark-7`, operation `get-message`, `GET`, slug, and path
+template, fetching message `m-42` has these call shapes:
+
+```json
+{"tool":"nyxid_service_inventory","arguments":{}}
+```
+
+```yaml
+capability:
+  nyxid_operation:
+    user_service_id: us-lark-7
+    operation_id: get-message
+parameters:
+  tool: nyxid_proxy
+  arguments: '{"path_params":{"message_id":"m-42"}}'
+```
+
+Do not put `user_service_id`, `operation_id`, `slug`, `method`, raw `path`, or a body inside those
+runtime arguments.
 
 Managing registrations: `list`, `delete id=<reg_id> confirm=true`.
 
