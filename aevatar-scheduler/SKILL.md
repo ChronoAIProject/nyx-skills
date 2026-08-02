@@ -1,7 +1,7 @@
 ---
 name: aevatar-scheduler
-description: Create and manage recurring Aevatar runs — and route to the RIGHT scheduling resource first, because there are three. Use when a user wants to "schedule", "run on a cron", "set up a recurring run", "run every day/hour/Monday", "automate this service on a timer", "schedule my team member workflow", "preview a cron", "pause/resume/disable a schedule", "run it now", "reauthorize or delete an automation" — or hits token_expired on a scheduled run's late steps. An already-bound Studio Team member workflow is canonically scheduled through aevatar_schedule_member_workflow or /api/scopes/{scopeId}/teams/{teamId}/members/{memberId}/automations and gets a dedicated, restricted Agent Key whose raw material lives only in the secret vault; generic /api/schedules is a separate platform resource for raw service invocations and envelopes, not a fallback for Team members. Covers preflight, the Agent Key lifecycle (create, pause/resume, update, reauthorize, delete with independent NyxID and Vault revocation tracks), 202-is-admission-only semantics, preview, enable/disable, run-now, and diagnosing a credential failure by credentialSourceKind rather than by assuming a 300-second broker token. Publish the service first with the service-publisher skill.
-version: "1.8"
+description: Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.
+version: "1.9"
 metadata:
   category: plain
   tag:
@@ -27,7 +27,7 @@ APIs. Pick before you call anything; using the wrong one is not a shortcut, it i
 |---|---|---|---|
 | An already-bound **Studio Team member** workflow | `scope → team → member` | `aevatar_schedule_member_workflow`, or REST `/api/scopes/{scopeId}/teams/{teamId}/members/{memberId}/automations` | **Dedicated Agent Key** |
 | An independent **scheduled Ornn skill agent** or a **one-shot reminder** | Scheduled agent / catalog actors | `scheduled_agent_creator`, then `agent_builder` — see `aevatar-automation` | **Dedicated Agent Key** |
-| A **raw service invocation or actor envelope** | Generic platform schedule actor | Generic `/api/schedules` — the rest of this skill | Typed source; may be a NyxID binding exchange |
+| A typed **service invocation** | Generic platform schedule actor | Generic `/api/schedules` — the rest of this skill | Typed source; may be a NyxID binding exchange |
 
 **If the owner is a Team member, the canonical path is the member automation route — not generic
 `/api/schedules`.** Generic `/api/schedules` is a platform-level resource for raw invocations. It
@@ -133,10 +133,11 @@ credential source with different lifetime semantics.
 
 ---
 
-## Generic platform schedule (`/api/schedules`)
+## Generic typed-service schedule (`/api/schedules`)
 
-Everything below is the **generic** resource: a raw service invocation or actor envelope. Use it
-when that is genuinely what the user wants — not as a fallback for a Team member.
+Everything below is the **generic** typed service-invocation resource. External callers cannot
+schedule a raw actor `EventEnvelope`; that target is retired and rejected. Never use an envelope
+as a fallback for a Team member.
 
 You create a **schedule** that fires a published service on a cron expression,
 authenticated as **you** (the scope owner) through NyxID. Publish the service first
@@ -172,8 +173,9 @@ aev "api/scopes/$scopeId/services" \
   | jq '.[] | {tenantId, appId, namespace, serviceId, defaultServingRevisionId, invokeReady,
                endpoints: [.endpoints[] | {endpointId, requestTypeUrl}]}'
 ```
-- **identity** — the 4-tuple `{tenantId, appId, namespace, serviceId}`. For a workflow
-  member the `serviceId` is `member-<memberId>`.
+- **identity** — copy the explicit 4-tuple `{tenantId, appId, namespace, serviceId}` from the
+  service read model or member `published-service` association. Never derive `serviceId` from
+  `memberId`, a prefix, route position, or string equality.
 - **endpointId** + **payloadTypeUrl** — from `endpoints[]` (`payloadTypeUrl` = the
   endpoint's `requestTypeUrl`). A workflow member's default endpoint is `chat` with
   `type.googleapis.com/aevatar.ai.ChatRequestEvent`.
@@ -206,14 +208,9 @@ binding fails fast at create with one of:
 > HTTP 400 — "Authenticated NyxID owner binding is required for scope owner schedule auth…"
 > HTTP 400 — "NyxID binding was revoked for the scheduled subject. (Parameter 'configuration')"
 
-**Diagnose before re-logging in** — the binding lives on the NyxID side, so check it directly:
-```bash
-NYX=$(tr -d '\n' < ~/.nyxid/base_url); TOK=$(tr -d '\n' < ~/.nyxid/access_token)
-curl -s -H "Authorization: Bearer $TOK" "$NYX/api/v1/users/me/broker-bindings" \
-  | jq -r '.bindings[] | "\(.client_name)  scopes=\(.scopes|join(","))  last_used=\(.last_used_at)"'
-```
-A non-revoked `aevatar` binding with the `proxy` scope means NyxID is healthy and the fault
-is Aevatar-side (it can be pinned to a stale binding). A **clean** console re-login (fully
+Diagnose from the typed create/preflight error and the Aevatar read model. Never read a stored
+access token, construct an Authorization header, or call NyxID/Aevatar directly with `curl`.
+A **clean** console re-login (fully
 logged out first) refreshes a revoked binding — finalize replaces it on the revoked/stale
 probe path — so that usually clears it; an SSO-cached login may not re-run finalize.
 
@@ -223,16 +220,11 @@ Tracked at **aevatarAI/aevatar#2491** — do not promise a CLI-only way to creat
 `scopeOwnerNyxId` schedule until it lands.
 
 ### CLI-only alternative: skip the Aevatar scheduler entirely
-For a recurring run **without the browser console**, don't use `scopeOwnerNyxId` scheduling
-at all. The published service is already invocable — drive it from an **external timer**
-(cron, `launchd`, a node) that hits the invoke endpoint with a **non-expiring NyxID API key**
-(`nyxid api-key create --scopes proxy`; export as `NYXID_ACCESS_TOKEN`). No broker binding,
-no console:
-```bash
-NYXID_ACCESS_TOKEN="$KEY" nyxid proxy request aevatar \
-  "api/scopes/$scopeId/members/$memberId/invoke/chat:stream" -m POST --stream \
-  -H 'Content-Type: application/json' -d '{"prompt":"poll"}'
-```
+For a recurring run **without the browser console**, don't use `scopeOwnerNyxId` scheduling.
+An explicitly authorized external timer may invoke the already-published member/team endpoint
+through NyxID using a dedicated minimum-authority API key kept in that timer's secret manager.
+Never print the key, put it in workflow YAML, export it into a shared shell history, or expose it
+in diagnostics.
 The member invoke endpoint carries `scopeId` in its path, so it runs even though a bare API
 key reports `scopeResolved:false` on the generic `api/studio/context` call. The same pattern
 works for **event-driven external triggers** such as Lark Base automation's "send HTTP request"
@@ -299,7 +291,7 @@ aev "api/schedules" -m POST -d "{
   \"timezone\": \"Asia/Shanghai\",
   \"enabled\": true,
   \"serviceInvocation\": {
-    \"identity\": { \"tenantId\": \"$scopeId\", \"appId\": \"default\", \"namespace\": \"default\", \"serviceId\": \"member-<memberId>\" },
+    \"identity\": { \"tenantId\": \"<from-service-contract>\", \"appId\": \"<from-service-contract>\", \"namespace\": \"<from-service-contract>\", \"serviceId\": \"<published-service-id-from-contract>\" },
     \"endpointId\": \"chat\",
     \"payloadTypeUrl\": \"type.googleapis.com/aevatar.ai.ChatRequestEvent\",
     \"payloadJson\": $(jq -nc '{prompt:"do the thing"} | tojson'),
@@ -310,8 +302,8 @@ aev "api/schedules" -m POST -d "{
 ```
 
 `ScheduledDispatchConfigurationHttpRequest`: `cronExpression` (required); `displayName?`,
-`timezone?`, `enabled` (default true), `headers?` (string map), and **exactly one** target:
-`serviceInvocation` (above) or `envelope` (a raw actor `EventEnvelope` — advanced).
+`timezone?`, `enabled` (default true), `headers?` (string map), and exactly one
+`serviceInvocation` target. Any external `envelope` target must be rejected.
 
 > **`payloadJson` requires `revisionId`.** If you supply `payloadJson` without a
 > `revisionId` (and the service has no *active* serving revision), creation fails with
