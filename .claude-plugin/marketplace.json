@@ -115,7 +115,7 @@
       "name": "aevatar-platform-map",
       "source": "./aevatar-platform-map",
       "description": "Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.",
-      "version": "1.10",
+      "version": "1.11",
       "keywords": [
         "aevatar",
         "routing",
@@ -229,8 +229,8 @@
     {
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
-      "description": "Author, validate, and persist an executable aevatar workflow from a natural-language request — use it when the user wants to create, build, set up, or automate a multi-step task as a runnable aevatar workflow (make a workflow that…, automate…, build a pipeline…, set up a recurring…). It generates workflow YAML, dispatch-validates it, then saves it as a reusable workflow that can be re-run and watched in the observatory. Not for running an existing workflow — search for that and start it instead.",
-      "version": "2.1",
+      "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, or automate a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, and reusable publication. Not for blindly rerunning an existing failed workflow.",
+      "version": "2.2",
       "keywords": [
         "workflow",
         "authoring",
