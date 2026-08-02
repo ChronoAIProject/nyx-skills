@@ -83,7 +83,7 @@
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
       "description": "Use before building when a user asks whether Aevatar can achieve a goal, what prerequisites it has, or why it is unavailable. Triggers include bots and third-party APIs, inbound channels, external HTTP triggers, schedules, service exposure, Agent Profiles and tool ceilings, and bounded managed or private-host codex_exec work. It distinguishes outbound connectors from inbound channels and separates not connected, host-gated, not deployed, and genuinely unsupported outcomes. It chooses managed_sandbox versus private_ssh without promising repository, model, credential, runtime, or deployment capabilities the caller does not control, then routes feasible work to the owning Aevatar skill.",
-      "version": "1.4",
+      "version": "1.5",
       "keywords": [
         "aevatar",
         "feasibility",
@@ -115,7 +115,7 @@
       "name": "aevatar-platform-map",
       "source": "./aevatar-platform-map",
       "description": "Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.",
-      "version": "1.10",
+      "version": "1.11",
       "keywords": [
         "aevatar",
         "routing",
@@ -147,8 +147,8 @@
     {
       "name": "aevatar-scheduler",
       "source": "./aevatar-scheduler",
-      "description": "Create and manage recurring Aevatar runs — and route to the RIGHT scheduling resource first, because there are three. Use when a user wants to \"schedule\", \"run on a cron\", \"set up a recurring run\", \"run every day/hour/Monday\", \"automate this service on a timer\", \"schedule my team member workflow\", \"preview a cron\", \"pause/resume/disable a schedule\", \"run it now\", \"reauthorize or delete an automation\" — or hits token_expired on a scheduled run's late steps. An already-bound Studio Team member workflow is canonically scheduled through aevatar_schedule_member_workflow or /api/scopes/{scopeId}/teams/{teamId}/members/{memberId}/automations and gets a dedicated, restricted Agent Key whose raw material lives only in the secret vault; generic /api/schedules is a separate platform resource for raw service invocations and envelopes, not a fallback for Team members. Covers preflight, the Agent Key lifecycle (create, pause/resume, update, reauthorize, delete with independent NyxID and Vault revocation tracks), 202-is-admission-only semantics, preview, enable/disable, run-now, and diagnosing a credential failure by credentialSourceKind rather than by assuming a 300-second broker token. Publish the service first with the service-publisher skill.",
-      "version": "1.8",
+      "description": "Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.",
+      "version": "1.9",
       "keywords": [
         "aevatar",
         "schedule",
@@ -212,7 +212,7 @@
       "name": "aevatar-triage",
       "source": "./aevatar-triage",
       "description": "Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.",
-      "version": "1.6",
+      "version": "1.7",
       "keywords": [
         "aevatar",
         "triage",
