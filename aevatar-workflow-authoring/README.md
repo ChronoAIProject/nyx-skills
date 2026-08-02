@@ -1,6 +1,6 @@
 # aevatar-workflow-authoring
 
-> Author, validate, and persist an executable aevatar workflow from a natural-language request — use it when the user wants to create, build, set up, or automate a multi-step task as a runnable aevatar workflow (make a workflow that…, automate…, build a pipeline…, set up a recurring…). It generates workflow YAML, dispatch-validates it, then saves it as a reusable workflow that can be re-run and watched in the observatory. Not for running an existing workflow — search for that and start it instead.
+> Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, or automate a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, and reusable publication. Not for blindly rerunning an existing failed workflow.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `2.1`
-- Last synced: `2026-08-02T15:00:07.731Z`
+- Latest version: `2.2`
+- Last synced: `2026-08-02T15:08:16.154Z`
 
 ## Install
 

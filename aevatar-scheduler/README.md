@@ -1,6 +1,6 @@
 # aevatar-scheduler
 
-> Create and manage recurring Aevatar runs — and route to the RIGHT scheduling resource first, because there are three. Use when a user wants to "schedule", "run on a cron", "set up a recurring run", "run every day/hour/Monday", "automate this service on a timer", "schedule my team member workflow", "preview a cron", "pause/resume/disable a schedule", "run it now", "reauthorize or delete an automation" — or hits token_expired on a scheduled run's late steps. An already-bound Studio Team member workflow is canonically scheduled through aevatar_schedule_member_workflow or /api/scopes/{scopeId}/teams/{teamId}/members/{memberId}/automations and gets a dedicated, restricted Agent Key whose raw material lives only in the secret vault; generic /api/schedules is a separate platform resource for raw service invocations and envelopes, not a fallback for Team members. Covers preflight, the Agent Key lifecycle (create, pause/resume, update, reauthorize, delete with independent NyxID and Vault revocation tracks), 202-is-admission-only semantics, preview, enable/disable, run-now, and diagnosing a credential failure by credentialSourceKind rather than by assuming a 300-second broker token. Publish the service first with the service-publisher skill.
+> Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.8`
-- Last synced: `2026-08-02T15:00:08.080Z`
+- Latest version: `1.9`
+- Last synced: `2026-08-02T15:08:16.470Z`
 
 ## Install
 
