@@ -1,5 +1,0 @@
-{
-  "name": "aevatar-local-nyxid-chat-schedule",
-  "version": "0.1",
-  "description": "Debug local Aevatar Mainnet Host against online NyxID for /api/chat Studio schedule provisioning, frontend-equivalent PKCE finalization, broker-capable OAuth clients, and scheduled-dispatch fire failures."
-}
