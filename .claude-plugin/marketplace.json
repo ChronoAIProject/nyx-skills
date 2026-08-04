@@ -773,6 +773,17 @@
       ]
     },
     {
+      "name": "release-readiness-review",
+      "source": "./release-readiness-review",
+      "description": "检查上线准备、备份、监控或回滚控制。用户提到“发布准备度审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "research-claim-fidelity-reviewer",
       "source": "./research-claim-fidelity-reviewer",
       "description": "Severity-weighted BLOCK, WARN, OK reviewer method for technical and research posts. Use when reviewing X threads, announcements, captions, or launch copy for hook strength, thread arc, generic AI vocabulary, source fidelity, claim support, numeric-claim verification, and thread format before recommending publish.",
@@ -781,6 +792,28 @@
         "research-review",
         "claim-fidelity",
         "severity-rubric"
+      ]
+    },
+    {
+      "name": "saas-license-optimization-digest",
+      "source": "./saas-license-optimization-digest",
+      "description": "汇总多路 Base 数据并预览或发送许可证优化卡片。用户提到“SaaS 许可证优化摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "4.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "saas-license-utilization-review",
+      "source": "./saas-license-utilization-review",
+      "description": "复核软件席位、许可证利用率或订阅成本。用户提到“SaaS 许可证利用率审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
