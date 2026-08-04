@@ -244,7 +244,7 @@
       "name": "asset-inventory-attestation",
       "source": "./asset-inventory-attestation",
       "description": "预览或明确提交 IT 资产盘点记录。用户提到“资产盘点确认”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -269,7 +269,7 @@
       "name": "candidate-document-compliance-preview",
       "source": "./candidate-document-compliance-preview",
       "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -327,7 +327,7 @@
       "name": "complex-codex-exec-validation",
       "source": "./complex-codex-exec-validation",
       "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -338,7 +338,7 @@
       "name": "contractor-access-package-approval",
       "source": "./contractor-access-package-approval",
       "description": "检查外包人员附件、历史去重并预览或创建审批。用户提到“外包人员访问资料审批”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -349,7 +349,7 @@
       "name": "email-access-approval-audit",
       "source": "./email-access-approval-audit",
       "description": "只读检查邮箱访问审批列表和实例详情。用户提到“邮箱访问审批审计”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -416,7 +416,7 @@
       "name": "invoice-ocr-policy-review",
       "source": "./invoice-ocr-policy-review",
       "description": "从发票图片或 PDF 提取字段、归一化并检查历史重复。用户提到“发票 OCR 与策略审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -495,7 +495,7 @@
       "name": "lark-contact-batch-resolution",
       "source": "./lark-contact-batch-resolution",
       "description": "通过 contact batch_get_id 解析入职邮箱身份。用户提到“Lark 联系人批量解析”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
