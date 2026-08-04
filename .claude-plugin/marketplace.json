@@ -266,17 +266,6 @@
       ]
     },
     {
-      "name": "candidate-document-compliance-preview",
-      "source": "./candidate-document-compliance-preview",
-      "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
-      ]
-    },
-    {
       "name": "chatgpt-image-short-video",
       "source": "./chatgpt-image-short-video",
       "description": "Method for producing short vertical videos from ChatGPT image generation through a fixed browser tab, local TTS narration, timed subtitle burn-in, cover exports, and a manifest. Use when an operator needs a reproducible image-to-short workflow with pinned session consistency, per-beat visual prompts, 1080x1920 safe-area rules, local ffmpeg/PIL assembly, and private access kept outside the skill.",
@@ -321,39 +310,6 @@
       "version": "1.4",
       "keywords": [
         "chronoai-official"
-      ]
-    },
-    {
-      "name": "complex-codex-exec-validation",
-      "source": "./complex-codex-exec-validation",
-      "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
-      ]
-    },
-    {
-      "name": "contractor-access-package-approval",
-      "source": "./contractor-access-package-approval",
-      "description": "检查外包人员附件、历史去重并预览或创建审批。用户提到“外包人员访问资料审批”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
-      ]
-    },
-    {
-      "name": "email-access-approval-audit",
-      "source": "./email-access-approval-audit",
-      "description": "只读检查邮箱访问审批列表和实例详情。用户提到“邮箱访问审批审计”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
       ]
     },
     {
@@ -410,17 +366,6 @@
         "issues",
         "rest-api",
         "agent-guide"
-      ]
-    },
-    {
-      "name": "invoice-ocr-policy-review",
-      "source": "./invoice-ocr-policy-review",
-      "description": "从发票图片或 PDF 提取字段、归一化并检查历史重复。用户提到“发票 OCR 与策略审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
       ]
     },
     {
