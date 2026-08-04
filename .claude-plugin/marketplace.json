@@ -729,6 +729,17 @@
       ]
     },
     {
+      "name": "project-shared-mailbox-approval",
+      "source": "./project-shared-mailbox-approval",
+      "description": "从 Base 申请创建并回读共享邮箱审批。用户提到“项目共享邮箱审批”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "promo-scout",
       "source": "./promo-scout",
       "description": "Verify-first promotion intelligence for ANY repo or org. Pulls live GitHub state, runs sshx multi-perspective consensus over it, and returns an evidence-backed board of what is genuinely promotable, how items connect, and what is unverifiable. Use when an agent or operator asks \"what's worth promoting / what connects / what's real\" for a target repo or org.",
@@ -748,6 +759,17 @@
         "public-copy",
         "release-gate",
         "content-safety"
+      ]
+    },
+    {
+      "name": "quarterly-access-review-reminder",
+      "source": "./quarterly-access-review-reminder",
+      "description": "预览或明确发送季度访问审查私信。用户提到“季度访问审查提醒”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
