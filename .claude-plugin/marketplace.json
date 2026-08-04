@@ -241,6 +241,17 @@
       ]
     },
     {
+      "name": "asset-inventory-attestation",
+      "source": "./asset-inventory-attestation",
+      "description": "预览或明确提交 IT 资产盘点记录。用户提到“资产盘点确认”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "budget-monitoring-variance-payload-builder",
       "source": "./budget-monitoring-variance-payload-builder",
       "description": "Builds deterministic Lark budget variance payloads and, when asked, runs the full budget monitoring flow through a NyxID service instead of direct Lark credentials.",
@@ -252,6 +263,17 @@
         "lark",
         "nyxid-service-runner",
         "payload-builder"
+      ]
+    },
+    {
+      "name": "candidate-document-compliance-preview",
+      "source": "./candidate-document-compliance-preview",
+      "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -299,6 +321,28 @@
       "version": "1.4",
       "keywords": [
         "chronoai-official"
+      ]
+    },
+    {
+      "name": "complex-codex-exec-validation",
+      "source": "./complex-codex-exec-validation",
+      "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "contractor-access-package-approval",
+      "source": "./contractor-access-package-approval",
+      "description": "检查外包人员附件、历史去重并预览或创建审批。用户提到“外包人员访问资料审批”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
