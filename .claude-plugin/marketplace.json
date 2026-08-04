@@ -230,7 +230,7 @@
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
       "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, or automate a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, and reusable publication. Not for blindly rerunning an existing failed workflow.",
-      "version": "2.3",
+      "version": "2.4",
       "keywords": [
         "workflow",
         "authoring",
