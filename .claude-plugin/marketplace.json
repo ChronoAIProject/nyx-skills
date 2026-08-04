@@ -732,7 +732,7 @@
       "name": "project-shared-mailbox-approval",
       "source": "./project-shared-mailbox-approval",
       "description": "从 Base 申请创建并回读共享邮箱审批。用户提到“项目共享邮箱审批”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -765,7 +765,7 @@
       "name": "quarterly-access-review-reminder",
       "source": "./quarterly-access-review-reminder",
       "description": "预览或明确发送季度访问审查私信。用户提到“季度访问审查提醒”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -776,7 +776,7 @@
       "name": "release-readiness-review",
       "source": "./release-readiness-review",
       "description": "检查上线准备、备份、监控或回滚控制。用户提到“发布准备度审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -798,7 +798,7 @@
       "name": "saas-license-optimization-digest",
       "source": "./saas-license-optimization-digest",
       "description": "汇总多路 Base 数据并预览或发送许可证优化卡片。用户提到“SaaS 许可证优化摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "4.0",
+      "version": "4.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -809,7 +809,7 @@
       "name": "saas-license-utilization-review",
       "source": "./saas-license-utilization-review",
       "description": "复核软件席位、许可证利用率或订阅成本。用户提到“SaaS 许可证利用率审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
