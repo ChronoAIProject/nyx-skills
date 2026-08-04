@@ -266,6 +266,17 @@
       ]
     },
     {
+      "name": "candidate-document-compliance-preview",
+      "source": "./candidate-document-compliance-preview",
+      "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "chatgpt-image-short-video",
       "source": "./chatgpt-image-short-video",
       "description": "Method for producing short vertical videos from ChatGPT image generation through a fixed browser tab, local TTS narration, timed subtitle burn-in, cover exports, and a manifest. Use when an operator needs a reproducible image-to-short workflow with pinned session consistency, per-beat visual prompts, 1080x1920 safe-area rules, local ffmpeg/PIL assembly, and private access kept outside the skill.",
@@ -310,6 +321,17 @@
       "version": "1.4",
       "keywords": [
         "chronoai-official"
+      ]
+    },
+    {
+      "name": "complex-codex-exec-validation",
+      "source": "./complex-codex-exec-validation",
+      "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
