@@ -266,6 +266,17 @@
       ]
     },
     {
+      "name": "candidate-document-compliance-preview",
+      "source": "./candidate-document-compliance-preview",
+      "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "chatgpt-image-short-video",
       "source": "./chatgpt-image-short-video",
       "description": "Method for producing short vertical videos from ChatGPT image generation through a fixed browser tab, local TTS narration, timed subtitle burn-in, cover exports, and a manifest. Use when an operator needs a reproducible image-to-short workflow with pinned session consistency, per-beat visual prompts, 1080x1920 safe-area rules, local ffmpeg/PIL assembly, and private access kept outside the skill.",
@@ -310,6 +321,39 @@
       "version": "1.4",
       "keywords": [
         "chronoai-official"
+      ]
+    },
+    {
+      "name": "complex-codex-exec-validation",
+      "source": "./complex-codex-exec-validation",
+      "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "contractor-access-package-approval",
+      "source": "./contractor-access-package-approval",
+      "description": "检查外包人员附件、历史去重并预览或创建审批。用户提到“外包人员访问资料审批”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "email-access-approval-audit",
+      "source": "./email-access-approval-audit",
+      "description": "只读检查邮箱访问审批列表和实例详情。用户提到“邮箱访问审批审计”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -366,6 +410,17 @@
         "issues",
         "rest-api",
         "agent-guide"
+      ]
+    },
+    {
+      "name": "invoice-ocr-policy-review",
+      "source": "./invoice-ocr-policy-review",
+      "description": "从发票图片或 PDF 提取字段、归一化并检查历史重复。用户提到“发票 OCR 与策略审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -434,6 +489,17 @@
         "messages",
         "recall",
         "summary"
+      ]
+    },
+    {
+      "name": "lark-contact-batch-resolution",
+      "source": "./lark-contact-batch-resolution",
+      "description": "通过 contact batch_get_id 解析入职邮箱身份。用户提到“Lark 联系人批量解析”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -529,6 +595,17 @@
         "creator-mindset",
         "perspective",
         "nuwa"
+      ]
+    },
+    {
+      "name": "monthly-access-certification",
+      "source": "./monthly-access-certification",
+      "description": "执行月末访问认证、提醒预览或明确发送提醒。用户提到“月度访问认证”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "3.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -652,6 +729,17 @@
       ]
     },
     {
+      "name": "project-shared-mailbox-approval",
+      "source": "./project-shared-mailbox-approval",
+      "description": "从 Base 申请创建并回读共享邮箱审批。用户提到“项目共享邮箱审批”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "promo-scout",
       "source": "./promo-scout",
       "description": "Verify-first promotion intelligence for ANY repo or org. Pulls live GitHub state, runs sshx multi-perspective consensus over it, and returns an evidence-backed board of what is genuinely promotable, how items connect, and what is unverifiable. Use when an agent or operator asks \"what's worth promoting / what connects / what's real\" for a target repo or org.",
@@ -674,6 +762,28 @@
       ]
     },
     {
+      "name": "quarterly-access-review-reminder",
+      "source": "./quarterly-access-review-reminder",
+      "description": "预览或明确发送季度访问审查私信。用户提到“季度访问审查提醒”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "release-readiness-review",
+      "source": "./release-readiness-review",
+      "description": "检查上线准备、备份、监控或回滚控制。用户提到“发布准备度审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "research-claim-fidelity-reviewer",
       "source": "./research-claim-fidelity-reviewer",
       "description": "Severity-weighted BLOCK, WARN, OK reviewer method for technical and research posts. Use when reviewing X threads, announcements, captions, or launch copy for hook strength, thread arc, generic AI vocabulary, source fidelity, claim support, numeric-claim verification, and thread format before recommending publish.",
@@ -682,6 +792,39 @@
         "research-review",
         "claim-fidelity",
         "severity-rubric"
+      ]
+    },
+    {
+      "name": "saas-license-optimization-digest",
+      "source": "./saas-license-optimization-digest",
+      "description": "汇总多路 Base 数据并预览或发送许可证优化卡片。用户提到“SaaS 许可证优化摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "4.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "saas-license-utilization-review",
+      "source": "./saas-license-utilization-review",
+      "description": "复核软件席位、许可证利用率或订阅成本。用户提到“SaaS 许可证利用率审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "2.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "safe-code-execute-validation",
+      "source": "./safe-code-execute-validation",
+      "description": "验证通用 JavaScript 执行和结构化结算 receipt。用户提到“安全 code_execute 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -706,6 +849,17 @@
         "managed-sandbox",
         "smoke-test",
         "diagnostics"
+      ]
+    },
+    {
+      "name": "weekly-budget-variance-digest",
+      "source": "./weekly-budget-variance-digest",
+      "description": "生成预算周报、月度投影或配置 recurring schedule。用户提到“周度预算差异摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     }
   ]
