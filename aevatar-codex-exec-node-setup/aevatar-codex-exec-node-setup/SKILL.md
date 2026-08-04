@@ -1,7 +1,7 @@
 ---
 name: aevatar-codex-exec-node-setup
 description: Configure and prove Aevatar codex_exec for one NyxID account, choosing operator-managed chrono-sandbox/gVisor for bounded empty-workspace work or private NyxID node-backed SSH for a fixed host workspace. Use for managed eligibility and UserService readiness, private node/SSH hardening, mandatory public-sample verification, or diagnosing typed managed and private-route failures.
-version: "4.1"
+version: "4.2"
 metadata:
   category: tool-based
   tool-list:
@@ -20,11 +20,18 @@ metadata:
   depends-on:
     - aevatar-codex-exec-workflow-sample@3.1
 compatibility: NyxID CLI and an Aevatar deployment that exposes codex_exec; private SSH additionally requires macOS or Linux, OpenSSH, Codex CLI, and Git
-disable-model-invocation: true
+disable-model-invocation: false
 user-invocable: true
 ---
 
 # Configure Aevatar codex_exec
+
+## Invocation gate
+
+Continue only when the user explicitly asks to configure, repair, or prove a `codex_exec` target,
+or explicitly invokes this skill. If this skill was selected speculatively, stop before mutation:
+route feasibility questions to `aevatar-feasibility-advisor` and failure attribution to
+`aevatar-triage`.
 
 Choose exactly one target before changing state:
 
