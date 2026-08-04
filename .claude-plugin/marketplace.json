@@ -776,7 +776,7 @@
       "name": "release-readiness-review",
       "source": "./release-readiness-review",
       "description": "检查上线准备、备份、监控或回滚控制。用户提到“发布准备度审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -798,7 +798,7 @@
       "name": "saas-license-optimization-digest",
       "source": "./saas-license-optimization-digest",
       "description": "汇总多路 Base 数据并预览或发送许可证优化卡片。用户提到“SaaS 许可证优化摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "4.0",
+      "version": "4.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -809,7 +809,7 @@
       "name": "saas-license-utilization-review",
       "source": "./saas-license-utilization-review",
       "description": "复核软件席位、许可证利用率或订阅成本。用户提到“SaaS 许可证利用率审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -820,7 +820,7 @@
       "name": "safe-code-execute-validation",
       "source": "./safe-code-execute-validation",
       "description": "验证通用 JavaScript 执行和结构化结算 receipt。用户提到“安全 code_execute 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -855,7 +855,7 @@
       "name": "weekly-budget-variance-digest",
       "source": "./weekly-budget-variance-digest",
       "description": "生成预算周报、月度投影或配置 recurring schedule。用户提到“周度预算差异摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
