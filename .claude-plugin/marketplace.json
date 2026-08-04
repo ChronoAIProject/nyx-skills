@@ -349,7 +349,7 @@
       "name": "email-access-approval-audit",
       "source": "./email-access-approval-audit",
       "description": "只读检查邮箱访问审批列表和实例详情。用户提到“邮箱访问审批审计”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "2.0",
+      "version": "2.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -416,7 +416,7 @@
       "name": "invoice-ocr-policy-review",
       "source": "./invoice-ocr-policy-review",
       "description": "从发票图片或 PDF 提取字段、归一化并检查历史重复。用户提到“发票 OCR 与策略审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -495,7 +495,7 @@
       "name": "lark-contact-batch-resolution",
       "source": "./lark-contact-batch-resolution",
       "description": "通过 contact batch_get_id 解析入职邮箱身份。用户提到“Lark 联系人批量解析”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
@@ -601,7 +601,7 @@
       "name": "monthly-access-certification",
       "source": "./monthly-access-certification",
       "description": "执行月末访问认证、提醒预览或明确发送提醒。用户提到“月度访问认证”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "3.0",
+      "version": "3.1",
       "keywords": [
         "workflow",
         "acceptance",
