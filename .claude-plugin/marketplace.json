@@ -7,8 +7,8 @@
     {
       "name": "aevatar-agent-profile-management",
       "source": "./aevatar-agent-profile-management",
-      "description": "Create, edit, bind skills to, validate, publish, or explain an Aevatar Agent Profile — the resource that defines an agent's purpose, instructions, exact Ornn skill routing, and maximum tool authority. Use whenever a user wants to \"create/configure an agent profile\", \"set an agent's purpose or instructions\", \"bind a skill to my agent\", \"make skill X always on / routed by intent\", \"limit which tools my agent may use\", \"validate or publish a profile\", or asks why a profile ETag, validation, publication, or runtime binding behaved as it did. Agent Profile is its own resource surface — it is NOT a workflow, member, team, service, or schedule, and creating one never creates any of those. This skill teaches the exact authority model (opaque profileId, ownerHandle/profileSlug, exact `{skillGuid, literalVersion, expectedName, expectedPublisherId}` Ornn references), the strong-ETag concurrency protocol, accepted-vs-committed ACK semantics, and — first and hardest — how to detect whether the running deployment exposes the Profile contract at all before attempting any mutation.",
-      "version": "1.0",
+      "description": "Use when a user wants to create, edit, validate, publish, or explain an Aevatar Agent Profile; set purpose or instructions; bind exact Ornn skills and activation modes; restrict tool authority; or diagnose ETag, validation, publication, deployment exposure, or runtime binding. Agent Profile is a separate resource, not a workflow, member, team, service, or schedule. Use the opaque profileId, exact `{skillGuid, literalVersion, expectedName, expectedPublisherId}` references, strong ETags, accepted-vs-committed semantics, and capability detection before mutation.",
+      "version": "1.1",
       "keywords": [
         "aevatar",
         "agent-profile",
@@ -148,7 +148,7 @@
       "name": "aevatar-scheduler",
       "source": "./aevatar-scheduler",
       "description": "Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.",
-      "version": "1.9",
+      "version": "1.10",
       "keywords": [
         "aevatar",
         "schedule",
@@ -229,8 +229,8 @@
     {
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
-      "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, or automate a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, and reusable publication. Not for blindly rerunning an existing failed workflow.",
-      "version": "2.4",
+      "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, automate, or feature-probe a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, feature-equivalent evidence boundaries, and reusable publication. Not for blindly rerunning an existing failed workflow.",
+      "version": "2.5",
       "keywords": [
         "workflow",
         "authoring",

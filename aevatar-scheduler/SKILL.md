@@ -1,7 +1,7 @@
 ---
 name: aevatar-scheduler
 description: Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.
-version: "1.9"
+version: "1.10"
 metadata:
   category: plain
   tag:
@@ -30,7 +30,7 @@ APIs. Pick before you call anything; using the wrong one is not a shortcut, it i
 | A typed **service invocation** | Generic platform schedule actor | Generic `/api/schedules` — the rest of this skill | Typed source; may be a NyxID binding exchange |
 
 **If the owner is a Team member, the canonical path is the member automation route — not generic
-`/api/schedules`.** Generic `/api/schedules` is a platform-level resource for raw invocations. It
+`/api/schedules`.** Generic `/api/schedules` is a platform-level resource for typed service invocations. It
 is supported, but it is *not* a fallback for Team member automation, and reaching for it because
 you already know its shape is the most common mistake here.
 
