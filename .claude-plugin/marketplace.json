@@ -650,6 +650,17 @@
       ]
     },
     {
+      "name": "nyxid-read-receipt-probe",
+      "source": "./nyxid-read-receipt-probe",
+      "description": "验证 managed workflow 的 NyxID provider receipt、首步输出或 issue 3161 回归。用户提到“NyxID 只读回执探针”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.1",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "nyxid-service-call",
       "source": "./nyxid-service-call",
       "description": "Invoke an operation on a connected and authorized NyxID service through Aevatar's dynamically typed connected-service tools or the credential-injecting nyxid_proxy fallback. Use when a user asks to read, search, create, update, send, run, download, or otherwise call a NyxID service while keeping upstream credentials inside NyxID and respecting provider scopes, approvals, and service routing. 中文触发包括“调用我的 NyxID 服务”“使用服务”“让服务执行”。",
