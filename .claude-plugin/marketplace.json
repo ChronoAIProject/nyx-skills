@@ -828,6 +828,17 @@
       ]
     },
     {
+      "name": "readonly-attested-post-probe",
+      "source": "./readonly-attested-post-probe",
+      "description": "验证声明 read_only 风险的语义只读 POST 免运行时审批执行。用户提到“只读声明 POST 探针”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "release-readiness-review",
       "source": "./release-readiness-review",
       "description": "检查上线准备、备份、监控或回滚控制。用户提到“发布准备度审查”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -847,6 +858,17 @@
         "research-review",
         "claim-fidelity",
         "severity-rubric"
+      ]
+    },
+    {
+      "name": "runtime-tool-approval-write-probe",
+      "source": "./runtime-tool-approval-write-probe",
+      "description": "验证未声明风险 POST 的运行时 tool approval 挂起、恢复与真实写入回执。用户提到“运行时工具审批写入探针”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
@@ -876,6 +898,17 @@
       "source": "./safe-code-execute-validation",
       "description": "验证通用 JavaScript 执行和结构化结算 receipt。用户提到“安全 code_execute 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
       "version": "1.1",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "sequential-tool-approval-write-probe",
+      "source": "./sequential-tool-approval-write-probe",
+      "description": "验证一次运行内连续两次写入的 tool approval 挂起与恢复组合。用户提到“顺序工具审批写入探针”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
       "keywords": [
         "workflow",
         "acceptance",
