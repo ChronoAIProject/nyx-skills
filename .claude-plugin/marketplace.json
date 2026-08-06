@@ -861,6 +861,28 @@
       ]
     },
     {
+      "name": "supplier-control-attestation-review",
+      "source": "./supplier-control-attestation-review",
+      "description": "验证 guard、conditional 与 while 三个确定性工作流原语的真实运行行为。用户提到“供应商控制项自证审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "supplier-risk-tier-aggregation",
+      "source": "./supplier-risk-tier-aggregation",
+      "description": "验证 map_reduce 与 cache 两个确定性工作流原语的真实运行行为。用户提到“供应商风险分档汇总”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "verify-codex-exec",
       "source": "./verify-codex-exec",
       "description": "Use when a user asks whether managed codex_exec is available for their current account, requests a codex_exec readiness check, or wants to run the canonical managed Codex smoke test.",
