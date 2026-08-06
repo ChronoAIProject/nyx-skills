@@ -368,6 +368,28 @@
       ]
     },
     {
+      "name": "deterministic-parallel-evidence-review",
+      "source": "./deterministic-parallel-evidence-review",
+      "description": "验证 deterministic parallel 三路 worker、receipt 与 dispatch index 合并。用户提到“确定性并行证据审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "deterministic-race-policy-review",
+      "source": "./deterministic-race-policy-review",
+      "description": "验证 deterministic race 的首成功 winner 与后续完成忽略语义。用户提到“确定性竞速政策审查”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "email-access-approval-audit",
       "source": "./email-access-approval-audit",
       "description": "只读检查邮箱访问审批列表和实例详情。用户提到“邮箱访问审批审计”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -941,6 +963,17 @@
       "name": "supplier-risk-tier-aggregation",
       "source": "./supplier-risk-tier-aggregation",
       "description": "验证 map_reduce 与 cache 两个确定性工作流原语的真实运行行为。用户提到“供应商风险分档汇总”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
+      "name": "vendor-policy-inline-delegation",
+      "source": "./vendor-policy-inline-delegation",
+      "description": "验证 workflow_call 的 inline 子定义绑定、子运行与结果回传。用户提到“供应商政策 inline 委派审查”、对应英文名称或要求运行该验收 workflow 时使用。",
       "version": "1.0",
       "keywords": [
         "workflow",
