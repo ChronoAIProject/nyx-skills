@@ -1,0 +1,5 @@
+{
+  "name": "invoice-approval-routing-preview",
+  "version": "1.0",
+  "description": "验证当前发票附件、审批历史去重和 contact 路由的 no-submit 集成契约。用户提到“发票审批路由预览”、对应英文名称或要求运行该验收 workflow 时使用。"
+}
