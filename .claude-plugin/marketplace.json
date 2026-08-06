@@ -544,17 +544,6 @@
       ]
     },
     {
-      "name": "lark-post-search-approval-probe",
-      "source": "./lark-post-search-approval-probe",
-      "description": "验证 POST 搜索的 typed tool approval pending、resume 或 issue 3184 回归。用户提到“Lark POST 搜索批准恢复探针”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.1",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
-      ]
-    },
-    {
       "name": "lark-sheets-ops",
       "source": "./lark-sheets-ops",
       "description": "Read and write Lark Sheets (电子表格) through the bot's NyxID-brokered sheets APIs — find a spreadsheet and its sheet ids, read a cell range, append rows to the bottom, and overwrite a range. Handles the range format (sheetId!A1:D10) and the valueRange wrapper, extracts the spreadsheet_token from a share URL, and doubles as the sheets-scope probe — on a scope 403 it reports the exact missing permission. Lark Sheets here is the spreadsheet product, distinct from Lark Base / Bitable — use the Base skill for Bitable tables.",
@@ -858,28 +847,6 @@
         "research-announcement",
         "source-fidelity",
         "public-copy"
-      ]
-    },
-    {
-      "name": "supplier-control-attestation-review",
-      "source": "./supplier-control-attestation-review",
-      "description": "验证 guard、conditional 与 while 三个确定性工作流原语的真实运行行为。用户提到“供应商控制项自证审查”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
-      ]
-    },
-    {
-      "name": "supplier-risk-tier-aggregation",
-      "source": "./supplier-risk-tier-aggregation",
-      "description": "验证 map_reduce 与 cache 两个确定性工作流原语的真实运行行为。用户提到“供应商风险分档汇总”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
-      "keywords": [
-        "workflow",
-        "acceptance",
-        "aevatar"
       ]
     },
     {
