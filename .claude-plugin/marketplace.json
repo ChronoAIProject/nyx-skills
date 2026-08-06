@@ -5,6 +5,17 @@
   },
   "plugins": [
     {
+      "name": "acceptance-fixture-drift-attestation",
+      "source": "./acceptance-fixture-drift-attestation",
+      "description": "只读体检验收 canary 数据是否漂移、fixture 是否完好。用户提到“验收 fixture 漂移体检”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
+      ]
+    },
+    {
       "name": "aevatar-agent-profile-management",
       "source": "./aevatar-agent-profile-management",
       "description": "Use when a user wants to create, edit, validate, publish, or explain an Aevatar Agent Profile; set purpose or instructions; bind exact Ornn skills and activation modes; restrict tool authority; or diagnose ETag, validation, publication, deployment exposure, or runtime binding. Agent Profile is a separate resource, not a workflow, member, team, service, or schedule. Use the opaque profileId, exact `{skillGuid, literalVersion, expectedName, expectedPublisherId}` references, strong ETags, accepted-vs-committed semantics, and capability detection before mutation.",
@@ -238,6 +249,17 @@
         "aevatar",
         "create-workflow",
         "pipeline"
+      ]
+    },
+    {
+      "name": "approval-window-integrity-audit",
+      "source": "./approval-window-integrity-audit",
+      "description": "审计审批查询时间窗口是否过期、历史窗口陷阱或窗口重基线。用户提到“审批窗口完整性审计”、对应英文名称或要求运行该验收 workflow 时使用。",
+      "version": "1.0",
+      "keywords": [
+        "workflow",
+        "acceptance",
+        "aevatar"
       ]
     },
     {
