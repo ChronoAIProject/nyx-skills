@@ -974,7 +974,7 @@
       "name": "supplier-risk-tier-aggregation",
       "source": "./supplier-risk-tier-aggregation",
       "description": "验证 map_reduce 与 cache 两个确定性工作流原语的真实运行行为。用户提到“供应商风险分档汇总”、对应英文名称或要求运行该验收 workflow 时使用。",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "workflow",
         "acceptance",
