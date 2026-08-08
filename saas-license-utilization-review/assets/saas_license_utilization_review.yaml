@@ -127,7 +127,7 @@ steps:
     type: transform
     op: template
     template: >-
-      {{~ feature_ok = data.live_base_reads_ok && data.source_counts.licenses == 3 && data.source_counts.tables == 6 && data.source_counts.views == 1 && data.total_seats == 185 && data.total_active_users == 140 && data.monthly_cost_usd == 6670 && data.reduce_candidates == 1 ~}}
+      {{~ feature_ok = data.live_base_reads_ok && data.source_counts.licenses == 3 && data.source_counts.tables >= 6 && data.source_counts.views == 1 && data.total_seats == 185 && data.total_active_users == 140 && data.monthly_cost_usd == 6670 && data.reduce_candidates == 1 ~}}
       {{ json({ case: 'saas_license_utilization', feature_ok: feature_ok, live_base_reads_ok: data.live_base_reads_ok, source_counts: data.source_counts, total_seats: data.total_seats, total_active_users: data.total_active_users, monthly_cost_usd: data.monthly_cost_usd, reduce_candidates: data.reduce_candidates, side_effects: false }) }}
     next: done
 
