@@ -35,7 +35,7 @@
       "name": "aevatar-automation",
       "source": "./aevatar-automation",
       "description": "Aevatar scheduling & workflow automation: scheduled_agent_creator (cron/one-shot) for independent scheduled Ornn skill agents and reminders — NOT an alias for Studio Team member automation — the long-running task automation playbook, workflow creation semantics (Scope Workflow vs Ornn publish), agent_builder lifecycle, the typed required_nyx_services contract (exact user_service_id is the authorization; a slug snapshot never substitutes), dedicated Agent Key semantics (vault-held raw material, borrowed durable reference late-resolved per use, exact non-wildcard grants, ~90-day projected expiry, reauthorize-then-revoke, independent NyxID and Vault revocation tracks), accepted-is-admission-only receipts, and a token_expired triage protocol that reads credentialSourceKind before assuming any TTL.",
-      "version": "1.2",
+      "version": "1.3",
       "keywords": [
         "aevatar",
         "aevatar-system",
@@ -94,7 +94,7 @@
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
       "description": "Use before building when a user asks whether Aevatar can achieve a goal, what prerequisites it has, or why it is unavailable. Triggers include bots and third-party APIs, inbound channels, external HTTP triggers, schedules, service exposure, Agent Profiles and tool ceilings, and bounded managed or private-host codex_exec work. It distinguishes outbound connectors from inbound channels and separates not connected, host-gated, not deployed, and genuinely unsupported outcomes. It chooses managed_sandbox versus private_ssh without promising repository, model, credential, runtime, or deployment capabilities the caller does not control, then routes feasible work to the owning Aevatar skill.",
-      "version": "1.8",
+      "version": "1.10",
       "keywords": [
         "aevatar",
         "feasibility",
@@ -126,7 +126,7 @@
       "name": "aevatar-platform-map",
       "source": "./aevatar-platform-map",
       "description": "Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.",
-      "version": "1.14",
+      "version": "1.16",
       "keywords": [
         "aevatar",
         "routing",
@@ -223,7 +223,7 @@
       "name": "aevatar-triage",
       "source": "./aevatar-triage",
       "description": "Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.",
-      "version": "1.10",
+      "version": "1.11",
       "keywords": [
         "aevatar",
         "triage",
