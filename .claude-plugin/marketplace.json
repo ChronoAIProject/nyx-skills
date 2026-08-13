@@ -94,7 +94,7 @@
       "name": "aevatar-feasibility-advisor",
       "source": "./aevatar-feasibility-advisor",
       "description": "Use before building when a user asks whether Aevatar can achieve a goal, what prerequisites it has, or why it is unavailable. Triggers include bots and third-party APIs, inbound channels, external HTTP triggers, schedules, service exposure, Agent Profiles and tool ceilings, and bounded managed or private-host codex_exec work. It distinguishes outbound connectors from inbound channels and separates not connected, host-gated, not deployed, and genuinely unsupported outcomes. It chooses managed_sandbox versus private_ssh without promising repository, model, credential, runtime, or deployment capabilities the caller does not control, then routes feasible work to the owning Aevatar skill.",
-      "version": "1.8",
+      "version": "1.10",
       "keywords": [
         "aevatar",
         "feasibility",
@@ -126,7 +126,7 @@
       "name": "aevatar-platform-map",
       "source": "./aevatar-platform-map",
       "description": "Entry point, panorama, and router for the Aevatar skill family. Use before building, running, publishing, scheduling, externally triggering, or operating Aevatar resources; configuring an Agent Profile; assessing managed/private codex_exec feasibility and setup; running the canonical Codex readiness proof; authoring a workflow with codex_exec; diagnosing a Codex failure; or deciding which companion skill owns a request. It teaches resource and identity boundaries, NyxID-brokered auth, client REST versus in-session tools, deployment gates, and exact handoffs without treating member, workflow, service, profile, schedule, or Codex capabilities as one lifecycle.",
-      "version": "1.14",
+      "version": "1.16",
       "keywords": [
         "aevatar",
         "routing",
@@ -223,7 +223,7 @@
       "name": "aevatar-triage",
       "source": "./aevatar-triage",
       "description": "Use after an Aevatar workflow, codex_exec call, schedule, channel, connector, skill, Agent Profile, or control-plane request fails or behaves unexpectedly. It applies when the agent must attribute the first broken boundary across Aevatar, NyxID, Ornn, chrono-sandbox/gVisor, the managed runner, or private SSH; distinguish credential sources and deployment gaps; preserve sanitized evidence; determine defect versus usage; or draft an issue for explicit user confirmation. Never use it to guess a root cause from one error string or auto-file.",
-      "version": "1.10",
+      "version": "1.11",
       "keywords": [
         "aevatar",
         "triage",
