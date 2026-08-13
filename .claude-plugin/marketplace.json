@@ -159,7 +159,7 @@
       "name": "aevatar-scheduler",
       "source": "./aevatar-scheduler",
       "description": "Create and manage recurring Aevatar runs and route to the correct scheduling resource. Use for cron, recurring Team member workflows, scheduled skill agents, typed service invocations, pause/resume, run-now, reauthorization, deletion, or credential triage. Team member automation uses its dedicated route and Agent Key; generic schedules accept typed service invocation only. External raw actor/envelope schedules are retired and must fail closed.",
-      "version": "1.10",
+      "version": "1.11",
       "keywords": [
         "aevatar",
         "schedule",
@@ -176,7 +176,7 @@
       "name": "aevatar-service-publisher",
       "source": "./aevatar-service-publisher",
       "description": "Publish an Aevatar member, team, or workflow as an invocable service and (host permitting) register it with NyxID, then verify, invoke, or wire external HTTP triggers such as Lark Base automation — all over the REST API. Use when a user wants to \"publish/bind a service\", \"expose my workflow/team as a service\", \"register it with NyxID\", \"make it callable\", \"get the service slug/URL\", \"invoke my service\", \"let Lark Base call my workflow\", \"trigger this workflow from an external webhook\", or \"version/deploy/roll out a service\". It covers the simple scope binding, reading back a member's published service, the full account-level service lifecycle (revision → publish → deploy → rollout), how to confirm the NyxID registration (slug + status), how to invoke an endpoint, and how to distinguish direct NyxID proxy triggering from host-gated externalExposure. Build the team/member first with the team-builder skill.",
-      "version": "1.8",
+      "version": "2.0",
       "keywords": [
         "aevatar",
         "service",
@@ -207,7 +207,7 @@
       "name": "aevatar-team-builder",
       "source": "./aevatar-team-builder",
       "description": "Build an Aevatar agent team and its members over the REST API. Use when a user wants to \"create a team\", \"add a member\", \"make a workflow member / script member / gagent member\", \"set the team's entry point\", or \"assemble agents into a team\". It creates the team, creates members whose implementation is a workflow (most common), a script, or a hosted gagent, binds each member's concrete implementation (the workflow YAML is attached here), waits for the async binding to succeed, and sets the team entry member. Author the workflow YAML first with the workflow-authoring skill; publish the result as a service with the service-publisher skill.",
-      "version": "1.6",
+      "version": "1.7",
       "keywords": [
         "aevatar",
         "team",
@@ -241,7 +241,7 @@
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
       "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, automate, or feature-probe a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, feature-equivalent evidence boundaries, and reusable publication. Not for blindly rerunning an existing failed workflow.",
-      "version": "2.6",
+      "version": "2.7",
       "keywords": [
         "workflow",
         "authoring",
