@@ -1,7 +1,7 @@
 ---
 name: github-via-nyxid
 description: Operate a user's GitHub account through NyxID's credential-brokering proxy (service slug api-github) — read and write repositories, files, issues, pull requests, commits, branches, Actions, gists and anything else the GitHub REST API exposes, all on the user's behalf and without ever handling a raw token. NyxID injects the user's GitHub credential server-side. Use when an agent needs to read from or act on GitHub for a user who has connected their GitHub account in NyxID.
-version: "1.1"
+version: "1.2"
 license: MIT
 metadata:
   category: plain
@@ -188,8 +188,19 @@ base commit `sha`, then `POST /git/refs` with `refs/heads/<new-name>`.
 
 ## 4. Pagination, rate limits, conditional requests
 
-- **Pagination:** use `per_page` (max **100**) and `page`; follow the `Link` response header
-  `rel="next"` until absent. Search endpoints cap at **1000** results total.
+- **Aevatar bounded reads:** interactive connected-service read projections are capped at
+  **16 KiB**. For every GitHub list or search operation in an Aevatar turn, start with
+  `per_page=1`, increment `page` one at a time, and retain only the fields needed for the
+  user's answer. Never start with the GitHub default page size or `per_page=100` on this
+  surface. Stop when a page has no item, the requested limit is reached, or all reported
+  results are consumed. If a result returns `status: "retry_required"`, narrow the query
+  or page size and continue; do not claim that the GitHub tool is unavailable.
+- **Assigned-issue query:** first call `GET /user`, then call
+  `GET /search/issues?q=is:issue+is:open+assignee:{login}+archived:false&per_page=1&page={n}`.
+  Continue pages until empty and summarize the collected issue number, title, repository,
+  URL, and relevant state. Do not substitute the literal `@me` in the REST query.
+- **Other runtimes:** use `per_page` (max **100**) and `page`; follow the `Link` response
+  header `rel="next"` until absent. Search endpoints cap at **1000** results total.
 - **Rate limits:** authenticated GitHub allows ~**5000 req/hr**. `GET /rate_limit` is free.
   Watch `X-RateLimit-Remaining`; on **403/429** with a `Retry-After` header, back off for
   that many seconds before retrying. Avoid tight polling loops.
