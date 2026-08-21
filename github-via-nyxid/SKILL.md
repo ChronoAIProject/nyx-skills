@@ -1,7 +1,7 @@
 ---
 name: github-via-nyxid
 description: Operate a user's GitHub account through NyxID's credential-brokering proxy (service slug api-github) — read and write repositories, files, issues, pull requests, commits, branches, Actions, gists and anything else the GitHub REST API exposes, all on the user's behalf and without ever handling a raw token. NyxID injects the user's GitHub credential server-side. Use when an agent needs to read from or act on GitHub for a user who has connected their GitHub account in NyxID.
-version: "1.2"
+version: "1.3"
 license: MIT
 metadata:
   category: plain
@@ -35,32 +35,26 @@ only ever send your **NyxID** bearer; you never see, request, or log the GitHub 
 > that the OAuth scopes granted to the `api-github` connection permit. The ceiling is the
 > granted scopes, not the entire API surface (see [Scopes & permissions](#scopes--permissions)).
 
-## 1. Preflight — confirm GitHub is connected
+## 1. Preflight — use the product connection flow
 
-Before the first call, confirm the user has the `api-github` service connected in NyxID. In an
-Aevatar turn, call the available `nyxid_service_inventory` with `{}` and select an exact
-`user_service_id`; use only the schema emitted for that request. The CLI and raw HTTP remain
-operator alternatives:
+In an Aevatar interactive turn, the request-local exact GitHub operations are the connection
+evidence. If those operations are present, call the admitted `GET /user` operation directly;
+do not second-guess the active connection or claim that no GitHub tool is available.
 
-- CLI: `nyxid service list --output json` → look for an entry with `"slug": "api-github"`.
-- Raw HTTP: `GET https://nyx-api.chrono-ai.fun/api/v1/services` with `Authorization: Bearer <NYXID_TOKEN>`.
+If the exact operations are absent, use the route-owned typed readiness action for
+`service_slug=api-github` and the real catalog capability `requested_scopes=["read:user"]`.
+That action emits the authorization/connect-required event rendered as the Web UI connection
+card. Never tell an Aevatar Web UI user to run `nyxid`, `gh`, `curl`, raw HTTP, or any other CLI
+fallback. If the typed readiness action is unavailable, return a typed failure; do not replace it
+with prose connection instructions.
 
-If `api-github` is **not** present, the user must connect it once (one-click OAuth to their
-own GitHub account). Tell them to run:
-
-```bash
-nyxid service add api-github --oauth
-```
-
-To grant write/admin capabilities up front, request extra scopes at connect time, e.g.:
-
-```bash
-nyxid service add api-github --oauth --scope "repo,workflow,read:org,gist"
-```
+CLI and raw HTTP are operator-only alternatives outside the Aevatar Web UI. Operators may inspect
+`nyxid service list --output json` or the NyxID service API, and may request broader scopes during
+OAuth. These commands are not user-facing chat remedies.
 
 Do **not** ask the user to paste a GitHub token into chat — the OAuth flow handles it.
-(If broader, user-controlled scopes are needed, the `api-github-pat` service — a
-user-supplied Personal Access Token — is the fallback; same proxy, slug `api-github-pat`.)
+(If broader, user-controlled scopes are needed, `api-github-pat` is an operator-selected fallback;
+never solicit the PAT in chat.)
 
 ## 2. How to call the GitHub API
 
@@ -124,7 +118,9 @@ The server-owned proof also owns the contract digest, schemas, and response poli
 `response_mode`; never put `service_id`, `user_service_id`, `operation_id`, `slug`, `path`,
 `method`, or proof fields there.
 
-Outside the Aevatar tool surface, operators may still use the lower-level transports below:
+Outside the Aevatar tool surface, operators may still use the lower-level transports below.
+These examples are operator documentation and must never be sent to an Aevatar Web UI user as a
+fallback:
 
 **Raw HTTP** (any runtime that holds a NyxID bearer):
 
@@ -192,15 +188,18 @@ base commit `sha`, then `POST /git/refs` with `refs/heads/<new-name>`.
   **16 KiB**. For every GitHub list or search operation in an Aevatar turn, start with
   `per_page=1`, increment `page` one at a time, and retain only the fields needed for the
   user's answer. Never start with the GitHub default page size or `per_page=100` on this
-  surface. Stop when a page has no item, the requested limit is reached, or all reported
-  results are consumed. If a result returns `status: "retry_required"`, narrow the query
-  or page size and continue; do not claim that the GitHub tool is unavailable.
+  surface. If a result returns `status: "retry_required"`, narrow the query or page size and
+  continue; do not claim that the GitHub tool is unavailable.
 - **Assigned-issue query:** first call `GET /user`, then call
   `GET /search/issues?q=is:issue+is:open+assignee:{login}+archived:false&per_page=1&page={n}`.
-  Continue pages until empty and summarize the collected issue number, title, repository,
-  URL, and relevant state. Do not substitute the literal `@me` in the REST query.
-- **Other runtimes:** use `per_page` (max **100**) and `page`; follow the `Link` response
-  header `rel="next"` until absent. Search endpoints cap at **1000** results total.
+  Page 1 reports `total_count`. If `total_count` is 20 or fewer and the user did not set a
+  smaller limit, fetch every page from 1 through `total_count` before answering. Never stop at
+  five, never claim all results from `total_count` alone, and never summarize an issue whose page
+  was not fetched. If `total_count` exceeds 20, fetch pages 1 through 20 and explicitly report the
+  remaining count instead of claiming completeness. Summarize each fetched issue's number, title,
+  repository, URL, and relevant state. Do not substitute literal `@me` in the REST query.
+- **Other runtimes:** use `per_page` (max **100**) and `page`; follow the `Link` response header
+  `rel="next"` until absent. Search endpoints cap at **1000** results total.
 - **Rate limits:** authenticated GitHub allows ~**5000 req/hr**. `GET /rate_limit` is free.
   Watch `X-RateLimit-Remaining`; on **403/429** with a `Retry-After` header, back off for
   that many seconds before retrying. Avoid tight polling loops.
@@ -220,8 +219,9 @@ The real capability ceiling is the **OAuth scopes** granted when the user connec
 | Create/manage gists | `gist` |
 | Delete a repo | `delete_repo` |
 
-If a call fails for lack of scope, **don't work around it** — tell the user which scope is
-missing and how to grant it:
+If an Aevatar Web UI call lacks scope, use the typed reauthorization/readiness flow so the UI can
+render the appropriate card; never replace that card with a CLI command. Outside the Web UI, an
+operator may re-consent with the required scopes, for example:
 
 ```bash
 nyxid service add api-github --oauth --scope "repo,workflow"   # re-consent with more scopes
@@ -234,7 +234,7 @@ nyxid service add api-github --oauth --scope "repo,workflow"   # re-consent with
 
 | Status | Meaning | What to do |
 |---|---|---|
-| **401** | NyxID couldn't inject a valid GitHub credential | User must (re)connect `api-github` (`nyxid service add api-github --oauth`) |
+| **401** | NyxID couldn't inject a valid GitHub credential | In Aevatar, emit typed readiness/reauthorization for `api-github`; operator CLI is outside the Web UI |
 | **403** | Missing scope **or** rate limit | Read the message + `X-RateLimit-Remaining`; if scope, see §5; if rate, back off per `Retry-After` |
 | **404** | Resource missing **or** token can't see it | GitHub returns 404 for private resources the scope can't reach — verify the path, then suspect a missing scope |
 | **409** | Conflict | Stale `sha` on a file update — re-GET the blob `sha` and retry |
@@ -252,5 +252,5 @@ nyxid service add api-github --oauth --scope "repo,workflow"   # re-consent with
   authorized for that specific action.
 - **Report exactly what GitHub returns** (status + message). Never claim success on a
   non-2xx response.
-- Act only within the user's granted scopes; when blocked, name the missing scope and the
-  `nyxid service add ... --scope` remedy instead of silently failing.
+- Act only within the user's granted scopes. In Aevatar Web UI, surface missing connection or
+  scope only through the typed card/failure contract; never tell the user to execute CLI commands.
