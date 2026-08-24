@@ -274,6 +274,16 @@
       ]
     },
     {
+      "name": "bazi-analyst",
+      "source": "./bazi-analyst",
+      "description": "八字原局与流日分析。基于确定性排盘事实（干支/十神/节气/刑冲合害）生成解释文本；从不自行计算历法，计算一律调用已装载的排盘工具。",
+      "version": "0.1",
+      "keywords": [
+        "fortune",
+        "bazi"
+      ]
+    },
+    {
       "name": "budget-monitoring-variance-payload-builder",
       "source": "./budget-monitoring-variance-payload-builder",
       "description": "Builds deterministic Lark budget variance payloads and, when asked, runs the full budget monitoring flow through a NyxID service instead of direct Lark credentials.",
@@ -672,6 +682,16 @@
         "creator-mindset",
         "perspective",
         "nuwa"
+      ]
+    },
+    {
+      "name": "liuyao-reader",
+      "source": "./liuyao-reader",
+      "description": "六爻解卦。基于确定性排卦事实（本变卦/世应/六亲/六神/动爻）解读所占之事；从不自行排卦，排卦一律来自排卦工具。",
+      "version": "0.1",
+      "keywords": [
+        "fortune",
+        "liuyao"
       ]
     },
     {
