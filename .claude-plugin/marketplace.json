@@ -685,16 +685,6 @@
       ]
     },
     {
-      "name": "liuyao-reader",
-      "source": "./liuyao-reader",
-      "description": "六爻解卦。基于确定性排卦事实（本变卦/世应/六亲/六神/动爻）解读所占之事；从不自行排卦，排卦一律来自排卦工具。",
-      "version": "0.1",
-      "keywords": [
-        "fortune",
-        "liuyao"
-      ]
-    },
-    {
       "name": "monthly-access-certification",
       "source": "./monthly-access-certification",
       "description": "执行月末访问认证、提醒预览或明确发送提醒。用户提到“月度访问认证”、对应英文名称或要求运行该验收 workflow 时使用。",
