@@ -1,0 +1,5 @@
+{
+  "name": "github-repo-digest",
+  "version": "0.1",
+  "description": "Given an owner repo rank recent GitHub activity into an actionable digest."
+}

@@ -1,0 +1,102 @@
+# github-repo-digest — DRAFT v0.1
+#
+# Native aevatar re-expression of the ECC github-ops "triage signal" pattern:
+# given an owner/repo, pull the repo's recent activity (open issues, open PRs, latest
+# releases) and fold it into a single ranked, most-actionable-first digest. Stateless
+# single run — the run itself IS the record (visible in the observatory).
+#
+# SOURCE: wired to the nyxid connector `api-github` (GitHub REST API, base
+# https://api.github.com, bearer injected by NyxID). All three reads are READ-ONLY GETs;
+# owner/repo are interpolated into the PATH (no JSON body), so there is no JSON-escaping
+# risk on the fetch steps. The engine has NO clock — any "recent / since <date>" window
+# must arrive in the run prompt; the GitHub `sort=updated` ordering already surfaces the
+# freshest items first.
+# NOTE: this concrete wiring (`api-github`) is a runnable INSTANCE; a publishable generic
+# skill must parameterize the source (slug + base) rather than hardcode it (see DESIGN.md
+# "Genericness"). The connector is `active` but was NOT live-probed — confirm the exact
+# response field names on the first real run (see DESIGN.md verification checklist).
+
+name: github_repo_digest
+description: >-
+  Given an owner/repo, fetch the repository's recent activity (open issues, open PRs,
+  latest releases) from GitHub and emit a single ranked, most-actionable-first digest.
+  Watch the run in the observatory.
+
+roles:
+  - id: triager
+    system_prompt: >-
+      You are a precise repository triage analyst. You are given three lists pulled live
+      from one GitHub repository: open issues, open pull requests, and recent releases.
+      Produce ONE ranked digest, most-actionable-first, that a maintainer can act on at a
+      glance. Rank by urgency and staleness: surface breaking/security/bug signals, PRs
+      that look review-ready or have sat without activity, and call out the latest release.
+      Use ONLY the data provided in the input — never invent issues, PRs, counts, or
+      releases, and never fabricate totals. If a list is empty, say so plainly.
+
+steps:
+  # 0) CAPTURE — the run prompt must be the target repo as "owner/repo" (e.g. "facebook/react").
+  #    "owner/repo" is already the exact GitHub path infix /repos/{owner}/{repo}, so it is used
+  #    directly in each GET path below — no parsing step. (The engine's `transform op:split`
+  #    joins all parts with "\n---\n" and does NOT extract a single element by index, so
+  #    splitting owner/repo apart is both unnecessary and unavailable. `${target}` is the bare
+  #    assigned variable — the real way to read an assign back, vs the never-registered
+  #    `${steps.<id>.text}`.) Keep the prompt a clean single "owner/repo" line.
+  - id: capture_target
+    type: assign
+    parameters: { target: target, value: "$input" }
+    next: fetch_issues
+
+  # 3) FETCH OPEN ISSUES — GitHub REST, READ-ONLY GET. owner/repo go in the PATH (no body),
+  #    so there is no JSON-escaping risk. sort=updated puts the freshest first.
+  #    NOTE: GitHub's /issues endpoint also returns PRs; the LLM is told to separate them,
+  #    and the dedicated /pulls fetch below is the authoritative PR list.
+  - id: fetch_issues
+    type: tool_call
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"slug":"api-github","path":"/repos/${target}/issues?state=open&sort=updated&per_page=10","method":"GET"}'
+    next: fetch_pulls
+
+  # 4) FETCH OPEN PULL REQUESTS — READ-ONLY GET, authoritative PR list.
+  - id: fetch_pulls
+    type: tool_call
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"slug":"api-github","path":"/repos/${target}/pulls?state=open&sort=updated&per_page=10","method":"GET"}'
+    next: fetch_releases
+
+  # 5) FETCH RECENT RELEASES — READ-ONLY GET, newest first.
+  - id: fetch_releases
+    type: tool_call
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"slug":"api-github","path":"/repos/${target}/releases?per_page=5","method":"GET"}'
+    next: digest
+
+  # 6) DIGEST — ONE LLM pass folds the three lists into a single ranked, most-actionable-first
+  #    digest. The three fetched lists are pulled in by reference; $input here is the releases
+  #    result and is also passed through. This is the single terminal step: last in the
+  #    document, no `next`. Nothing may follow it (fall-through would overwrite the output).
+  - id: digest
+    type: llm_call
+    target_role: triager
+    parameters:
+      prompt_prefix: >-
+        Repository: ${target}
+        Caller note (may include a recency window): ${steps.capture_target.output}
+        ---
+        OPEN ISSUES (GitHub /issues, may include PRs — keep only real issues here):
+        ${steps.fetch_issues.output}
+        ---
+        OPEN PULL REQUESTS (authoritative, GitHub /pulls):
+        ${steps.fetch_pulls.output}
+        ---
+        RECENT RELEASES (GitHub /releases, newest first):
+        ${steps.fetch_releases.output}
+        ---
+        Now produce ONE ranked digest, most-actionable-first. Group as: "Top signals"
+        (the few things a maintainer should look at first, each one line: what it is, why
+        it matters, its number/url), then "Open issues", "Open PRs", "Latest release".
+        One line per item: "<#number> — <title> — <why it matters / staleness note> — <url>".
+        If a section is empty, state that explicitly. Do not assert any total you were not
+        given; describe volume qualitatively ("several", "a handful") rather than guessing a count.

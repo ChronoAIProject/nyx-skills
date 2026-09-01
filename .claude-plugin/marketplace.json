@@ -5,6 +5,16 @@
   },
   "plugins": [
     {
+      "name": "acceptance-criteria-author",
+      "source": "./acceptance-criteria-author",
+      "description": "Turn an ambiguous request into scoped testable acceptance criteria with risks and edge cases.",
+      "version": "0.1",
+      "keywords": [
+        "requirements",
+        "testing"
+      ]
+    },
+    {
       "name": "acceptance-fixture-drift-attestation",
       "source": "./acceptance-fixture-drift-attestation",
       "description": "只读体检验收 canary 数据是否漂移、fixture 是否完好。用户提到“验收 fixture 漂移体检”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -516,6 +526,16 @@
         "substrate",
         "github-issues",
         "manual"
+      ]
+    },
+    {
+      "name": "github-repo-digest",
+      "source": "./github-repo-digest",
+      "description": "Given an owner repo rank recent GitHub activity into an actionable digest.",
+      "version": "0.1",
+      "keywords": [
+        "github",
+        "digest"
       ]
     },
     {
@@ -1080,6 +1100,16 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "social-search-digest",
+      "source": "./social-search-digest",
+      "description": "Read-only X Twitter search producing a ranked summarized digest of recent posts.",
+      "version": "0.1",
+      "keywords": [
+        "social",
+        "digest"
       ]
     },
     {
