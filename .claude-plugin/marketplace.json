@@ -52,6 +52,20 @@
       ]
     },
     {
+      "name": "aevatar-attachment-probe",
+      "source": "./aevatar-attachment-probe",
+      "description": "Boundary test for inbound Lark attachments — the user sends an image or file alongside this command and the bot reports exactly what it can observe on the chat path (text only, attachment refs, or nothing), without guessing. Detects when the platform wires chat-path attachment visibility so dependent skills can be upgraded.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "attachments",
+        "vision",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-automation",
       "source": "./aevatar-automation",
       "description": "Aevatar scheduling & workflow automation: scheduled_agent_creator (cron/one-shot) for independent scheduled Ornn skill agents and reminders — NOT an alias for Studio Team member automation — the long-running task automation playbook, workflow creation semantics (Scope Workflow vs Ornn publish), agent_builder lifecycle, the typed required_nyx_services contract (exact user_service_id is the authorization; a slug snapshot never substitutes), dedicated Agent Key semantics (vault-held raw material, borrowed durable reference late-resolved per use, exact non-wildcard grants, ~90-day projected expiry, reauthorize-then-revoke, independent NyxID and Vault revocation tracks), accepted-is-admission-only receipts, and a token_expired triage protocol that reads credentialSourceKind before assuming any TTL.",
@@ -1196,6 +1210,21 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "scheduled-agent-doctor",
+      "source": "./scheduled-agent-doctor",
+      "description": "Audit, debug, trigger, and repair scheduled (cron) agents from chat — list what exists, verify cron and timezone really mean what the user intended, manually run one to test, disable or delete-and-recreate broken ones. Encodes the known failure modes (timezone double-conversion, zombie agents from older runtimes, cron-mode credential 403, DM-vs-group visibility) so users can self-serve.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "scheduled",
+        "cron",
+        "agents",
+        "diagnostics",
+        "self-service"
       ]
     },
     {
