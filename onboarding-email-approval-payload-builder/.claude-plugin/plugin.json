@@ -1,0 +1,5 @@
+{
+  "name": "onboarding-email-approval-payload-builder",
+  "version": "2.2",
+  "description": "Runs the new-hire onboarding email-account approval flow end to end yourself — resolve the new hire's info, build the exact Lark approval body with the bundled deterministic builder, then SUBMIT the onboarding email approval instance."
+}

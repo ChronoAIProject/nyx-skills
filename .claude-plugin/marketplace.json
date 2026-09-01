@@ -376,6 +376,19 @@
       ]
     },
     {
+      "name": "budget-monitor-variance-payload-builder",
+      "source": "./budget-monitor-variance-payload-builder",
+      "description": "Runs the weekly budget-monitor flow end to end — reads the four Lark Bitable budget/actual tables, computes budget-vs-actual variance with the bundled deterministic builder, builds the weekly Lark variance card, and posts it to the current Lark chat.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "budget-monitor",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "budget-monitoring-variance-payload-builder",
       "source": "./budget-monitoring-variance-payload-builder",
       "description": "Builds deterministic Lark budget variance payloads and, when asked, runs the full budget monitoring flow through a NyxID service instead of direct Lark credentials.",
@@ -499,6 +512,18 @@
       "source": "./demo-fun-facts-workflow",
       "description": "Given any topic, returns three surprising true facts plus one catchy title for them. Runs a tiny two-step aevatar workflow (facts then title) and is watchable in the observatory. A minimal demo of a workflow-carrying ornn skill.",
       "version": "0.1"
+    },
+    {
+      "name": "deploy-gate",
+      "source": "./deploy-gate",
+      "description": "Deployment gate with human approval — runs preflight checks, sends an interactive Lark approval card, then simulates deployment on approval. Usable from Lark bot via natural language or /deploy command.",
+      "version": "1.0",
+      "keywords": [
+        "deploy",
+        "devops",
+        "approval",
+        "workflow"
+      ]
     },
     {
       "name": "deterministic-parallel-evidence-review",
@@ -945,6 +970,20 @@
       ]
     },
     {
+      "name": "monthly-attendance-submit-payload-builder",
+      "source": "./monthly-attendance-submit-payload-builder",
+      "description": "Runs the monthly China-region attendance approval flow end to end yourself — fetch the month's Lark attendance records, compute出勤/离职/事假/病假 stats, build the exact approval body, SUBMIT the Lark attendance approval instance, then DM the confirmation card.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "attendance",
+        "approval",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "nyx-lark",
       "source": "./nyx-lark",
       "description": "Lark/Feishu integration via NyxID proxy. Replaces lark-cli — call Lark OpenAPI directly through nyxid proxy request with automatic credential injection.",
@@ -1067,6 +1106,20 @@
       "source": "./office-lights-control",
       "description": "Turn the office wall lights on or off via two pre-registered aevatar scope workflows (office_lights_on / office_lights_off). Each asserts the on/off state of the 10 office wall-switch lights (Corridor, Front/Mid Reception, Coworking ceiling; Dubai Room excluded) through the NyxID-brokered home-assistant service. Use whenever the user wants to switch the office lights on or off.",
       "version": "1.0"
+    },
+    {
+      "name": "onboarding-email-approval-payload-builder",
+      "source": "./onboarding-email-approval-payload-builder",
+      "description": "Runs the new-hire onboarding email-account approval flow end to end yourself — resolve the new hire's info, build the exact Lark approval body with the bundled deterministic builder, then SUBMIT the onboarding email approval instance.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "onboarding",
+        "approval",
+        "lark",
+        "payload-builder"
+      ]
     },
     {
       "name": "ornn-agent-manual-cli",
