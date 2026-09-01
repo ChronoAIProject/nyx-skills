@@ -761,6 +761,20 @@
       ]
     },
     {
+      "name": "hr-approval-bot-payload-builder",
+      "source": "./hr-approval-bot-payload-builder",
+      "description": "Runs the Lark HR approval bot flow end to end yourself — read the Lark leave request, look up the employee contact record, analyze the request, then SUBMIT the Lark leave approval and send the reply.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "hr-approval",
+        "lark",
+        "lark-approval",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "hr-attendance-fill-reminder",
       "source": "./hr-attendance-fill-reminder",
       "description": "考勤填写提醒。当用户说：考勤提醒、催填考勤、考勤填写、月底提醒、提醒大家填考勤、attendance reminder 时使用。生成月底考勤核对清单卡片预览；确认后可正式发送提醒。",
@@ -1279,6 +1293,19 @@
         "manual",
         "skill-lifecycle",
         "cli"
+      ]
+    },
+    {
+      "name": "petty-cash-approval-payload-builder",
+      "source": "./petty-cash-approval-payload-builder",
+      "description": "Runs the petty-cash approval flow end to end yourself — collect Lark DM/sheet/image context, extract receipt details, build the exact approval body, then SUBMIT the Lark approval instance.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "petty-cash",
+        "lark-approval",
+        "payload-builder"
       ]
     },
     {

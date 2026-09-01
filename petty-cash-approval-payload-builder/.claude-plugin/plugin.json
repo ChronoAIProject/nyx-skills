@@ -1,0 +1,5 @@
+{
+  "name": "petty-cash-approval-payload-builder",
+  "version": "2.2",
+  "description": "Runs the petty-cash approval flow end to end yourself — collect Lark DM/sheet/image context, extract receipt details, build the exact approval body, then SUBMIT the Lark approval instance."
+}
