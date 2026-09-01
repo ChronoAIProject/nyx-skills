@@ -208,6 +208,20 @@
       ]
     },
     {
+      "name": "aevatar-scripting-probe",
+      "source": "./aevatar-scripting-probe",
+      "description": "Verify the code_execute sandbox is fully working from chat — runs a tiny deterministic snippet in each supported language (python / javascript / typescript / bash) and checks the output equals the known answer, reporting a per-language pass/fail matrix. Run it before any workflow that relies on code_execute (deterministic amount math, payload building).",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "scripting",
+        "code-execute",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-service-publisher",
       "source": "./aevatar-service-publisher",
       "description": "Publish an Aevatar member, team, or workflow as an invocable service and (host permitting) register it with NyxID, then verify, invoke, or wire external HTTP triggers such as Lark Base automation — all over the REST API. Use when a user wants to \"publish/bind a service\", \"expose my workflow/team as a service\", \"register it with NyxID\", \"make it callable\", \"get the service slug/URL\", \"invoke my service\", \"let Lark Base call my workflow\", \"trigger this workflow from an external webhook\", or \"version/deploy/roll out a service\". It covers the simple scope binding, reading back a member's published service, the full account-level service lifecycle (revision → publish → deploy → rollout), how to confirm the NyxID registration (slug + status), how to invoke an endpoint, and how to distinguish direct NyxID proxy triggering from host-gated externalExposure. Build the team/member first with the team-builder skill.",
@@ -273,6 +287,21 @@
       ]
     },
     {
+      "name": "aevatar-vision-probe",
+      "source": "./aevatar-vision-probe",
+      "description": "Verify the read-image (vision) path end to end — the user sends an image plus the trigger, a workflow vision step describes it, and the run output proves the model actually saw the image (a real description, not \"no image received\"). Run it before any image-dependent workflow (petty-cash receipt, invoice OCR).",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "vision",
+        "read-image",
+        "workflow",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
       "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, automate, or feature-probe a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, feature-equivalent evidence boundaries, and reusable publication. Not for blindly rerunning an existing failed workflow.",
@@ -284,6 +313,20 @@
         "aevatar",
         "create-workflow",
         "pipeline"
+      ]
+    },
+    {
+      "name": "aevatar-workflow-engine-probe",
+      "source": "./aevatar-workflow-engine-probe",
+      "description": "Verify the workflow engine can actually start a run and return its output to chat — uses aevatar_start_workflow with an inline self-contained workflow (no pre-registration needed), waits for completion, and checks the run output echoes a unique token. Run it before relying on any workflow; it isolates \"is the engine alive\" from \"is my workflow correct\".",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "workflow",
+        "engine",
+        "diagnostics"
       ]
     },
     {

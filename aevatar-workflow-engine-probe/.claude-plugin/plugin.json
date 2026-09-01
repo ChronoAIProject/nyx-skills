@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-workflow-engine-probe",
+  "version": "1.0",
+  "description": "Verify the workflow engine can actually start a run and return its output to chat — uses aevatar_start_workflow with an inline self-contained workflow (no pre-registration needed), waits for completion, and checks the run output echoes a unique token. Run it before relying on any workflow; it isolates \"is the engine alive\" from \"is my workflow correct\"."
+}
