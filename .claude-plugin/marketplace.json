@@ -502,6 +502,19 @@
       ]
     },
     {
+      "name": "community-radar-digest-payload-builder",
+      "source": "./community-radar-digest-payload-builder",
+      "description": "Runs the community-radar flow end to end and posts a digest to the chat.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "community-radar",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "complex-codex-exec-validation",
       "source": "./complex-codex-exec-validation",
       "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -809,6 +822,19 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "invoice-ocr-approval-payload-builder",
+      "source": "./invoice-ocr-approval-payload-builder",
+      "description": "Runs the invoice OCR approval flow end to end yourself — collect invoice files and review fields, OCR them, upload attachments, resolve Lark contacts and related approvals, then SUBMIT the Lark approval instance.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "invoice-approval",
+        "lark-approval",
+        "payload-builder"
       ]
     },
     {
@@ -1327,6 +1353,19 @@
         "research-review",
         "claim-fidelity",
         "severity-rubric"
+      ]
+    },
+    {
+      "name": "resume-screening-payload-builder",
+      "source": "./resume-screening-payload-builder",
+      "description": "Runs the HR resume screening flow end to end — collects the candidate's form/chat fields and resume PDF, screens the resume with your own model, uploads the passing resume to Lark Drive, writes the Bitable record, and posts a summary to the chat.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "resume-screening",
+        "lark",
+        "payload-builder"
       ]
     },
     {
