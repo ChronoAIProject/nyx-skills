@@ -5,6 +5,16 @@
   },
   "plugins": [
     {
+      "name": "acceptance-criteria-author",
+      "source": "./acceptance-criteria-author",
+      "description": "Turn an ambiguous request into scoped testable acceptance criteria with risks and edge cases.",
+      "version": "0.1",
+      "keywords": [
+        "requirements",
+        "testing"
+      ]
+    },
+    {
       "name": "acceptance-fixture-drift-attestation",
       "source": "./acceptance-fixture-drift-attestation",
       "description": "只读体检验收 canary 数据是否漂移、fixture 是否完好。用户提到“验收 fixture 漂移体检”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -813,6 +823,17 @@
       ]
     },
     {
+      "name": "long-form-writer",
+      "source": "./long-form-writer",
+      "description": "Write polished long-form content with structure credibility and an optional supplied voice.",
+      "version": "0.1",
+      "keywords": [
+        "writing",
+        "content",
+        "longform"
+      ]
+    },
+    {
       "name": "monthly-access-certification",
       "source": "./monthly-access-certification",
       "description": "执行月末访问认证、提醒预览或明确发送提醒。用户提到“月度访问认证”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -1157,6 +1178,17 @@
         "managed-sandbox",
         "smoke-test",
         "diagnostics"
+      ]
+    },
+    {
+      "name": "voice-profile-builder",
+      "source": "./voice-profile-builder",
+      "description": "Derive a structured reusable writing-voice profile from supplied sample texts.",
+      "version": "0.1",
+      "keywords": [
+        "voice",
+        "writing",
+        "style"
       ]
     },
     {
