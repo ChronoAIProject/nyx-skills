@@ -378,6 +378,31 @@
       ]
     },
     {
+      "name": "daily-tech-news-briefing",
+      "source": "./daily-tech-news-briefing",
+      "description": "每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。",
+      "version": "1.0",
+      "keywords": [
+        "news",
+        "technology",
+        "daily",
+        "summary",
+        "chinese"
+      ]
+    },
+    {
+      "name": "daily-tech-news-digest",
+      "source": "./daily-tech-news-digest",
+      "description": "每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。",
+      "version": "1.0",
+      "keywords": [
+        "news",
+        "technology",
+        "daily-digest",
+        "chinese"
+      ]
+    },
+    {
       "name": "deterministic-parallel-evidence-review",
       "source": "./deterministic-parallel-evidence-review",
       "description": "验证 deterministic parallel 三路 worker、receipt 与 dispatch index 合并。用户提到“确定性并行证据审查”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -516,6 +541,20 @@
         "hr",
         "lark",
         "attendance",
+        "approval"
+      ]
+    },
+    {
+      "name": "hr-onboarding-email-approval",
+      "source": "./hr-onboarding-email-approval",
+      "description": "入职邮箱开通审批。当用户说入职邮箱、新员工邮箱、邮箱申请、开通邮箱、邮箱审批、onboarding email，或 Employee Master 新员工入职状态触发邮箱审批时使用。支持自然语言预览/提交和 Base record 自动化；默认只预览，用户无需知道 workflow、skill、工具或 JSON。",
+      "version": "7.0",
+      "keywords": [
+        "chronoai",
+        "hr",
+        "lark",
+        "onboarding",
+        "email",
         "approval"
       ]
     },
@@ -875,6 +914,12 @@
         "proxy",
         "skill-authoring"
       ]
+    },
+    {
+      "name": "office-lights-control",
+      "source": "./office-lights-control",
+      "description": "Turn the office wall lights on or off via two pre-registered aevatar scope workflows (office_lights_on / office_lights_off). Each asserts the on/off state of the 10 office wall-switch lights (Corridor, Front/Mid Reception, Coworking ceiling; Dubai Room excluded) through the NyxID-brokered home-assistant service. Use whenever the user wants to switch the office lights on or off.",
+      "version": "1.0"
     },
     {
       "name": "ornn-agent-manual-cli",
