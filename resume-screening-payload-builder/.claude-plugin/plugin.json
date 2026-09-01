@@ -1,0 +1,5 @@
+{
+  "name": "resume-screening-payload-builder",
+  "version": "2.1",
+  "description": "Runs the HR resume screening flow end to end — collects the candidate's form/chat fields and resume PDF, screens the resume with your own model, uploads the passing resume to Lark Drive, writes the Bitable record, and posts a summary to the chat."
+}
