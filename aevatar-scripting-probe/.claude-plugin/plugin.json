@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-scripting-probe",
+  "version": "1.0",
+  "description": "Verify the code_execute sandbox is fully working from chat — runs a tiny deterministic snippet in each supported language (python / javascript / typescript / bash) and checks the output equals the known answer, reporting a per-language pass/fail matrix. Run it before any workflow that relies on code_execute (deterministic amount math, payload building)."
+}
