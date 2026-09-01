@@ -1,0 +1,5 @@
+{
+  "name": "aevatar-vision-probe",
+  "version": "1.0",
+  "description": "Verify the read-image (vision) path end to end — the user sends an image plus the trigger, a workflow vision step describes it, and the run output proves the model actually saw the image (a real description, not \"no image received\"). Run it before any image-dependent workflow (petty-cash receipt, invoice OCR)."
+}

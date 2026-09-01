@@ -129,6 +129,21 @@
       ]
     },
     {
+      "name": "aevatar-file-extract-probe",
+      "source": "./aevatar-file-extract-probe",
+      "description": "Verify the read-file path end to end — the user sends a PDF/DOCX/txt/json/md/csv plus the trigger, a workflow document_extract step pulls its text, and the run output proves the file was read. Run it before any file-dependent workflow (invoice, resume screening, reimbursement intake). As of 2026-06-12 this probe is expected to surface a known gap; the result tells you whether read-file is wired yet.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "read-file",
+        "document-extract",
+        "workflow",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-lark-provisioning",
       "source": "./aevatar-lark-provisioning",
       "description": "Lark resource provisioning for Aevatar agents: after creating any private doc/Base/sheet/folder for a user, grant the requester full access BEFORE returning the link, with an org-wide (tenant) share fallback when no personal id resolves. Always-on correctness rule.",
@@ -258,6 +273,21 @@
       ]
     },
     {
+      "name": "aevatar-vision-probe",
+      "source": "./aevatar-vision-probe",
+      "description": "Verify the read-image (vision) path end to end — the user sends an image plus the trigger, a workflow vision step describes it, and the run output proves the model actually saw the image (a real description, not \"no image received\"). Run it before any image-dependent workflow (petty-cash receipt, invoice OCR).",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "vision",
+        "read-image",
+        "workflow",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-workflow-authoring",
       "source": "./aevatar-workflow-authoring",
       "description": "Author, preview, validate, and persist an executable aevatar workflow from a natural-language request. Use it when the user wants to create, build, set up, automate, or feature-probe a multi-step task as a runnable Aevatar workflow. It covers exact NyxID operation and authored-request admission, bounded YAML, file inputs, terminal run verification, feature-equivalent evidence boundaries, and reusable publication. Not for blindly rerunning an existing failed workflow.",
@@ -269,6 +299,20 @@
         "aevatar",
         "create-workflow",
         "pipeline"
+      ]
+    },
+    {
+      "name": "aevatar-workflow-engine-probe",
+      "source": "./aevatar-workflow-engine-probe",
+      "description": "Verify the workflow engine can actually start a run and return its output to chat — uses aevatar_start_workflow with an inline self-contained workflow (no pre-registration needed), waits for completion, and checks the run output echoes a unique token. Run it before relying on any workflow; it isolates \"is the engine alive\" from \"is my workflow correct\".",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "workflow",
+        "engine",
+        "diagnostics"
       ]
     },
     {
@@ -1110,6 +1154,16 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "scheduled-collect-enrich-digest",
+      "source": "./scheduled-collect-enrich-digest",
+      "description": "Collect items from a connected source score and summarize them against a brief and emit a ranked digest.",
+      "version": "1.0",
+      "keywords": [
+        "digest",
+        "monitoring"
       ]
     },
     {
