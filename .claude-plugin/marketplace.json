@@ -391,6 +391,18 @@
       ]
     },
     {
+      "name": "daily-tech-news-digest",
+      "source": "./daily-tech-news-digest",
+      "description": "每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。",
+      "version": "1.0",
+      "keywords": [
+        "news",
+        "technology",
+        "daily-digest",
+        "chinese"
+      ]
+    },
+    {
       "name": "deterministic-parallel-evidence-review",
       "source": "./deterministic-parallel-evidence-review",
       "description": "验证 deterministic parallel 三路 worker、receipt 与 dispatch index 合并。用户提到“确定性并行证据审查”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -902,6 +914,12 @@
         "proxy",
         "skill-authoring"
       ]
+    },
+    {
+      "name": "office-lights-control",
+      "source": "./office-lights-control",
+      "description": "Turn the office wall lights on or off via two pre-registered aevatar scope workflows (office_lights_on / office_lights_off). Each asserts the on/off state of the 10 office wall-switch lights (Corridor, Front/Mid Reception, Coworking ceiling; Dubai Room excluded) through the NyxID-brokered home-assistant service. Use whenever the user wants to switch the office lights on or off.",
+      "version": "1.0"
     },
     {
       "name": "ornn-agent-manual-cli",
