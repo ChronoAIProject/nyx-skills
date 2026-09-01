@@ -1,0 +1,5 @@
+{
+  "name": "github-repo-insights",
+  "version": "1.0",
+  "description": "On-demand GitHub intelligence for any repo the team's credential can see — weekly activity digest, issue and PR triage table, milestone progress, release-notes draft, and \"what changed since X\" answers, fetched live through NyxID-brokered GitHub access and delivered in chat. Complements deadline-monitor (deadline risk) and github-candidate-sourcing (hiring)."
+}
