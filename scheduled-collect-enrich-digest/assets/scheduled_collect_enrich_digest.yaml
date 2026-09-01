@@ -1,0 +1,73 @@
+# scheduled-collect-enrich-digest — DRAFT v0.1
+#
+# Native aevatar re-expression of the "collect → enrich → store" data-agent pattern.
+# Stateless single run: search ONE connected source, batch-score/summarize the hits
+# against the brief, and freeze a ranked digest. The run itself IS the record
+# (visible in the observatory). "Scheduled" = an external trigger (scheduled agent /
+# cron caller) starts this workflow on an interval — the engine has no clock of its own.
+#
+# SOURCE: wired to the nyxid connector `tavily-search-chrono-ai` (Tavily web search,
+# ChronoAI org-shared). Probed live 2026-06-22: POST /search -> HTTP 200, hits in `results[]`.
+# To retarget another source, change the `collect` body + `extract_items` path (see DESIGN.md).
+# NOTE: this concrete wiring is a runnable INSTANCE; a publishable generic skill must
+# parameterize the source rather than hardcode a slug (see DESIGN.md "Genericness").
+
+name: scheduled_collect_enrich_digest
+description: >-
+  Search one connected source (Tavily), score and summarize the hits against the run
+  brief, and emit a ranked digest. Trigger on a schedule; watch in the observatory.
+
+roles:
+  - id: curator
+    system_prompt: >-
+      You are a precise curator. Given web search hits and the user's brief, score each
+      hit 0-100 for relevance to the brief, write a one-line reason, and output a ranked
+      digest, highest score first. Use ONLY the hits provided in the input. Never invent
+      results and never fabricate totals or counts.
+
+steps:
+  # 0) CAPTURE — snapshot the run prompt (the search query / topic + any date window) so
+  #    later steps can still reference it after $input has become the search hits.
+  #    Keep the prompt a single clean query line (it is interpolated into the JSON body below).
+  - id: capture_brief
+    type: assign
+    parameters: { target: brief, value: "$input" }
+    next: collect
+
+  # 1) COLLECT — Tavily web search via the nyxid_proxy tool against tavily-search-chrono-ai.
+  #    body is a nested JSON object (POST). The query is the captured brief.
+  - id: collect
+    type: tool_call
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"slug":"tavily-search-chrono-ai","path":"/search","method":"POST","body":{"query":"${steps.capture_brief.output}","max_results":5,"search_depth":"basic"}}'
+    next: extract_items
+
+  # 2) EXTRACT — deterministically pull the hits array out of the Tavily response.
+  #    Tavily nests its hits under `results` (each: title, url, content, score).
+  - id: extract_items
+    type: transform
+    parameters:
+      op: json_extract
+      path: "results"
+    next: enrich
+
+  # 3) ENRICH — ONE batched LLM pass scores + summarizes every hit (never per-item).
+  #    Priorities come from the captured brief; the hits arrive as $input.
+  - id: enrich
+    type: llm_call
+    target_role: curator
+    parameters:
+      prompt_prefix: >-
+        User brief and priorities: ${steps.capture_brief.output}
+        ---
+        Score and summarize each search hit below against that brief. Output a ranked
+        digest (highest score first), one line per hit, formatted as:
+        "<score> — <title> — <one-line why it matters> — <url>". Search hits:
+    next: digest
+
+  # 4) DIGEST — freeze the curated output as the workflow result.
+  #    Single terminal step: last in the document, no `next`. Nothing may follow it.
+  - id: digest
+    type: assign
+    parameters: { target: digest, value: "$input" }

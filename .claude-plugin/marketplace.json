@@ -129,6 +129,21 @@
       ]
     },
     {
+      "name": "aevatar-file-extract-probe",
+      "source": "./aevatar-file-extract-probe",
+      "description": "Verify the read-file path end to end — the user sends a PDF/DOCX/txt/json/md/csv plus the trigger, a workflow document_extract step pulls its text, and the run output proves the file was read. Run it before any file-dependent workflow (invoice, resume screening, reimbursement intake). As of 2026-06-12 this probe is expected to surface a known gap; the result tells you whether read-file is wired yet.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "read-file",
+        "document-extract",
+        "workflow",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-lark-provisioning",
       "source": "./aevatar-lark-provisioning",
       "description": "Lark resource provisioning for Aevatar agents: after creating any private doc/Base/sheet/folder for a user, grant the requester full access BEFORE returning the link, with an org-wide (tenant) share fallback when no personal id resolves. Always-on correctness rule.",
@@ -1110,6 +1125,16 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "scheduled-collect-enrich-digest",
+      "source": "./scheduled-collect-enrich-digest",
+      "description": "Collect items from a connected source score and summarize them against a brief and emit a ranked digest.",
+      "version": "1.0",
+      "keywords": [
+        "digest",
+        "monitoring"
       ]
     },
     {

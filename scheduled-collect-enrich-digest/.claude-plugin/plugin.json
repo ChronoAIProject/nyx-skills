@@ -1,0 +1,5 @@
+{
+  "name": "scheduled-collect-enrich-digest",
+  "version": "1.0",
+  "description": "Collect items from a connected source score and summarize them against a brief and emit a ranked digest."
+}
