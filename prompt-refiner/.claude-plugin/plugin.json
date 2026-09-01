@@ -1,0 +1,5 @@
+{
+  "name": "prompt-refiner",
+  "version": "0.1",
+  "description": "Take a rough prompt and its goal and return an optimized prompt with clarified intent, structure, constraints, and output spec."
+}
