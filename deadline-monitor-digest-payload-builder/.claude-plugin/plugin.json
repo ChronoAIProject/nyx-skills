@@ -1,0 +1,5 @@
+{
+  "name": "deadline-monitor-digest-payload-builder",
+  "version": "2.3",
+  "description": "Runs the deadline-monitor flow end to end — reads GitHub repo or org milestones/issues, ranks deadline risk, builds the exact Lark digest with the bundled deterministic builder, and posts it to the current Lark chat."
+}
