@@ -426,6 +426,20 @@
       ]
     },
     {
+      "name": "chrono-ai-weekly-report",
+      "source": "./chrono-ai-weekly-report",
+      "description": "Pulls a GitHub account's issues and pull requests for the week, analyzes what shipped, what is in progress, and what is blocked with real workload metrics, then renders a Lark interactive card with hyperlinked rows and a metrics table, or a markdown report. The agent runs the whole flow itself using its own NyxID-brokered tools.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "payload-builder",
+        "github",
+        "weekly-report",
+        "lark"
+      ]
+    },
+    {
       "name": "chrono-onboarding",
       "source": "./chrono-onboarding",
       "description": "Chrono AI 非技术团队 onboarding — 安装 NyxID CLI, 配置 AI 工具 MCP, 克隆战略仓库, 运行每日更新",
@@ -1342,6 +1356,20 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "team-health-report-payload-builder",
+      "source": "./team-health-report-payload-builder",
+      "description": "Runs the team-health report flow end to end and posts a digest to the chat.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "team-health",
+        "lark",
+        "github",
+        "payload-builder"
       ]
     },
     {

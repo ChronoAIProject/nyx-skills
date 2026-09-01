@@ -1,0 +1,5 @@
+{
+  "name": "chrono-ai-weekly-report",
+  "version": "1.0",
+  "description": "Pulls a GitHub account's issues and pull requests for the week, analyzes what shipped, what is in progress, and what is blocked with real workload metrics, then renders a Lark interactive card with hyperlinked rows and a metrics table, or a markdown report. The agent runs the whole flow itself using its own NyxID-brokered tools."
+}
