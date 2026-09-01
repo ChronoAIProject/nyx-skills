@@ -378,31 +378,6 @@
       ]
     },
     {
-      "name": "daily-tech-news-briefing",
-      "source": "./daily-tech-news-briefing",
-      "description": "每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。",
-      "version": "1.0",
-      "keywords": [
-        "news",
-        "technology",
-        "daily",
-        "summary",
-        "chinese"
-      ]
-    },
-    {
-      "name": "daily-tech-news-digest",
-      "source": "./daily-tech-news-digest",
-      "description": "每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。",
-      "version": "1.0",
-      "keywords": [
-        "news",
-        "technology",
-        "daily-digest",
-        "chinese"
-      ]
-    },
-    {
       "name": "deterministic-parallel-evidence-review",
       "source": "./deterministic-parallel-evidence-review",
       "description": "验证 deterministic parallel 三路 worker、receipt 与 dispatch index 合并。用户提到“确定性并行证据审查”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -463,20 +438,6 @@
       ]
     },
     {
-      "name": "fin-invoice-precheck-approval",
-      "source": "./fin-invoice-precheck-approval",
-      "description": "Lark FIN-01 发票预检 workflow 路由。用户说‘帮我预检刚上传的发票’、‘发票预检’、‘检查发票’、‘检查刚上传的发票’、‘发票审批’、‘付款审批’、‘发起付款’、‘invoice precheck’或 fin-invoice-precheck-approval 时，优先加载这个精确 skill；附件和申请日期齐备后执行 workflow，缺项时先索取；不要走通用 OCR。",
-      "version": "15.0",
-      "keywords": [
-        "chronoai",
-        "finance",
-        "lark",
-        "invoice",
-        "payment",
-        "approval"
-      ]
-    },
-    {
       "name": "firecrawl-via-nyxid",
       "source": "./firecrawl-via-nyxid",
       "description": "Teach an aevatar agent to run Firecrawl web-research/agent jobs through NyxID (submit, poll, then read the result).",
@@ -516,46 +477,6 @@
         "issues",
         "rest-api",
         "agent-guide"
-      ]
-    },
-    {
-      "name": "hr-attendance-fill-reminder",
-      "source": "./hr-attendance-fill-reminder",
-      "description": "考勤填写提醒。当用户说：考勤提醒、催填考勤、考勤填写、月底提醒、提醒大家填考勤、attendance reminder 时使用。生成月底考勤核对清单卡片预览；确认后可正式发送提醒。",
-      "version": "6.0",
-      "keywords": [
-        "chronoai",
-        "hr",
-        "lark",
-        "attendance",
-        "reminder"
-      ]
-    },
-    {
-      "name": "hr-monthly-attendance-approval",
-      "source": "./hr-monthly-attendance-approval",
-      "description": "月度考勤审批。当用户说：月度考勤、考勤审批、考勤汇总、提交考勤、预览某月考勤、monthly attendance 时使用。读取考勤表并汇总人数/应出勤/离职/事假/病假，生成审批预览；确认后可正式创建审批并通知。",
-      "version": "6.0",
-      "keywords": [
-        "chronoai",
-        "hr",
-        "lark",
-        "attendance",
-        "approval"
-      ]
-    },
-    {
-      "name": "hr-onboarding-email-approval",
-      "source": "./hr-onboarding-email-approval",
-      "description": "入职邮箱开通审批。当用户说入职邮箱、新员工邮箱、邮箱申请、开通邮箱、邮箱审批、onboarding email，或 Employee Master 新员工入职状态触发邮箱审批时使用。支持自然语言预览/提交和 Base record 自动化；默认只预览，用户无需知道 workflow、skill、工具或 JSON。",
-      "version": "7.0",
-      "keywords": [
-        "chronoai",
-        "hr",
-        "lark",
-        "onboarding",
-        "email",
-        "approval"
       ]
     },
     {
@@ -914,12 +835,6 @@
         "proxy",
         "skill-authoring"
       ]
-    },
-    {
-      "name": "office-lights-control",
-      "source": "./office-lights-control",
-      "description": "Turn the office wall lights on or off via two pre-registered aevatar scope workflows (office_lights_on / office_lights_off). Each asserts the on/off state of the 10 office wall-switch lights (Corridor, Front/Mid Reception, Coworking ceiling; Dubai Room excluded) through the NyxID-brokered home-assistant service. Use whenever the user wants to switch the office lights on or off.",
-      "version": "1.0"
     },
     {
       "name": "ornn-agent-manual-cli",

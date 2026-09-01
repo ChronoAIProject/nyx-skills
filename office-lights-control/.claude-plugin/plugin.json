@@ -1,5 +1,0 @@
-{
-  "name": "office-lights-control",
-  "version": "1.0",
-  "description": "Turn the office wall lights on or off via two pre-registered aevatar scope workflows (office_lights_on / office_lights_off). Each asserts the on/off state of the 10 office wall-switch lights (Corridor, Front/Mid Reception, Coworking ceiling; Dubai Room excluded) through the NyxID-brokered home-assistant service. Use whenever the user wants to switch the office lights on or off."
-}
