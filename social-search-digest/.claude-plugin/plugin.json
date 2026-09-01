@@ -1,0 +1,5 @@
+{
+  "name": "social-search-digest",
+  "version": "0.1",
+  "description": "Read-only X Twitter search producing a ranked summarized digest of recent posts."
+}

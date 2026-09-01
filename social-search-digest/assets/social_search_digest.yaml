@@ -1,0 +1,81 @@
+# social-search-digest — DRAFT v0.1
+#
+# Native aevatar re-expression of the READ side of an X (Twitter) integration:
+# given a search query, pull recent PUBLIC posts and freeze a ranked, summarized
+# digest. READ-ONLY — there is no posting step (a publish side-effect deliberately
+# kept out of a generic skill; see DESIGN.md). Stateless single run: the run itself
+# IS the record (visible in the observatory). "Recent" comes from X's own recent-
+# search window; the engine has no clock of its own (the query carries any recency).
+#
+# SOURCE: wired to the nyxid connector `api-twitter` (X API v2, ChronoAI org-shared,
+#   bearer injected by nyxid). Base already includes /2 -> paths must NOT prepend /2.
+#   Call shape: GET /tweets/search/recent?query=<q>&max_results=10 ; hits under `data[]`
+#   (each: id, text, ...). The connector is `active` but NOT live-probed here — an
+#   author must test-run once to confirm the exact response shape + query encoding.
+# NOTE: this concrete wiring is a runnable INSTANCE; a publishable generic skill must
+#   parameterize the source rather than hardcode a slug (see DESIGN.md "Genericness").
+
+name: social_search_digest
+description: >-
+  Search X (Twitter) for recent public posts matching the run query, score and
+  summarize the hits against that query, and emit a ranked digest. READ-ONLY;
+  watch in the observatory.
+
+roles:
+  - id: curator
+    system_prompt: >-
+      You are a precise social-media curator. Given recent public posts and the
+      user's search query, score each post 0-100 for relevance to the query, write
+      a one-line reason, and output a ranked digest, highest score first. Use ONLY
+      the posts provided in the input. Never invent posts and never fabricate totals
+      or counts.
+
+steps:
+  # 0) CAPTURE — snapshot the run prompt (the search query, plus any recency words)
+  #    so later steps can still reference it after $input has become the search hits.
+  #    Keep the query a single clean, URL-safe line: it is interpolated both into the
+  #    request query string below and into the JSON `arguments` of the tool_call, so a
+  #    '"' or newline in it would break the request. (See DESIGN.md "query encoding".)
+  - id: capture_query
+    type: assign
+    parameters: { target: query, value: "$input" }
+    next: search
+
+  # 1) SEARCH — X recent-search via the nyxid_proxy tool against api-twitter.
+  #    GET has no body; the query rides in the path's query string. The connector base
+  #    already includes /2, so the path starts at /tweets (do NOT prepend /2).
+  - id: search
+    type: tool_call
+    parameters:
+      tool: nyxid_proxy
+      arguments: '{"slug":"api-twitter","path":"/tweets/search/recent?query=${steps.capture_query.output}&max_results=10","method":"GET"}'
+    next: extract_posts
+
+  # 2) EXTRACT — deterministically pull the posts array out of the X response.
+  #    X v2 nests its results under `data` (each: id, text, ...).
+  - id: extract_posts
+    type: transform
+    parameters:
+      op: json_extract
+      path: "data"
+    next: rank_and_summarize
+
+  # 3) RANK + SUMMARIZE — ONE batched LLM pass scores + summarizes every post
+  #    (never per-item). Priorities come from the captured query; posts arrive as $input.
+  - id: rank_and_summarize
+    type: llm_call
+    target_role: curator
+    parameters:
+      prompt_prefix: >-
+        User search query and priorities: ${steps.capture_query.output}
+        ---
+        Score and summarize each public post below against that query. Output a ranked
+        digest (highest score first), one line per post, formatted as:
+        "<score> — <one-line why it matters> — <post text, trimmed>". Posts:
+    next: digest
+
+  # 4) DIGEST — freeze the curated output as the workflow result.
+  #    Single terminal step: last in the document, no `next`. Nothing may follow it.
+  - id: digest
+    type: assign
+    parameters: { target: digest, value: "$input" }
