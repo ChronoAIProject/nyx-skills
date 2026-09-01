@@ -1,0 +1,5 @@
+{
+  "name": "demo-fun-facts-workflow",
+  "version": "0.1",
+  "description": "Given any topic, returns three surprising true facts plus one catchy title for them. Runs a tiny two-step aevatar workflow (facts then title) and is watchable in the observatory. A minimal demo of a workflow-carrying ornn skill."
+}

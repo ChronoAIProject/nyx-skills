@@ -1,0 +1,18 @@
+name: demo_fun_facts
+description: Given any topic, list three surprising true facts then write one catchy title for them.
+roles:
+  - id: writer
+    name: Writer
+    system_prompt: "You are a concise, upbeat explainer. State only accurate, verifiable facts and never invent details."
+steps:
+  - id: facts
+    type: llm_call
+    target_role: writer
+    parameters:
+      prompt_prefix: "List exactly three surprising but true facts about the following topic, as three short bullet points:"
+    next: title
+  - id: title
+    type: llm_call
+    target_role: writer
+    parameters:
+      prompt_prefix: "Write one catchy, single-line title (no more than 10 words) that captures the spirit of these three facts:"
