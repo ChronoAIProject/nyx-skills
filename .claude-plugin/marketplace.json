@@ -426,6 +426,19 @@
       ]
     },
     {
+      "name": "cho-weekly-goal-audit-payload-builder",
+      "source": "./cho-weekly-goal-audit-payload-builder",
+      "description": "Runs the CHO weekly goal audit / weekend review flow end to end — parses the employee's Lark goal message, audits or reviews it with your own model, writes the Base record, and posts the employee reply plus the CHO diagnosis to Lark.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "weekly-goal-audit",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "chrono-ai-weekly-report",
       "source": "./chrono-ai-weekly-report",
       "description": "Pulls a GitHub account's issues and pull requests for the week, analyzes what shipped, what is in progress, and what is blocked with real workload metrics, then renders a Lark interactive card with hyperlinked rows and a metrics table, or a markdown report. The agent runs the whole flow itself using its own NyxID-brokered tools.",
@@ -472,6 +485,20 @@
       "version": "1.4",
       "keywords": [
         "chronoai-official"
+      ]
+    },
+    {
+      "name": "cn-reimbursement-approval-payload-builder",
+      "source": "./cn-reimbursement-approval-payload-builder",
+      "description": "Runs the CN reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "cn-reimbursement",
+        "lark",
+        "lark-approval",
+        "payload-builder"
       ]
     },
     {
@@ -573,6 +600,20 @@
       ]
     },
     {
+      "name": "employee-reimbursement-approval-payload-builder",
+      "source": "./employee-reimbursement-approval-payload-builder",
+      "description": "Runs the SG employee reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "employee-reimbursement",
+        "lark",
+        "lark-approval",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "fallback-to-calling-agent",
       "source": "./fallback-to-calling-agent",
       "description": "Universal try-catch fallback for the aevatar model. Use whenever, after a genuine attempt, you cannot complete the user's request with available server-side capabilities — no matching skill/workflow/connector/tool, a terminal failure, or a task that inherently needs the caller's local environment (files, shell, local context). Instead of failing opaquely or fabricating, return the original request verbatim to the calling agent so it can finish with its own local tools. Generic by design — addresses \"the calling agent\" with no hardcoded client or skill names.",
@@ -637,6 +678,19 @@
         "substrate",
         "github-issues",
         "manual"
+      ]
+    },
+    {
+      "name": "github-candidate-sourcing-payload-builder",
+      "source": "./github-candidate-sourcing-payload-builder",
+      "description": "Runs the GitHub candidate sourcing flow end to end and posts a digest to the chat.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "github-candidate-sourcing",
+        "lark",
+        "payload-builder"
       ]
     },
     {
@@ -717,6 +771,19 @@
         "onboarding",
         "email",
         "approval"
+      ]
+    },
+    {
+      "name": "icp-hunter-scoring-payload-builder",
+      "source": "./icp-hunter-scoring-payload-builder",
+      "description": "Runs the NyxID ICP Hunter scoring flow end to end — searches ICP evidence, enriches and scores candidates with your own model, writes the new candidates to the ICP Hunter Lark Base, and posts the run report card.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "icp-hunter",
+        "lark",
+        "payload-builder"
       ]
     },
     {
@@ -1369,6 +1436,19 @@
         "team-health",
         "lark",
         "github",
+        "payload-builder"
+      ]
+    },
+    {
+      "name": "tech-digest-aggregator-payload-builder",
+      "source": "./tech-digest-aggregator-payload-builder",
+      "description": "Runs the tech-digest aggregator flow end to end and posts a digest to the chat.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "tech-digest",
+        "lark",
         "payload-builder"
       ]
     },
