@@ -1,0 +1,5 @@
+{
+  "name": "nyxid-service-doctor",
+  "version": "1.0",
+  "description": "Diagnose NyxID service and credential problems from chat — \"工具 403 / Provider not connected / 服务没绑 / 找不到搜索服务\" — using the typed nyxid_* tools to inspect what is actually connected, who owns the credential, and which grant the current run is using, then prescribe the exact fix (connect, org-share, or rebind)."
+}
