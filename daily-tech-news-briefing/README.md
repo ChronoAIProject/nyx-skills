@@ -1,0 +1,23 @@
+# daily-tech-news-briefing
+
+> 每天汇总全球科技新闻，中文输出，覆盖 AI、芯片、互联网、创业、开源。
+
+---
+
+**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/daily-tech-news-briefing) — read-only.**
+
+Edits here are NOT propagated back. Submit changes on Ornn.
+
+- Latest version: `1.0`
+- Last synced: `2026-09-01T07:50:58.579Z`
+
+## Install
+
+```bash
+npx skills add ChronoAIProject/nyx-skills/daily-tech-news-briefing
+```
+
+## Use
+
+See `SKILL.md` in this folder for the full instructions an AI agent
+follows when this skill is loaded.

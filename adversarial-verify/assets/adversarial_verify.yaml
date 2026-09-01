@@ -1,0 +1,161 @@
+# adversarial-verify — DRAFT v0.1
+#
+# Native aevatar re-expression of the "multi-agent adversarial verification with a
+# convergence gate" pattern (ECC santa-method, generalized). One claim is reviewed by
+# TWO independent skeptics from DIFFERENT angles (logic/correctness vs evidence/
+# assumptions); it PASSES only if NEITHER refutes it. No external calls — pure llm_call
+# reasoning + a deterministic convergence gate. The run itself IS the record (observatory).
+#
+# CONVERGENCE GATE: built from DOCUMENTED primitives only (no `vote`, whose param shape
+# is not specified in the DSL). Each reviewer is INSTRUCTED to end with a strict final
+# token on its own line — exactly `VERDICT: REFUTED` or `VERDICT: NOT_REFUTED`, defaulting
+# to REFUTED when uncertain. A `conditional` then passes ONLY when the captured logic
+# verdict AND the captured evidence verdict are both exactly `NOT_REFUTED`. See DESIGN.md.
+#
+# ENGINE RULES OBEYED: single terminal step (`emit_pass` ... no, see below) is LAST in
+# document order with no `next`; both gate branches reach it via explicit `next`; all
+# `parameters` values are strings; the only arithmetic (the unanimity decision) is
+# deterministic, never delegated to an llm_call.
+
+name: adversarial_verify
+description: >-
+  Subject one claim to two independent skeptical reviews (logic vs evidence), each
+  defaulting to "refuted" when uncertain, and pass only if NEITHER refutes. Emits a
+  PASS/REFUTED verdict with both reviewers' reasoning. No external calls.
+
+roles:
+  # Reviewer 1 — attacks CORRECTNESS: reasoning, internal consistency, logical validity,
+  # edge cases, mismatched conclusions. Knows nothing of the other reviewer.
+  - id: logic_adversary
+    name: Logic Adversary
+    system_prompt: >-
+      You are an independent, skeptical reviewer whose ONLY job is to REFUTE a claim on
+      grounds of CORRECTNESS and LOGIC. You have NOT seen any other review. Attack the
+      claim's reasoning: invalid inferences, internal contradictions, unhandled edge cases,
+      conclusions that do not follow from the stated premises, miscalculations, and scope
+      errors. You are NOT judging whether sources exist — only whether the claim is
+      logically sound given what it asserts. Default to REFUTED whenever you are uncertain
+      or cannot positively confirm the logic holds; the burden is on the claim to survive,
+      not on you to find a knockout. Do NOT be agreeable; your job is to find the flaw, not
+      to approve. After your reasoning, output your verdict on its OWN FINAL LINE, EXACTLY
+      one of these two strings and nothing else on that line:
+      VERDICT: REFUTED
+      VERDICT: NOT_REFUTED
+
+  # Reviewer 2 — attacks EVIDENCE: unsupported claims, fabricated facts/quotes/numbers,
+  # unstated assumptions, cherry-picking. A genuinely DIFFERENT angle from reviewer 1.
+  - id: evidence_adversary
+    name: Evidence Adversary
+    system_prompt: >-
+      You are an independent, skeptical reviewer whose ONLY job is to REFUTE a claim on
+      grounds of EVIDENCE and ASSUMPTIONS. You have NOT seen any other review. Attack the
+      claim's support: assertions stated without backing in the provided context,
+      fabricated or unverifiable facts/quotes/figures/citations, hidden or unstated
+      assumptions the claim silently depends on, and cherry-picked context that ignores
+      contradicting information present in the input. Judge the claim ONLY against the
+      context provided in the input — do not assume facts not given, and treat "no
+      supporting evidence in the input" as grounds to refute. Default to REFUTED whenever
+      you are uncertain or cannot positively confirm the claim is supported. Do NOT be
+      agreeable; your job is to find the gap, not to approve. After your reasoning, output
+      your verdict on its OWN FINAL LINE, EXACTLY one of these two strings and nothing else
+      on that line:
+      VERDICT: REFUTED
+      VERDICT: NOT_REFUTED
+
+steps:
+  # 0) CAPTURE — snapshot the run prompt (claim + supporting context) so BOTH reviewers
+  #    judge the IDENTICAL input, and so the verdict step can echo the claim back.
+  - id: capture_claim
+    type: assign
+    parameters: { target: claim, value: "$input" }
+    next: review_logic
+
+  # 1) LOGIC REVIEW — independent correctness adversary. Sees only the captured claim.
+  - id: review_logic
+    type: llm_call
+    target_role: logic_adversary
+    parameters:
+      prompt_prefix: >-
+        Claim and supporting context under review (judge ONLY this):
+        ${steps.capture_claim.output}
+        ---
+        Try to REFUTE the claim on CORRECTNESS/LOGIC grounds per your instructions.
+        Default to REFUTED if uncertain. End with your verdict on its own final line.
+    next: review_evidence
+
+  # 2) EVIDENCE REVIEW — independent evidence adversary, DIFFERENT angle. Re-injects the
+  #    SAME captured claim (NOT $input) so it does not review the logic reviewer's output.
+  #    Independence: it is given the original claim+context, never reviewer 1's verdict.
+  - id: review_evidence
+    type: llm_call
+    target_role: evidence_adversary
+    parameters:
+      prompt_prefix: >-
+        Claim and supporting context under review (judge ONLY this):
+        ${steps.capture_claim.output}
+        ---
+        Try to REFUTE the claim on EVIDENCE/ASSUMPTION grounds per your instructions.
+        Default to REFUTED if uncertain. End with your verdict on its own final line.
+    next: combine
+
+  # 3) CONVERGENCE GATE — deterministic unanimity check (NOT delegated to an llm_call).
+  #    Passes ONLY when BOTH captured verdict lines are exactly "VERDICT: NOT_REFUTED".
+  #    Either verdict missing / REFUTED / malformed → routes to the REFUTED branch
+  #    (fail-closed, matching the reviewers' default-to-refuted stance).
+  # 3a) COMBINE — join both reviewers' outputs so the gate can test them in one substring
+  #     check. `concat` is an engine-supported expression function; `.output` is the real
+  #     registered step-output key (NOT `.text`, which the engine never registers).
+  - id: combine
+    type: assign
+    parameters: { target: both_verdicts, value: "${concat(steps.review_logic.output, ' ||| ', steps.review_evidence.output)}" }
+    next: gate
+
+  # 3b) CONVERGENCE GATE — deterministic unanimity via the engine's NATIVE conditional
+  #     behaviour: ConditionalModule does `input.Contains(condition)` when the condition is
+  #     not a literal boolean. input = the combined verdicts; condition = the literal
+  #     "VERDICT: REFUTED". A clean reviewer prints "VERDICT: NOT_REFUTED" — which does NOT
+  #     contain the substring "VERDICT: REFUTED" — so unanimous-pass routes `false`. Any
+  #     "VERDICT: REFUTED" present routes `true` → fail-closed.
+  - id: gate
+    type: conditional
+    parameters:
+      condition: "VERDICT: REFUTED"
+    branches:
+      true: verdict_refuted
+      false: verdict_pass
+
+  # 4a) PASS branch — neither reviewer refuted. Build the verdict block, then converge.
+  - id: verdict_pass
+    type: assign
+    parameters:
+      target: pass_block
+      value: >-
+        VERDICT: PASS
+        ---
+        LOGIC REVIEW (correctness adversary):
+        ${steps.review_logic.output}
+        ---
+        EVIDENCE REVIEW (evidence adversary):
+        ${steps.review_evidence.output}
+    next: finalize
+
+  # 4b) REFUTED branch — at least one reviewer refuted (or a verdict was missing/malformed).
+  - id: verdict_refuted
+    type: assign
+    parameters:
+      target: refuted_block
+      value: >-
+        VERDICT: REFUTED
+        ---
+        LOGIC REVIEW (correctness adversary):
+        ${steps.review_logic.output}
+        ---
+        EVIDENCE REVIEW (evidence adversary):
+        ${steps.review_evidence.output}
+    next: finalize
+
+  # 5) FINALIZE — single terminal step: LAST in document order, no `next`. Both gate
+  #    branches reach here via explicit `next`. $input carries the chosen verdict block.
+  - id: finalize
+    type: assign
+    parameters: { target: verdict, value: "$input" }

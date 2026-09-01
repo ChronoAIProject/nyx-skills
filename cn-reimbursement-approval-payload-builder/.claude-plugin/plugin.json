@@ -1,0 +1,5 @@
+{
+  "name": "cn-reimbursement-approval-payload-builder",
+  "version": "2.2",
+  "description": "Runs the CN reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow."
+}

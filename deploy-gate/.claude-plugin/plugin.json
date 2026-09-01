@@ -1,0 +1,5 @@
+{
+  "name": "deploy-gate",
+  "version": "1.0",
+  "description": "Deployment gate with human approval — runs preflight checks, sends an interactive Lark approval card, then simulates deployment on approval. Usable from Lark bot via natural language or /deploy command."
+}

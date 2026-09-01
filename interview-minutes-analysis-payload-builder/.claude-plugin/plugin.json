@@ -1,5 +1,0 @@
-{
-  "name": "interview-minutes-analysis-payload-builder",
-  "version": "2.1",
-  "description": "Runs the interview-minutes analysis flow end to end — scans the ATS Bitable, reads the Lark Minutes transcript, analyzes the interview with your own model, writes the AI notes back to the ATS record, and posts the HR card."
-}

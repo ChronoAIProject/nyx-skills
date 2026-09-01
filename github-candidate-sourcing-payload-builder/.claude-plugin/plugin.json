@@ -1,0 +1,5 @@
+{
+  "name": "github-candidate-sourcing-payload-builder",
+  "version": "2.2",
+  "description": "Runs the GitHub candidate sourcing flow end to end and posts a digest to the chat."
+}
