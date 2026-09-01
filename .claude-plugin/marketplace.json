@@ -475,6 +475,20 @@
       ]
     },
     {
+      "name": "cn-reimbursement-approval-payload-builder",
+      "source": "./cn-reimbursement-approval-payload-builder",
+      "description": "Runs the CN reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "cn-reimbursement",
+        "lark",
+        "lark-approval",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "complex-codex-exec-validation",
       "source": "./complex-codex-exec-validation",
       "description": "验证 managed sandbox、固定输出和多分支 receipt。用户提到“复杂 codex_exec 验证”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -570,6 +584,20 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "employee-reimbursement-approval-payload-builder",
+      "source": "./employee-reimbursement-approval-payload-builder",
+      "description": "Runs the SG employee reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "employee-reimbursement",
+        "lark",
+        "lark-approval",
+        "payload-builder"
       ]
     },
     {
@@ -717,6 +745,19 @@
         "onboarding",
         "email",
         "approval"
+      ]
+    },
+    {
+      "name": "icp-hunter-scoring-payload-builder",
+      "source": "./icp-hunter-scoring-payload-builder",
+      "description": "Runs the NyxID ICP Hunter scoring flow end to end — searches ICP evidence, enriches and scores candidates with your own model, writes the new candidates to the ICP Hunter Lark Base, and posts the run report card.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "icp-hunter",
+        "lark",
+        "payload-builder"
       ]
     },
     {
@@ -1369,6 +1410,19 @@
         "team-health",
         "lark",
         "github",
+        "payload-builder"
+      ]
+    },
+    {
+      "name": "tech-digest-aggregator-payload-builder",
+      "source": "./tech-digest-aggregator-payload-builder",
+      "description": "Runs the tech-digest aggregator flow end to end and posts a digest to the chat.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "tech-digest",
+        "lark",
         "payload-builder"
       ]
     },
