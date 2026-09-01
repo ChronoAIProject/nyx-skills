@@ -425,6 +425,33 @@
       ]
     },
     {
+      "name": "fin-budget-variance-monitor",
+      "source": "./fin-budget-variance-monitor",
+      "description": "Lark FIN-02 预算差异 workflow 路由。用户说‘帮我查看 2026 年第 32 周的预算差异’、‘预算差异’、‘预算对比’、‘预算执行’、‘超支情况’、‘第 N 周预算’、‘budget variance’或 fin-budget-variance-monitor 时，优先加载并执行这个精确 skill/workflow；不要只生成泛化周报或分析发票。",
+      "version": "13.0",
+      "keywords": [
+        "chronoai",
+        "finance",
+        "lark",
+        "budget",
+        "monitor"
+      ]
+    },
+    {
+      "name": "fin-invoice-precheck-approval",
+      "source": "./fin-invoice-precheck-approval",
+      "description": "Lark FIN-01 发票预检 workflow 路由。用户说‘帮我预检刚上传的发票’、‘发票预检’、‘检查发票’、‘检查刚上传的发票’、‘发票审批’、‘付款审批’、‘发起付款’、‘invoice precheck’或 fin-invoice-precheck-approval 时，优先加载这个精确 skill；附件和申请日期齐备后执行 workflow，缺项时先索取；不要走通用 OCR。",
+      "version": "15.0",
+      "keywords": [
+        "chronoai",
+        "finance",
+        "lark",
+        "invoice",
+        "payment",
+        "approval"
+      ]
+    },
+    {
       "name": "firecrawl-via-nyxid",
       "source": "./firecrawl-via-nyxid",
       "description": "Teach an aevatar agent to run Firecrawl web-research/agent jobs through NyxID (submit, poll, then read the result).",
@@ -464,6 +491,19 @@
         "issues",
         "rest-api",
         "agent-guide"
+      ]
+    },
+    {
+      "name": "hr-attendance-fill-reminder",
+      "source": "./hr-attendance-fill-reminder",
+      "description": "考勤填写提醒。当用户说：考勤提醒、催填考勤、考勤填写、月底提醒、提醒大家填考勤、attendance reminder 时使用。生成月底考勤核对清单卡片预览；确认后可正式发送提醒。",
+      "version": "6.0",
+      "keywords": [
+        "chronoai",
+        "hr",
+        "lark",
+        "attendance",
+        "reminder"
       ]
     },
     {
