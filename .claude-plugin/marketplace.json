@@ -761,6 +761,20 @@
       ]
     },
     {
+      "name": "hr-approval-bot-payload-builder",
+      "source": "./hr-approval-bot-payload-builder",
+      "description": "Runs the Lark HR approval bot flow end to end yourself — read the Lark leave request, look up the employee contact record, analyze the request, then SUBMIT the Lark leave approval and send the reply.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "hr-approval",
+        "lark",
+        "lark-approval",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "hr-attendance-fill-reminder",
       "source": "./hr-attendance-fill-reminder",
       "description": "考勤填写提醒。当用户说：考勤提醒、催填考勤、考勤填写、月底提醒、提醒大家填考勤、attendance reminder 时使用。生成月底考勤核对清单卡片预览；确认后可正式发送提醒。",
@@ -809,6 +823,19 @@
         "aevatar",
         "s-capability",
         "icp-hunter",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
+      "name": "interview-minutes-analysis-payload-builder",
+      "source": "./interview-minutes-analysis-payload-builder",
+      "description": "Runs the interview-minutes analysis flow end to end — scans the ATS Bitable, reads the Lark Minutes transcript, analyzes the interview with your own model, writes the AI notes back to the ATS record, and posts the HR card.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "interview",
         "lark",
         "payload-builder"
       ]
@@ -1269,6 +1296,19 @@
       ]
     },
     {
+      "name": "petty-cash-approval-payload-builder",
+      "source": "./petty-cash-approval-payload-builder",
+      "description": "Runs the petty-cash approval flow end to end yourself — collect Lark DM/sheet/image context, extract receipt details, build the exact approval body, then SUBMIT the Lark approval instance.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "petty-cash",
+        "lark-approval",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "project-shared-mailbox-approval",
       "source": "./project-shared-mailbox-approval",
       "description": "从 Base 申请创建并回读共享邮箱审批。用户提到“项目共享邮箱审批”、对应英文名称或要求运行该验收 workflow 时使用。",
@@ -1514,6 +1554,19 @@
         "aevatar",
         "s-capability",
         "tech-digest",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
+      "name": "tweet-draft-approval-payload-builder",
+      "source": "./tweet-draft-approval-payload-builder",
+      "description": "Runs the tweet-draft approval flow end to end yourself — collect the Lark tweet draft or approval-card action, audit it with your own model, build the exact Lark post/card, and post it to the source chat.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "tweet-draft",
         "lark",
         "payload-builder"
       ]
