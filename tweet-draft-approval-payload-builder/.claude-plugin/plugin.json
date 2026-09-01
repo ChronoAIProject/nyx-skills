@@ -1,0 +1,5 @@
+{
+  "name": "tweet-draft-approval-payload-builder",
+  "version": "2.1",
+  "description": "Runs the tweet-draft approval flow end to end yourself — collect the Lark tweet draft or approval-card action, audit it with your own model, build the exact Lark post/card, and post it to the source chat."
+}

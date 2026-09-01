@@ -1,0 +1,5 @@
+{
+  "name": "invoice-ocr-approval-payload-builder",
+  "version": "2.3",
+  "description": "Runs the invoice OCR approval flow end to end yourself — collect invoice files and review fields, OCR them, upload attachments, resolve Lark contacts and related approvals, then SUBMIT the Lark approval instance."
+}

@@ -1,0 +1,5 @@
+{
+  "name": "community-radar-digest-payload-builder",
+  "version": "2.2",
+  "description": "Runs the community-radar flow end to end and posts a digest to the chat."
+}
