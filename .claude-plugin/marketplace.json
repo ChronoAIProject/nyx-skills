@@ -52,6 +52,20 @@
       ]
     },
     {
+      "name": "aevatar-attachment-probe",
+      "source": "./aevatar-attachment-probe",
+      "description": "Boundary test for inbound Lark attachments — the user sends an image or file alongside this command and the bot reports exactly what it can observe on the chat path (text only, attachment refs, or nothing), without guessing. Detects when the platform wires chat-path attachment visibility so dependent skills can be upgraded.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "probe",
+        "attachments",
+        "vision",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "aevatar-automation",
       "source": "./aevatar-automation",
       "description": "Aevatar scheduling & workflow automation: scheduled_agent_creator (cron/one-shot) for independent scheduled Ornn skill agents and reminders — NOT an alias for Studio Team member automation — the long-running task automation playbook, workflow creation semantics (Scope Workflow vs Ornn publish), agent_builder lifecycle, the typed required_nyx_services contract (exact user_service_id is the authorization; a slug snapshot never substitutes), dedicated Agent Key semantics (vault-held raw material, borrowed durable reference late-resolved per use, exact non-wildcard grants, ~90-day projected expiry, reauthorize-then-revoke, independent NyxID and Vault revocation tracks), accepted-is-admission-only receipts, and a token_expired triage protocol that reads credentialSourceKind before assuming any TTL.",
@@ -485,6 +499,18 @@
       "source": "./demo-fun-facts-workflow",
       "description": "Given any topic, returns three surprising true facts plus one catchy title for them. Runs a tiny two-step aevatar workflow (facts then title) and is watchable in the observatory. A minimal demo of a workflow-carrying ornn skill.",
       "version": "0.1"
+    },
+    {
+      "name": "deploy-gate",
+      "source": "./deploy-gate",
+      "description": "Deployment gate with human approval — runs preflight checks, sends an interactive Lark approval card, then simulates deployment on approval. Usable from Lark bot via natural language or /deploy command.",
+      "version": "1.0",
+      "keywords": [
+        "deploy",
+        "devops",
+        "approval",
+        "workflow"
+      ]
     },
     {
       "name": "deterministic-parallel-evidence-review",
@@ -1055,6 +1081,20 @@
       "version": "1.0"
     },
     {
+      "name": "onboarding-email-approval-payload-builder",
+      "source": "./onboarding-email-approval-payload-builder",
+      "description": "Runs the new-hire onboarding email-account approval flow end to end yourself — resolve the new hire's info, build the exact Lark approval body with the bundled deterministic builder, then SUBMIT the onboarding email approval instance.",
+      "version": "2.2",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "onboarding",
+        "approval",
+        "lark",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "ornn-agent-manual-cli",
       "source": "./ornn-agent-manual-cli",
       "description": "The manual an AI agent loads to operate Ornn — the model-agnostic skill-lifecycle API (an npm-style registry + CLI for agent skills) — via the NyxID CLI (`nyxid proxy request ornn-api …`). Load and follow this skill WHENEVER the user asks to do anything with Ornn skills or skillsets. Skills: search Ornn or find a skill, pull or install a skill (or a specific version), run a skill, build and upload a skill, publish a new version, make a skill public / private / shared, run or read a security audit, deprecate or delete a version, diff two versions, check usage analytics, bind a skill to a NyxID service, link a skill to GitHub or sync from source, manage npm-style dist-tags, or transfer skill ownership. Skillsets — curated multi-skill bundles with a required master prompt: bundle skills into a set, create or publish a skillset, resolve its closure in one call, export a skillset as a Claude Code marketplace plugin, transfer skillset ownership, or diagnose why a shared skillset isn't visible (visibility derives from its member skills). Also load it to check your quota or pick an LLM model before an SSE call, and on phrases like 'share my skill', 'bundle these skills', or 'export as a Claude Code plugin'. Once loaded, the agent runs the whole search → pull → execute → build → upload → share lifecycle with no further setup — this is the authoritative Ornn↔agent contract, paired with references/api-reference.md (full per-endpoint catalogue + error legend).",
@@ -1196,6 +1236,21 @@
         "workflow",
         "acceptance",
         "aevatar"
+      ]
+    },
+    {
+      "name": "scheduled-agent-doctor",
+      "source": "./scheduled-agent-doctor",
+      "description": "Audit, debug, trigger, and repair scheduled (cron) agents from chat — list what exists, verify cron and timezone really mean what the user intended, manually run one to test, disable or delete-and-recreate broken ones. Encodes the known failure modes (timezone double-conversion, zombie agents from older runtimes, cron-mode credential 403, DM-vs-group visibility) so users can self-serve.",
+      "version": "1.0",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "scheduled",
+        "cron",
+        "agents",
+        "diagnostics",
+        "self-service"
       ]
     },
     {

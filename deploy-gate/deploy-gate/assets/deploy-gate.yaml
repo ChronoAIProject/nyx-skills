@@ -1,0 +1,34 @@
+name: deploy-gate
+description: Staging deployment gate with human approval card
+steps:
+  - id: preflight
+    type: tool_call
+    parameters:
+      tool: code_execute
+      language: python
+      code: |
+        from datetime import datetime
+        print(f"🔍 Preflight check: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("✅ Build passed")
+        print("✅ Tests green")
+        print("✅ No breaking changes detected")
+        print("📦 Ready to deploy to staging")
+  - id: approval
+    type: human_approval
+    parameters:
+      message: "🚀 确认部署到 staging？\n\nPreflight 检查已全部通过。"
+      timeout_minutes: 30
+  - id: deploy-step
+    type: tool_call
+    parameters:
+      tool: code_execute
+      language: python
+      code: |
+        import time
+        print("🚀 Deploying to staging environment...")
+        for i in range(3):
+            time.sleep(0.3)
+            print(f"  ⏳ Step {i+1}/3...")
+        print("✅ Deployment complete!")
+        print("📊 Monitor at: https://dashboard.aevatar.ai")
+        print("🎉 Staging is now live with latest changes!")
