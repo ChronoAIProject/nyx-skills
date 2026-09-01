@@ -1,0 +1,5 @@
+{
+  "name": "lark-meeting-payload-builder",
+  "version": "2.1",
+  "description": "Runs the Lark Meeting v2 flow end to end — extracts tasks from meeting notes (or reads the Base task records), analyzes them with your own model, writes the task records to Lark Bitable, and posts the task list / reminder to the Lark group."
+}

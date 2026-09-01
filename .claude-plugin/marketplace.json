@@ -549,6 +549,20 @@
       ]
     },
     {
+      "name": "deadline-monitor-digest-payload-builder",
+      "source": "./deadline-monitor-digest-payload-builder",
+      "description": "Runs the deadline-monitor flow end to end — reads GitHub repo or org milestones/issues, ranks deadline risk, builds the exact Lark digest with the bundled deterministic builder, and posts it to the current Lark chat.",
+      "version": "2.3",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "deadline-monitor",
+        "lark",
+        "github",
+        "payload-builder"
+      ]
+    },
+    {
       "name": "demo-fun-facts-workflow",
       "source": "./demo-fun-facts-workflow",
       "description": "Given any topic, returns three surprising true facts plus one catchy title for them. Runs a tiny two-step aevatar workflow (facts then title) and is watchable in the observatory. A minimal demo of a workflow-carrying ornn skill.",
@@ -924,6 +938,19 @@
         "im",
         "send",
         "react"
+      ]
+    },
+    {
+      "name": "lark-meeting-payload-builder",
+      "source": "./lark-meeting-payload-builder",
+      "description": "Runs the Lark Meeting v2 flow end to end — extracts tasks from meeting notes (or reads the Base task records), analyzes them with your own model, writes the task records to Lark Bitable, and posts the task list / reminder to the Lark group.",
+      "version": "2.1",
+      "keywords": [
+        "aevatar",
+        "s-capability",
+        "meeting",
+        "lark",
+        "payload-builder"
       ]
     },
     {
