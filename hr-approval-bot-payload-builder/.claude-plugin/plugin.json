@@ -1,0 +1,5 @@
+{
+  "name": "hr-approval-bot-payload-builder",
+  "version": "2.3",
+  "description": "Runs the Lark HR approval bot flow end to end yourself — read the Lark leave request, look up the employee contact record, analyze the request, then SUBMIT the Lark leave approval and send the reply."
+}
