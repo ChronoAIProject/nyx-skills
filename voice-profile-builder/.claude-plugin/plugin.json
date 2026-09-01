@@ -1,0 +1,5 @@
+{
+  "name": "voice-profile-builder",
+  "version": "0.1",
+  "description": "Derive a structured reusable writing-voice profile from supplied sample texts."
+}
