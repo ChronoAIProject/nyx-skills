@@ -1,0 +1,5 @@
+{
+  "name": "adversarial-verify",
+  "version": "0.1",
+  "description": "Subject a claim to two independent skeptical reviews pass only if neither refutes."
+}
