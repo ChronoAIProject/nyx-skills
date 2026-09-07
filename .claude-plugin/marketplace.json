@@ -508,12 +508,6 @@
       "version": "0.1"
     },
     {
-      "name": "codex-formalize",
-      "source": "./codex-formalize",
-      "description": "Use when asked to formalize and close an open digestion atom in this repository.",
-      "version": "0.1"
-    },
-    {
       "name": "community-radar-digest-payload-builder",
       "source": "./community-radar-digest-payload-builder",
       "description": "Runs the community-radar flow end to end and posts a digest to the chat.",
