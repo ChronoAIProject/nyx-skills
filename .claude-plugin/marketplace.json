@@ -1118,6 +1118,19 @@
       ]
     },
     {
+      "name": "merchant-auto-reply-booking",
+      "source": "./merchant-auto-reply-booking",
+      "description": "为商户自动处理订餐咨询与预订请求，遵守每个订餐时段至少间隔1小时、单次最多4人及总座位数40人的规则，并准确回复可订状态。",
+      "version": "0.1",
+      "keywords": [
+        "merchant",
+        "auto-reply",
+        "restaurant-booking",
+        "reservation",
+        "capacity-management"
+      ]
+    },
+    {
       "name": "monthly-access-certification",
       "source": "./monthly-access-certification",
       "description": "执行月末访问认证、提醒预览或明确发送提醒。用户提到“月度访问认证”、对应英文名称或要求运行该验收 workflow 时使用。",

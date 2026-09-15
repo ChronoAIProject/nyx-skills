@@ -1,0 +1,5 @@
+{
+  "name": "merchant-auto-reply-booking",
+  "version": "0.1",
+  "description": "为商户自动处理订餐咨询与预订请求，遵守每个订餐时段至少间隔1小时、单次最多4人及总座位数40人的规则，并准确回复可订状态。"
+}
