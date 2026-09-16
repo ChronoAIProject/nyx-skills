@@ -39,7 +39,7 @@
       "name": "ae-bot12345",
       "source": "./ae-bot12345",
       "description": "testing skill for aevatar bot",
-      "version": "0.1"
+      "version": "0.2"
     },
     {
       "name": "aevatar-agent-profile-management",
