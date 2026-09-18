@@ -1462,16 +1462,6 @@
       ]
     },
     {
-      "name": "sa-access-probe-20260918",
-      "source": "./sa-access-probe-20260918",
-      "description": "Throwaway probe skill created by a NyxID service account to verify Ornn write access. Safe to delete. Keyword marker: zebraquartz. Edited via service account: lemonbasalt.",
-      "version": "1.1",
-      "keywords": [
-        "probe",
-        "service-account"
-      ]
-    },
-    {
       "name": "saas-license-optimization-digest",
       "source": "./saas-license-optimization-digest",
       "description": "汇总多路 Base 数据并预览或发送许可证优化卡片。用户提到“SaaS 许可证优化摘要”、对应英文名称或要求运行该验收 workflow 时使用。",
