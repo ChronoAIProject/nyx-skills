@@ -1,0 +1,5 @@
+{
+  "name": "cma-public-skikl-test",
+  "version": "0.1",
+  "description": "Return a fixed confirmation value for CMA and Ornn public skill execution tests. Use when a user asks to run, verify, or smoke-test the CMA public skill test."
+}

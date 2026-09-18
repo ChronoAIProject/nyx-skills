@@ -494,6 +494,17 @@
       ]
     },
     {
+      "name": "cma-public-skikl-test",
+      "source": "./cma-public-skikl-test",
+      "description": "Return a fixed confirmation value for CMA and Ornn public skill execution tests. Use when a user asks to run, verify, or smoke-test the CMA public skill test.",
+      "version": "0.1",
+      "keywords": [
+        "cma",
+        "test",
+        "smoke-test"
+      ]
+    },
+    {
       "name": "cn-reimbursement-approval-payload-builder",
       "source": "./cn-reimbursement-approval-payload-builder",
       "description": "Runs the CN reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
