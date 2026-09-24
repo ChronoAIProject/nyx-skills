@@ -494,6 +494,19 @@
       ]
     },
     {
+      "name": "cma",
+      "source": "./cma",
+      "description": "Operate ChronoAI Managed Agent (CMA) through its public API or NyxID proxy. Use for creating and using hosted agents, managing user environments and profiles, sharing resources, publishing Triggers, and configuring Telegram Bots and Event Worker Profiles.",
+      "version": "1.0",
+      "keywords": [
+        "cma",
+        "agents",
+        "nyxid",
+        "automation",
+        "profiles"
+      ]
+    },
+    {
       "name": "cn-reimbursement-approval-payload-builder",
       "source": "./cn-reimbursement-approval-payload-builder",
       "description": "Runs the CN reimbursement intake end to end and posts a structured summary; full approval state machine requires a bundled workflow.",
