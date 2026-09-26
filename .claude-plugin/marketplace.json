@@ -1440,6 +1440,19 @@
       ]
     },
     {
+      "name": "research-paper-writing-rigor",
+      "source": "./research-paper-writing-rigor",
+      "description": "Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.",
+      "version": "1.1",
+      "keywords": [
+        "research-writing",
+        "mathematics",
+        "scientific-writing",
+        "reproducibility",
+        "peer-review"
+      ]
+    },
+    {
       "name": "resume-screening-payload-builder",
       "source": "./resume-screening-payload-builder",
       "description": "Runs the HR resume screening flow end to end — collects the candidate's form/chat fields and resume PDF, screens the resume with your own model, uploads the passing resume to Lark Drive, writes the Bitable record, and posts a summary to the chat.",
