@@ -1,0 +1,5 @@
+{
+  "name": "nyxid-aevatar-channel-setup",
+  "version": "1.1",
+  "description": "通过 NyxID 中的 Aevatar Service 创建、复用并核验用户指定平台的 Channel，按实际平台能力处理登录授权、接入资源、凭据和中断恢复。用于把消息渠道接入 Aevatar；通过 CLI/API 完成，无需 MCP 或代操作网页。"
+}
