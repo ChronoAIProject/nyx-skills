@@ -1,0 +1,5 @@
+{
+  "name": "chrono-sandbox-connected-service",
+  "version": "1.0",
+  "description": "Use the user's Chrono Sandbox connected service through NyxID fixed operation invocation."
+}
