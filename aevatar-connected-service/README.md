@@ -1,0 +1,23 @@
+# aevatar-connected-service
+
+> Use the user's Aevatar Local Diagnostic Catalog connected service through NyxID fixed operation invocation.
+
+---
+
+**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/aevatar-connected-service) — read-only.**
+
+Edits here are NOT propagated back. Submit changes on Ornn.
+
+- Latest version: `1.0`
+- Last synced: `2026-10-02T14:00:02.193Z`
+
+## Install
+
+```bash
+npx skills add ChronoAIProject/nyx-skills/aevatar-connected-service
+```
+
+## Use
+
+See `SKILL.md` in this folder for the full instructions an AI agent
+follows when this skill is loaded.
