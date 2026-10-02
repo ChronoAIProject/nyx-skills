@@ -490,6 +490,15 @@
       ]
     },
     {
+      "name": "chrono-sandbox-connected-service",
+      "source": "./chrono-sandbox-connected-service",
+      "description": "Use the user's Chrono Sandbox connected service through NyxID fixed operation invocation.",
+      "version": "1.0",
+      "keywords": [
+        "chrono-sandbox"
+      ]
+    },
+    {
       "name": "chrono-team-health",
       "source": "./chrono-team-health",
       "description": "Run a real GitHub-based team health / performance audit for the Chrono AI engineering team. Triggers on \"team health\", \"团队健康\", \"全员审计\", \"全员绩效\", \"绩效审计\", \"check the team\". Runs a fixed self-contained script via code_execute and returns a red/yellow/green report; posts it to Lark.",
