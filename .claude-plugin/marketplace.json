@@ -133,11 +133,10 @@
     {
       "name": "aevatar-connected-service",
       "source": "./aevatar-connected-service",
-      "description": "Use the user's Aevatar Local Diagnostic Catalog connected service through NyxID fixed operation invocation.",
-      "version": "1.0",
+      "description": "Use Aevatar connected services through NyxID fixed operation invocation.",
+      "version": "1.1",
       "keywords": [
-        "aevatar",
-        "aevatar-local-diag-catalog"
+        "aevatar"
       ]
     },
     {

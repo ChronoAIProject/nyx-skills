@@ -1,6 +1,6 @@
 # aevatar-connected-service
 
-> Use the user's Aevatar Local Diagnostic Catalog connected service through NyxID fixed operation invocation.
+> Use Aevatar connected services through NyxID fixed operation invocation.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.0`
-- Last synced: `2026-10-03T12:00:02.482Z`
+- Latest version: `1.1`
+- Last synced: `2026-10-03T12:53:04.588Z`
 
 ## Install
 

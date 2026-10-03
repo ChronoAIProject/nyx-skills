@@ -1,5 +1,5 @@
 {
   "name": "aevatar-connected-service",
-  "version": "1.0",
-  "description": "Use the user's Aevatar Local Diagnostic Catalog connected service through NyxID fixed operation invocation."
+  "version": "1.1",
+  "description": "Use Aevatar connected services through NyxID fixed operation invocation."
 }
