@@ -8,7 +8,7 @@ metadata:
     - "aevatar"
   tool-list:
     - "nyxid_invoke_operation"
-version: "1.1"
+version: "1.2"
 ---
 
 Use Aevatar connected services through NyxID fixed operation invocation.
