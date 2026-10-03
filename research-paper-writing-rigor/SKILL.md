@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.1"
+version: "1.2"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -59,6 +59,32 @@ Adapt the structure to the discipline, venue, and requested length. A short
 mathematical note need not have IMRaD sections, ablations, a teaser figure,
 or an experimental-performance narrative. Follow explicit user instructions
 and applicable venue requirements over these defaults.
+
+## Learn the discipline's written language
+
+Treat academic style as a set of field-specific explanatory choices: which
+objects are named, what can be assumed, where an argument needs a calculation,
+and how results are related to earlier work. Formal-sounding vocabulary alone
+does not supply these choices. For substantial drafting or complaints about
+generic or machine-like prose, read
+[discipline-and-voice.md](references/discipline-and-voice.md).
+
+When useful, inspect a few relevant, verified papers or the coauthors' existing
+text. Learn their organization and level of explanation; retain this paper's
+own definitions, argument and voice. For small edits, existing context is
+usually enough. Do not imitate an author's identity, copy distinctive phrases,
+or make a style-learning exercise into an unnecessary literature project.
+
+Prefer standard names and direct theorem statements. Add an optional theorem
+label only if readers will use it; avoid naming every observation or turning
+internal research labels into a vocabulary the reader must learn. A proof
+paragraph should expose the inference that makes the conclusion follow.
+Editing words cannot replace a missing inference.
+
+Judge the revision by its usefulness to a specialist, mathematical fidelity
+and fit with the authors' prose. Do not optimize for detector scores, invent
+human drafting history, introduce errors or slang to seem human, or promise
+that the text's origin will be undetectable.
 
 ## Establish the argument before polishing
 
@@ -141,6 +167,14 @@ only a subset. Human review or responsibility statements must not pretend that
 every coauthor personally reran every tool or already approved a pending draft.
 Follow the target venue's disclosure rules. Do not fix one project's models,
 author contributions, institutions, or acceptance status into future papers.
+
+Distinguish permission to use AI in research from permission to use AI-written
+submission prose. If the selected venue requires the actual wording to be
+human-authored, supply mathematical derivations, source checks, an outline and
+comments on the humans' text in the permitted roles. Keep model-written
+examples as working material; they do not become human-authored by paraphrasing,
+translation or a final approval pass. Apply this boundary to that venue rather
+than prohibiting manuscript drafting for every other venue.
 
 ## Finish proportionately
 

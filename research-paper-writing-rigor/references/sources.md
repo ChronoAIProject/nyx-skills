@@ -69,6 +69,13 @@ addresses, message identifiers, unpublished proof tables, or asserted permission
 to publish a coauthor's private material. A future user must inspect their own
 paper and evidence; the originating project's validation results do not transfer.
 
+User feedback and a further private mathematical review on 2026-10-03 motivate
+the discipline-and-voice reference: learn field-specific exposition, avoid
+inflated result labels, write the decisive proof steps, and distinguish
+stylistic quality from actual authorship. The new reference uses original
+generalized examples. It does not claim that prose style detects AI, and it
+does not encode one journal's human-wording rule as a ban for every venue.
+
 ## Skill discovery documentation
 
 Official Codex documentation inspected:
