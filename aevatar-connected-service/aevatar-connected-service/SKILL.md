@@ -8,7 +8,7 @@ metadata:
     - "aevatar"
   tool-list:
     - "nyxid_invoke_operation"
-version: "1.2"
+version: "1.3"
 ---
 
 Use Aevatar connected services through NyxID fixed operation invocation.
@@ -31,24 +31,28 @@ Choose from this bounded operation catalog only. If the requested operation is n
 - `GetAppHealth` (read): GET /api/health - Get readiness status for the current app-facing API surface.; inputs: none required
 - `custom_0075d28568aea9644becdf81e8d8daa3` (read): GET /api/auth/me - custom_0075d28568aea9644becdf81e8d8daa3; inputs: none required
 - `custom_02ea23afbdddbb12276bd7a398ae3af8` (read): GET /api/connectors/draft - custom_02ea23afbdddbb12276bd7a398ae3af8; inputs: none required
+- `custom_04d480cc423e5c5bb7ad8951c3d8d4b7` (write): POST /api/channels/registrations - Create a Channel registration for an owned NyxID Bot; inputs: body
 - `custom_108abe4b278f337c7b02ab61e3ae43cf` (read): GET /api/workflow-templates/{templateId} - custom_108abe4b278f337c7b02ab61e3ae43cf; inputs: path.templateId
 - `custom_1ed4a9ffa6602faa92b5b0596a2de5c2` (read): GET /api/scopes/{scopeId}/workflows/{workflowId}/schedules/{scheduleId} - custom_1ed4a9ffa6602faa92b5b0596a2de5c2; inputs: path.scheduleId, path.scopeId, path.workflowId
-- `custom_209a30ca5af98a5dbe464c829acd606a` (read): GET /api/channels/registrations - custom_209a30ca5af98a5dbe464c829acd606a; inputs: none required
+- `custom_209a30ca5af98a5dbe464c829acd606a` (read): GET /api/channels/registrations - List owned NyxID Bots and their materialized Channel registrations; inputs: none required
 - `custom_32e7b652b04d2ee8e7b980d0331bbb64` (read): GET /api/studio/context - custom_32e7b652b04d2ee8e7b980d0331bbb64; inputs: none required
 - `custom_3592e3c14befa77b97413526f3272add` (read): GET /api/workspace/workflow-drafts/{workflowId} - custom_3592e3c14befa77b97413526f3272add; inputs: path.workflowId
 - `custom_37a7ea4e8da7fdad20339af385aeab41` (read): GET /api/workspace/workflow-drafts - custom_37a7ea4e8da7fdad20339af385aeab41; inputs: none required
 - `custom_39236fe5c13e484659557fef9cfd2d4a` (destructive): DELETE /api/workspace/directories/{directoryId} - custom_39236fe5c13e484659557fef9cfd2d4a; inputs: path.directoryId
 - `custom_402742091acb22b06cfcde76faf8b529` (read): GET /api/schedules/{scheduleId} - custom_402742091acb22b06cfcde76faf8b529; inputs: path.scheduleId
 - `custom_451a1970220c45d627ea28fd0d160fef` (read): GET /api/roles/draft - custom_451a1970220c45d627ea28fd0d160fef; inputs: none required
+- `custom_537d560e71e1085762d32ab49f29c213` (write): POST /api/channels/registrations/{registrationId} - Update a Channel registration Skill and service authorization; inputs: path.registrationId, body
 - `custom_6290d66b154dbceaabfb8839ce51ce8f` (write): POST /api/auth/nyxid/authorization-catalog:refresh - custom_6290d66b154dbceaabfb8839ce51ce8f; inputs: none required
+- `custom_684bb986ea529c7d13460b30a9dfdf66` (read): GET /api/channels/me - Read the authenticated Channel caller; inputs: none required
 - `custom_695754b5692dd0e4fd800116df44fdc4` (read): GET /api/auth/nyxid/config - custom_695754b5692dd0e4fd800116df44fdc4; inputs: none required
+- `custom_6c24e1f9f6fbc448b56fa4588876556c` (read): GET /api/channels/registrations/{registrationId}/status - Read live Channel Bot and workflow result delivery status; inputs: path.registrationId
 - `custom_751bdee083ab56730de77b6362dcc418` (read): GET /api/connectors - custom_751bdee083ab56730de77b6362dcc418; inputs: none required
 - `custom_7bc948cc1200816ea31eb28d644b73b2` (read): GET /api/user-config - custom_7bc948cc1200816ea31eb28d644b73b2; inputs: none required
 - `custom_834bacfb27f89b27780e0365378eab63` (read): GET /api/executions - custom_834bacfb27f89b27780e0365378eab63; inputs: none required
 - `custom_8a60c7888e5c8450a9dd3de5461a8d3d` (read): GET /api/workspace - custom_8a60c7888e5c8450a9dd3de5461a8d3d; inputs: none required
 - `custom_8ebacf20969e852a85dc97ab25291f57` (read): GET /api/app/context - custom_8ebacf20969e852a85dc97ab25291f57; inputs: none required
 - `custom_90f4d64b14c7b1a96dbe28a1e48520e2` (read): GET /api/scopes/{scopeId}/workflows/{workflowId} - custom_90f4d64b14c7b1a96dbe28a1e48520e2; inputs: path.scopeId, path.workflowId
-- `custom_92f25906543e24a5f4cb894d6e55564c` (read): GET /api/channels/registrations/{registrationId} - custom_92f25906543e24a5f4cb894d6e55564c; inputs: path.registrationId
+- `custom_92f25906543e24a5f4cb894d6e55564c` (read): GET /api/channels/registrations/{registrationId} - Read the exact materialized Channel registration; inputs: path.registrationId
 - `custom_939ca93e64954b9447786d46ee13e39f` (read): GET /api/roles - custom_939ca93e64954b9447786d46ee13e39f; inputs: none required
 - `custom_bf5f3cfa5a0d95ece1e60f610054fe74` (write): POST /api/scopes/{scopeId}/workflows/{workflowId}:archive - custom_bf5f3cfa5a0d95ece1e60f610054fe74; inputs: path.scopeId, path.workflowId
 - `custom_c8c4b323392db9a7345c6ed867cd30e1` (write): POST /api/scopes/{scopeId}/workflows/{workflowId}/schedules/{scheduleId}:run-now - custom_c8c4b323392db9a7345c6ed867cd30e1; inputs: path.scheduleId, path.scopeId, path.workflowId
@@ -98,6 +102,36 @@ Choose from this bounded operation catalog only. If the requested operation is n
   - media_type: `text/json`
   - media_type: `text/plain`
 
+#### `custom_04d480cc423e5c5bb7ad8951c3d8d4b7`
+- summary: Create a Channel registration for an owned NyxID Bot
+- method_path: `POST /api/channels/registrations`
+- kind: `write`
+- risk: `write`
+- request_body_required: `true`
+- request_body_media_type: `application/json`
+- request_body_schema:
+```json
+{ "properties": { "authorization_mode": { "type": "string" }, "nyx_channel_bot_id": { "type": "string" }, "nyx_conversation_route_id": { "type": "string" }, "nyx_provider_slug": { "type": "string" }, "registration_id": { "type": "string" }, "runtime_config": { "properties": { "credential_source_mode": { "type": "string" }, "default_skill": { "properties": { "name": { "type": "string" }, "version": { "type": "string" } }, "type": "object" }, "extra_tool_names": { "items": { "type": "string" }, "type": "array" }, "instructions": { "type": "string" }, "nyxid_service_selectors": { "items": { "properties": { "endpoint_names": { "items": { "type": "string" }, "type": "array" }, "service_slug": { "type": "string" } }, "type": "object" }, "type": "array" }, "tool_set_refs": { "items": { "type": "string" }, "type": "array" } }, "type": "object" }, "service_ids": { "items": { "type": "string" }, "type": "array" }, "skill_name": { "type": "string" } }, "required": [ "nyx_channel_bot_id" ], "type": "object" }
+```
+- response: `202` - Accepted
+  - media_type: `application/json`
+- response: `400` - Bad Request
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+  - media_type: `application/json`
+- response: `403` - Forbidden
+  - media_type: `application/json`
+- response: `404` - Not Found
+  - media_type: `application/json`
+- response: `409` - Conflict
+  - media_type: `application/json`
+- response: `500` - Internal Server Error
+  - media_type: `application/json`
+- response: `502` - Bad Gateway
+  - media_type: `application/json`
+- response: `503` - Service Unavailable
+  - media_type: `application/json`
+
 #### `custom_108abe4b278f337c7b02ab61e3ae43cf`
 - summary: custom_108abe4b278f337c7b02ab61e3ae43cf
 - method_path: `GET /api/workflow-templates/{templateId}`
@@ -139,7 +173,7 @@ Choose from this bounded operation catalog only. If the requested operation is n
 - response: `409` - Conflict
 
 #### `custom_209a30ca5af98a5dbe464c829acd606a`
-- summary: custom_209a30ca5af98a5dbe464c829acd606a
+- summary: List owned NyxID Bots and their materialized Channel registrations
 - method_path: `GET /api/channels/registrations`
 - kind: `read`
 - risk: `read_only`
@@ -149,6 +183,11 @@ Choose from this bounded operation catalog only. If the requested operation is n
     { "type": "string" }
     ```
 - response: `200` - OK
+  - media_type: `application/json`
+- response: `400` - Bad Request
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+- response: `502` - Bad Gateway
   - media_type: `application/json`
 
 #### `custom_32e7b652b04d2ee8e7b980d0331bbb64`
@@ -265,6 +304,40 @@ Choose from this bounded operation catalog only. If the requested operation is n
   - media_type: `text/json`
   - media_type: `text/plain`
 
+#### `custom_537d560e71e1085762d32ab49f29c213`
+- summary: Update a Channel registration Skill and service authorization
+- method_path: `POST /api/channels/registrations/{registrationId}`
+- kind: `write`
+- risk: `write`
+- parameters:
+  - path.registrationId required
+    ```json
+    { "type": "string" }
+    ```
+- request_body_required: `true`
+- request_body_media_type: `application/json`
+- request_body_schema:
+```json
+{ "properties": { "authorization_mode": { "type": "string" }, "runtime_config": { "properties": { "credential_source_mode": { "type": "string" }, "default_skill": { "properties": { "name": { "type": "string" }, "version": { "type": "string" } }, "type": "object" }, "extra_tool_names": { "items": { "type": "string" }, "type": "array" }, "instructions": { "type": "string" }, "nyxid_service_selectors": { "items": { "properties": { "endpoint_names": { "items": { "type": "string" }, "type": "array" }, "service_slug": { "type": "string" } }, "type": "object" }, "type": "array" }, "tool_set_refs": { "items": { "type": "string" }, "type": "array" } }, "type": "object" }, "service_ids": { "items": { "type": "string" }, "type": "array" }, "skill_name": { "type": "string" } }, "type": "object" }
+```
+- response: `202` - Accepted
+  - media_type: `application/json`
+- response: `400` - Bad Request
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+- response: `403` - Forbidden
+  - media_type: `application/json`
+- response: `404` - Not Found
+  - media_type: `application/json`
+- response: `409` - Conflict
+  - media_type: `application/json`
+- response: `500` - Internal Server Error
+  - media_type: `application/json`
+- response: `502` - Bad Gateway
+  - media_type: `application/json`
+- response: `503` - Service Unavailable
+  - media_type: `application/json`
+
 #### `custom_6290d66b154dbceaabfb8839ce51ce8f`
 - summary: custom_6290d66b154dbceaabfb8839ce51ce8f
 - method_path: `POST /api/auth/nyxid/authorization-catalog:refresh`
@@ -278,6 +351,15 @@ Choose from this bounded operation catalog only. If the requested operation is n
 - response: `403` - Forbidden
 - response: `503` - Service Unavailable
 
+#### `custom_684bb986ea529c7d13460b30a9dfdf66`
+- summary: Read the authenticated Channel caller
+- method_path: `GET /api/channels/me`
+- kind: `read`
+- risk: `read_only`
+- response: `200` - OK
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+
 #### `custom_695754b5692dd0e4fd800116df44fdc4`
 - summary: custom_695754b5692dd0e4fd800116df44fdc4
 - method_path: `GET /api/auth/nyxid/config`
@@ -286,6 +368,22 @@ Choose from this bounded operation catalog only. If the requested operation is n
 - response: `200` - OK
   - media_type: `application/json`
 - response: `503` - Service Unavailable
+
+#### `custom_6c24e1f9f6fbc448b56fa4588876556c`
+- summary: Read live Channel Bot and workflow result delivery status
+- method_path: `GET /api/channels/registrations/{registrationId}/status`
+- kind: `read`
+- risk: `read_only`
+- parameters:
+  - path.registrationId required
+    ```json
+    { "type": "string" }
+    ```
+- response: `200` - OK
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+- response: `404` - Not Found
+  - media_type: `application/json`
 
 #### `custom_751bdee083ab56730de77b6362dcc418`
 - summary: custom_751bdee083ab56730de77b6362dcc418
@@ -360,7 +458,7 @@ Choose from this bounded operation catalog only. If the requested operation is n
 - response: `404` - Not Found
 
 #### `custom_92f25906543e24a5f4cb894d6e55564c`
-- summary: custom_92f25906543e24a5f4cb894d6e55564c
+- summary: Read the exact materialized Channel registration
 - method_path: `GET /api/channels/registrations/{registrationId}`
 - kind: `read`
 - risk: `read_only`
@@ -370,6 +468,9 @@ Choose from this bounded operation catalog only. If the requested operation is n
     { "type": "string" }
     ```
 - response: `200` - OK
+  - media_type: `application/json`
+- response: `401` - Unauthorized
+- response: `404` - Not Found
   - media_type: `application/json`
 
 #### `custom_939ca93e64954b9447786d46ee13e39f`
