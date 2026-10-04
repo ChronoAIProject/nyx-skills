@@ -361,8 +361,8 @@
     {
       "name": "api-google-workspace-connected-service",
       "source": "./api-google-workspace-connected-service",
-      "description": "Use the user's Google Workspace connected service through NyxID fixed operation invocation.",
-      "version": "1.0",
+      "description": "Use Google Workspace connected services through NyxID fixed operation invocation.",
+      "version": "1.1",
       "keywords": [
         "api-google-workspace"
       ]
