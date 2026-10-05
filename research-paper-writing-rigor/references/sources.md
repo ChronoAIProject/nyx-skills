@@ -76,6 +76,12 @@ stylistic quality from actual authorship. The new reference uses original
 generalized examples. It does not claim that prose style detects AI, and it
 does not encode one journal's human-wording rule as a ban for every venue.
 
+The 2026-10-05 follow-up adds an operational review of printed theorem titles,
+cross-reference labels, proof dependencies and finite-verification reductions.
+It also adds a feedback loop that separates explicit coauthor comments from
+editorial interpretations and checks whether a defect recurs in later drafts.
+The examples remain generalized; raw correspondence stays in private records.
+
 ## Skill discovery documentation
 
 Official Codex documentation inspected:

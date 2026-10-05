@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.2"
+version: "1.3"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -150,6 +150,13 @@ Implement supported changes when revision is requested. Explain disagreements
 with evidence and propose a precise alternative. Keep a compact disposition
 record only when the number or importance of comments warrants one. Do not
 require a separate approval checkpoint for every reversible edit.
+
+For feedback about formulaic prose or excessive theorem labels, read the
+comment and affected passage together. Identify the concrete defect, revise
+the passage, and extract a reusable lesson only if it applies beyond that
+example. Recheck the rendered statement and its proof dependencies; changing
+a heading alone does not address missing explanation. Use the focused review
+in [discipline-and-voice.md](references/discipline-and-voice.md).
 
 ## Verification, authorship, and AI use
 

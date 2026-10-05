@@ -77,6 +77,32 @@ result/evidence/caveat/open-question template on every paragraph.
 
 ## Show the decisive calculation
 
+### Review theorem labels and proof dependencies
+
+When a coauthor flags excessive theorem or corollary titles, inspect the
+optional printed titles separately from LaTeX cross-reference labels. Keep
+cross-references working. Retain a printed title when it names a standard
+result or helps the reader find a result used later; omit a decorative title
+when the numbered statement already says what is needed. Do not remove all
+names mechanically.
+
+For each affected statement, check its mathematical role. An immediate
+substitution may fit in the preceding proof or in one sentence after it;
+an independent result used later can justify its own environment. Write the
+inference that connects it to the main argument. Reducing the number of
+environments is useful only when the dependency order stays clear.
+
+When a note uses finite verification, explain the reduction that makes those
+checks sufficient, the exact finite premises and how they can be checked.
+Keep essential evidence accessible while moving execution logs out of the
+argument. Replacing the word “certificate” cannot repair a missing proof,
+and removing a computational premise can invalidate a theorem.
+
+For substantive revisions, inspect the rendered title, abstract, a central
+theorem and its proof as continuous exposition. Check that technical nouns
+are defined, named results have a purpose, and transitions give the actual
+inference. Record unresolved mathematical objections separately from style.
+
 A proof must let the intended reader recover the conclusion. “A standard
 induction establishes the claim” is adequate only when the actual induction
 step is straightforward in the stated setting. If a recurrence uses its own
@@ -164,3 +190,16 @@ must have antecedents, transitions must express actual dependencies, and
 the explanatory density should follow the difficulty of the argument.
 There is no required score, caveat count or prescribed percentage of edits.
 Report material improvements and remaining proof or author decisions.
+
+## Iterate from actual coauthor feedback
+
+Keep a short private record when learning from a substantive review: the
+actual comment, the affected passage, the concrete change and what was
+rechecked. Distinguish the reviewer's explicit objection from the editor's
+interpretation; do not turn a reaction to one label into a universal ban.
+Carry recurring, generalizable lessons into this skill with synthetic
+examples, keeping private correspondence out of a distributed package.
+
+At the next revision, check whether the same defect recurs in representative
+passages. Record whether a coauthor has actually reviewed the new version;
+local validation or a self-review does not establish their acceptance.
