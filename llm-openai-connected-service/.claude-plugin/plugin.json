@@ -1,0 +1,5 @@
+{
+  "name": "llm-openai-connected-service",
+  "version": "1.0",
+  "description": "Use OpenAI API connected services through NyxID fixed operation invocation."
+}
