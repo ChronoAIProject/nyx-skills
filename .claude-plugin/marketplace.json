@@ -1162,6 +1162,15 @@
       ]
     },
     {
+      "name": "llm-openai-connected-service",
+      "source": "./llm-openai-connected-service",
+      "description": "Use OpenAI API connected services through NyxID fixed operation invocation.",
+      "version": "1.0",
+      "keywords": [
+        "llm-openai"
+      ]
+    },
+    {
       "name": "long-form-writer",
       "source": "./long-form-writer",
       "description": "Write polished long-form content with structure credibility and an optional supplied voice.",
