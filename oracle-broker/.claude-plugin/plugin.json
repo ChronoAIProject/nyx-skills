@@ -1,5 +1,0 @@
-{
-  "name": "oracle-broker",
-  "version": "1.1",
-  "description": "Ask ChatGPT Pro through the Chrono oracle broker with the NyxID CLI (`nyxid proxy request oracle ...`) - single-shot questions, multi-turn conversations, file attachments, web-page extraction, generic jobs, pool and worker management. Questions go through the streaming OpenAI-compatible endpoint, one call per answer with no polling. Use whenever the user wants to ask ChatGPT or GPT Pro through NyxID, continue a ChatGPT conversation, query a file, check an oracle pool or its workers, or point an OpenAI client at the oracle. Do not use `nyxid oracle ...` for this; that command talks to the older oracle built into NyxID."
-}
