@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.3"
+version: "1.4"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -157,6 +157,39 @@ the passage, and extract a reusable lesson only if it applies beyond that
 example. Recheck the rendered statement and its proof dependencies; changing
 a heading alone does not address missing explanation. Use the focused review
 in [discipline-and-voice.md](references/discipline-and-voice.md).
+
+## Short result notes for a correspondent
+
+A short note (2 to 10 pages) answers one reader's question first: the author
+whose open problem, conjecture or request it addresses. Read their exact
+statement (paper version, section, equation) and answer that; move anything
+else to one closing remark or cut it.
+
+- Before writing, list each claim with its status: proved here, known (exact
+  source), known in a special case (state precisely what is new), computed
+  (finite range and method), or open. Only proved claims become theorems.
+- Title states the mathematics, never "Response to X". Use the byline and
+  affiliations the task supplies. Abstract gives the main statement exactly
+  and its scope in three to six sentences.
+- Introduction: the question as the source states it, the answer, its
+  relation to known results, what remains open. Then setting in the source's
+  notation, results with complete proofs, examples or certificates, open
+  problems, references.
+- Computation supports but never replaces a proof of an all-parameter
+  statement; give finite ranges explicitly. Never cite your own unpublished
+  drafts; fold what is needed into the note. Credit the correspondent's
+  question, examples, corrections and counterexamples plainly; cite private
+  communication by date.
+- Keep process and evidence logistics in a repository README, not the note.
+  No local paths, no tool or pipeline narrative, no long hash strings.
+- Compile, inspect every page, recheck every number against its computation,
+  and record what is proved, computed and open, plus any citation that could
+  not be verified.
+
+When asked to review such a note adversarially, recompute independently,
+read each proof line by line, verify every citation against the primary
+source, look for scope overreach and missing hypotheses, deliver a corrected
+version and a verdict: correct, fixable gaps (listed), or wrong at a named step.
 
 ## Verification, authorship, and AI use
 
