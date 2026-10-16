@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.4"
+version: "1.5"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -93,6 +93,13 @@ closest prior result, and remaining uncertainty. For long work, use a short
 private outline or claim-source map if it helps; reuse existing records.
 Do not insert drafting labels or audit tables into the manuscript by default.
 
+For substantial revision, check which auxiliary results and appendices the
+main argument actually uses. Keep an independent proof or example when it
+provides a distinct result, method, obstruction, or explanatory benefit
+worth its length. A consequence already supplied by the main theorem may
+need only its deduction. Before removing material, preserve every dependency
+and update the abstract, introduction, cross-references, and bibliography.
+
 For each central claim, know its scope and supporting evidence. Preserve
 quantifiers, initial indices, exceptional cases, hypotheses, and constants.
 Separate new mathematics from a new proof, a formalization, an implementation,
@@ -111,13 +118,19 @@ need not stop independent writing work on supported results.
 1. Lead with the mathematical or scientific content: what is established and
    the mechanism that establishes it. State the contribution specifically and
    at its full supported strength; keep it as the paragraph's main message.
-2. Give each paragraph a clear job. Check the sequence of paragraph messages
+2. In the introduction, say why the question matters before the proof: the
+   difficulty it resolves and the consequences the result makes available.
+   Give each paragraph a clear job. Check the sequence of paragraph messages
    before polishing sentences. Connect definitions, arguments, evidence, and
    consequences in the order a reader needs them.
 3. Use precise verbs and stable terminology. Prefer an identifiable object,
    such as "the correction automaton E", to "the supplied correction".
    Avoid internal project language and chronology unless they matter to the
    result. Repeating a defined term is preferable to a misleading synonym.
+   Check what each symbol denotes, its domain, and its normalization. Make
+   the map and measure clear when moving between representations or writing
+   integrals. Define a local use of a term that also names a different
+   standard quantity in the field.
 4. Credit the specific method or theorem being used, where it is used. Replace
    repeated novelty denials with positive attribution and a clear statement of
    this paper's extension. A citation must support the exact attached claim.
@@ -146,10 +159,25 @@ do not infer validity from the reviewer's authority alone. A shorter sentence
 must retain the witness bounds or hypotheses that make it true. Verify removal
 of an algebraic assumption with exact reasoning where feasible.
 
+A precise citation can replace a proof of a standard tool. Read the cited
+statement and match its domain, topology, boundedness or integrability,
+and normalization requirements to this application. Keep the instantiation
+and the conclusion used here explicit. When shortening local reasoning,
+retain the bound or hypothesis that licenses the next inference.
+When a known existence theorem supplies an exact optimizer, a proof can
+often use that optimizer instead of an approximate one with a split error
+budget; verify the theorem's hypotheses first.
+
 Implement supported changes when revision is requested. Explain disagreements
 with evidence and propose a precise alternative. Keep a compact disposition
 record only when the number or importance of comments warrants one. Do not
 require a separate approval checkpoint for every reversible edit.
+
+When following several revisions, distinguish the received draft, the
+corrected draft, and any later published version. Track important passages
+by their mathematical content as numbering and notation change. Recheck
+that previously accepted corrections remain effective; an equivalent
+reformulation may preserve a correction without preserving its wording.
 
 For feedback about formulaic prose or excessive theorem labels, read the
 comment and affected passage together. Identify the concrete defect, revise
@@ -227,6 +255,11 @@ compile the affected deliverable when available and inspect relevant rendered
 pages; report unavailable validation honestly. Do not rerun expensive formal
 jobs solely for prose changes unless changed claims or project rules require it.
 Respect the configured validation machine and existing repository gates.
+
+When assessing concision, compare like scopes: report whether the reduction
+comes from removed auxiliary material or from a shorter treatment of the
+retained argument. State the counting convention when lengths matter, and
+check any reported page count against the actual rendered artifact.
 
 Deliver the requested prose or artifact first, then a short account of material
 changes, completed checks, and remaining decisions. Keep internal checklists out
