@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.6"
+version: "1.7"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -69,17 +69,21 @@ does not supply these choices. For substantial drafting or complaints about
 generic or machine-like prose, read
 [discipline-and-voice.md](references/discipline-and-voice.md).
 
-When useful, inspect a few relevant, verified papers or the coauthors' existing
-text. Learn their organization and level of explanation; retain this paper's
-own definitions, argument and voice. For small edits, existing context is
-usually enough. Do not imitate an author's identity, copy distinctive phrases,
-or make a style-learning exercise into an unnecessary literature project.
+Before writing technical content, search recent relevant papers in the field
+and, when applicable, the correspondent's own papers. Read the relevant passages
+and adopt their standard terms and notation; when writing to an author about
+their paper, use that paper's notation. For small edits, reuse already checked
+sources when sufficient. Learn the field's organization and level of explanation
+while preserving the argument and authors' voice. Do not imitate an author's
+identity or copy distinctive phrases.
 
-Prefer standard names and direct theorem statements. Add an optional theorem
-label only if readers will use it; avoid naming every observation or turning
-internal research labels into a vocabulary the reader must learn. A proof
-paragraph should expose the inference that makes the conclusion follow.
-Editing words cannot replace a missing inference.
+Use established field terms; do not coin a name when a standard term exists.
+If a new term is unavoidable, define it in one sentence at first use and relate
+it to the standard term or object. Prefer direct theorem statements; add an
+optional theorem label only if readers will use it. Avoid naming every
+observation or importing internal research labels. A proof paragraph should
+expose the inference that makes the conclusion follow; editing words cannot
+replace a missing inference.
 
 Judge the revision by its usefulness to a specialist, mathematical fidelity
 and fit with the authors' prose. Do not optimize for detector scores, invent
@@ -109,6 +113,10 @@ prefix match with an all-input proof. Read
 computer-assisted results, literature placement and application, or mixed
 verification. Its literature review includes a dedicated independent referee
 pass before finalizing a manuscript.
+
+Call something a "counterexample" only when it falsifies a precisely quoted
+statement: quote that statement, check its hypotheses, and identify the failed
+conclusion. Otherwise call it an example or illustration and say what it shows.
 
 Unsupported claims need a narrower statement, evidence, or a clearly marked
 open question. Do not invent proof steps, references, numbers, author actions,
@@ -255,6 +263,10 @@ translation or a final approval pass. Apply this boundary to that venue rather
 than prohibiting manuscript drafting for every other venue.
 
 ## Finish proportionately
+
+Before sending or submitting a draft, complete the independent terminology and
+readability referee pass in
+[discipline-and-voice.md](references/discipline-and-voice.md#check-the-result).
 
 Check that the abstract, introduction, theorem statements, tables, conclusion,
 and verification description agree on the central claims. Read the abstract

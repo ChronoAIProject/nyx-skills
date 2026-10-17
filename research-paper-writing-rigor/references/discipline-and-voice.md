@@ -7,13 +7,13 @@ test of correctness, and stylistic revision does not change actual provenance.
 
 ## Establish the local conventions
 
-For a long manuscript, use a small set of relevant papers whose text has
-actually been inspected. A close mathematical predecessor teaches what the
-reader knows; an appropriate journal paper teaches scale and presentation;
-the coauthors' text teaches local notation and voice. These roles may be
-filled by the same paper. Reuse available sources before retrieving more.
-Never treat a title, citation count, or an inaccessible paper as a style
-sample. Do not claim a sample is human-authored without evidence.
+Use the recent field papers and, when relevant, the correspondent's papers
+required by the main skill as sources for terminology and notation as well as
+exposition. A close mathematical predecessor teaches what the reader knows;
+an appropriate journal paper teaches scale and presentation; the coauthors'
+text teaches local voice. These roles may be filled by the same paper. Inspect
+the actual passages; a title, citation count, or inaccessible paper is not a
+usage or style sample. Do not claim a sample is human-authored without evidence.
 
 Privately notice the choices that change exposition:
 
@@ -180,16 +180,21 @@ as human-authored after approval, translation or surface changes.
 
 ## Check the result
 
-Read the main theorem and its proof as a specialist encountering the paper
-for the first time. Can the reader tell what is new, which step is borrowed,
-and how the conclusion follows? Check this against the source evidence,
-not an AI detector.
+After writing, obtain an independent terminology and readability referee pass
+before sending or submitting the draft. The reviewer must check every technical
+term against current field usage and cite the inspected source passage in
+private review notes. For unavoidable new terms, check the first-use definition
+and explicit relation to standard language. Flag undefined or idiosyncratic
+names and inconsistent notation.
 
-Also read representative passages aloud or as continuous prose: notation
-must have antecedents, transitions must express actual dependencies, and
-the explanatory density should follow the difficulty of the argument.
-There is no required score, caveat count or prescribed percentage of edits.
-Report material improvements and remaining proof or author decisions.
+The reviewer must read the complete note, or manuscript under review, as a
+specialist encountering it without access to internal vocabulary. Can the
+reader identify the objects, what is new, which step is borrowed, and how the
+conclusion follows? Check notation's antecedents and whether transitions give
+the actual dependencies. Fix terminology and readability findings and have
+the affected passages rechecked before sending. If an independent reviewer is
+unavailable, report this required pass as outstanding; self-review does not
+discharge it. Keep review logistics outside the publication text.
 
 ## Iterate from actual coauthor feedback
 
