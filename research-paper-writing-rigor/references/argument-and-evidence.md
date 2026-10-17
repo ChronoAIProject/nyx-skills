@@ -74,13 +74,32 @@ conditions and do not remove H from neighboring steps without checking them.
 
 ## Literature and contribution
 
+Situate the question and contribution in the wider literature, beyond the
+paper that posed the problem. Treat a very short reference list as a defect
+in literature placement to investigate, rather than a citation quota to fill. Support
+general claims such as "various approaches have been introduced" or "it is
+known that" with relevant examples or a survey. This evidentiary role is
+especially prominent in mathematical physics. Ethical attribution requires
+citing all known related work, including recent preprints answering neighboring
+questions, with a precise account of their relation to the present result.
+
+Before finalizing a manuscript, obtain an independent referee pass specifically
+for missing literature, using a separate reviewer or agent when available.
+Check the wider field, borrowed methods, adjacent questions and recent
+preprints. If independent review is unavailable, report that gap rather than
+label a self-review independent. Verify every added reference against Crossref
+or arXiv as appropriate: authors, title, year, DOI or identifier, and version.
+Read the source passage supporting the cited sentence; metadata verification
+alone does not establish support. Add citations only where they substantiate
+a specific sentence, never to pad the bibliography.
+
 Match references to precise claims: existence of normalization, finite
 expansions, regularity of a language, conversion from automatic to morphic,
-or an effective optimization method are not interchangeable topics.
-Read the relevant statement and assumptions in the primary source when a proof
-depends on it. A title or abstract can locate a reference but cannot establish
-all its hypotheses. Mark inaccessible or author-supplied bibliographic details
-in working notes; do not silently upgrade them to independently verified facts.
+or an effective optimization method are not interchangeable topics. Read the
+relevant statement and assumptions in the primary source when a proof depends
+on it. A title or abstract cannot establish all its hypotheses. Mark inaccessible
+or unverified bibliographic details in working notes; do not silently upgrade
+them to independently verified facts.
 
 For an application, compare the base, polynomial, initial values, digit set,
 recognition order, and indexing against the theorem's assumptions. Explain a

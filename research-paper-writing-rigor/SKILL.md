@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.5"
+version: "1.6"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -106,7 +106,9 @@ Separate new mathematics from a new proof, a formalization, an implementation,
 and an empirical observation. Do not equate an agent's agreement or a finite
 prefix match with an all-input proof. Read
 [argument-and-evidence.md](references/argument-and-evidence.md) for proofs,
-computer-assisted results, literature application, or mixed verification.
+computer-assisted results, literature placement and application, or mixed
+verification. Its literature review includes a dedicated independent referee
+pass before finalizing a manuscript.
 
 Unsupported claims need a narrower statement, evidence, or a clearly marked
 open question. Do not invent proof steps, references, numbers, author actions,
@@ -131,9 +133,10 @@ need not stop independent writing work on supported results.
    the map and measure clear when moving between representations or writing
    integrals. Define a local use of a term that also names a different
    standard quantity in the field.
-4. Credit the specific method or theorem being used, where it is used. Replace
-   repeated novelty denials with positive attribution and a clear statement of
-   this paper's extension. A citation must support the exact attached claim.
+4. Place the contribution in the wider literature and credit the specific method
+   or theorem where it is used. Replace repeated novelty denials with positive
+   attribution and a clear statement of this paper's extension. A citation must
+   support the exact attached claim.
 5. Separate indispensable limitations from defensive repetition. Keep a
    qualification beside a claim if omitting it would change its interpretation;
    consolidate remaining scope details in the verification or limitations
@@ -169,9 +172,12 @@ often use that optimizer instead of an approximate one with a split error
 budget; verify the theorem's hypotheses first.
 
 Implement supported changes when revision is requested. Explain disagreements
-with evidence and propose a precise alternative. Keep a compact disposition
-record only when the number or importance of comments warrants one. Do not
-require a separate approval checkpoint for every reversible edit.
+with evidence and propose a precise alternative. When a coauthor's supervisor
+comments, address every point concretely in a change log: comment, manuscript
+location, change or reasoned response, and verification or unresolved issue.
+For other reviews, keep a compact disposition record when the number or
+importance of comments warrants one. Keep this log outside the manuscript;
+do not require a separate approval checkpoint for every reversible edit.
 
 When following several revisions, distinguish the received draft, the
 corrected draft, and any later published version. Track important passages
@@ -226,15 +232,19 @@ kernel checked, which computations ran, and which results are merely reported
 by another author. A successful build is evidence about a specific source
 version; it is not validation of all prose or a fresh independent review.
 
-Describe actual AI roles when disclosure is required or requested: exploration,
-code generation, formalization, debugging, cross-checking, literature assistance,
-or writing. Use confirmed model names, with "primarily" when appropriate.
-Do not reduce substantial AI involvement to grammar correction or code review.
-Do not say that every proof was kernel checked when the formalization covers
-only a subset. Human review or responsibility statements must not pretend that
-every coauthor personally reran every tool or already approved a pending draft.
-Follow the target venue's disclosure rules. Do not fix one project's models,
-author contributions, institutions, or acceptance status into future papers.
+When AI was used, disclose it in one or two sentences in declarations or
+acknowledgments: name confirmed tools and versions, actual roles, human
+verification, and author responsibility. Follow explicit venue requirements;
+do not create a Methods-style section narrating AI-assisted research.
+Roles may include exploration, code generation, formalization, debugging,
+cross-checking, literature assistance, or writing. Do not reduce substantial
+involvement to grammar correction or code review. Do not say that every proof
+was kernel checked when the formalization covers only a subset. Human review
+or responsibility statements must not pretend that every coauthor personally
+reran every tool or already approved a pending draft. Do not fix one project's
+models, author contributions, institutions, or acceptance status into future
+papers. Keep data/code availability in a separate statement; see
+[release-and-reproduction.md](references/release-and-reproduction.md).
 
 Distinguish permission to use AI in research from permission to use AI-written
 submission prose. If the selected venue requires the actual wording to be

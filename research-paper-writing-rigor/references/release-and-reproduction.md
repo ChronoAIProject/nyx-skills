@@ -7,6 +7,12 @@ not authorize changing repository visibility or submitting a paper.
 
 ## What must be reachable
 
+Give data/code availability its own statement, separate from AI disclosure and
+the reference list. Identify the supplementary material or repository and the
+version containing the data, verification code and reproduction instructions.
+Keep verification code out of the bibliography; bibliographic references
+support scholarly claims and do not replace an availability statement.
+
 When a computer-assisted proof depends on code, finite tables, or certificates,
 provide the actual materials through a stable accessible route at release.
 An email attachment or a local path in Appendix S2 is not a public reader's
