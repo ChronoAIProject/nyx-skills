@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.7"
+version: "1.8"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -220,13 +220,31 @@ else to one closing remark or cut it.
 - Computation supports but never replaces a proof of an all-parameter
   statement; give finite ranges explicitly. Never cite your own unpublished
   drafts; fold what is needed into the note. Credit the correspondent's
-  question, examples, corrections and counterexamples plainly; cite private
-  communication by date.
+  question, examples, corrections and counterexamples plainly in ordinary
+  prose, for example “in correspondence, 19 October 2026”; do not create an
+  email bibliography entry. Never cite or mention "private communication",
+  including hyphenated variants and self-certifying sentences such as
+  "no private-communication references".
 - Keep process and evidence logistics in a repository README, not the note.
   No local paths, no tool or pipeline narrative, no long hash strings.
 - Compile, inspect every page, recheck every number against its computation,
   and record what is proved, computed and open, plus any citation that could
   not be verified.
+
+For delivery of a research note by email, package one merged PDF named
+note_YYYYMMDD.pdf and one dated source ZIP (for example
+verification_YYYYMMDD.zip), with total attachments <= 5 MB (5,000,000 bytes).
+The ZIP contains text/source and concise readable outputs only; exclude binary
+files (.bin, .dat, .npz, .gz, .pkl), third-party copyrighted PDFs, and internal
+RESULTS-r*, REVIEW-r* and NOTES files, including nested copies. The merged note
+PDF is the document-format exception. Omit regenerable generator output even
+when it is text: give the exact command and output SHA256 in the package README.
+Large data belongs in the authors' designated public data repository;
+use a verified commit-pinned link and do not invent or publish artifacts without authority.
+Check final PDF text, source and archive members for long digit runs, including
+space/hyphen-separated digits, that pass Luhn and trigger institutional DLP.
+Use exact symbolic forms, concise scientific notation or pinned public data
+links to keep those runs out of delivered material.
 
 When asked to review such a note adversarially, recompute independently,
 read each proof line by line, verify every citation against the primary
@@ -240,18 +258,17 @@ kernel checked, which computations ran, and which results are merely reported
 by another author. A successful build is evidence about a specific source
 version; it is not validation of all prose or a fresh independent review.
 
-When AI was used, disclose it in one or two sentences in declarations or
-acknowledgments: name confirmed tools and versions, actual roles, human
-verification, and author responsibility. Follow explicit venue requirements;
-do not create a Methods-style section narrating AI-assisted research.
-Roles may include exploration, code generation, formalization, debugging,
-cross-checking, literature assistance, or writing. Do not reduce substantial
-involvement to grammar correction or code review. Do not say that every proof
-was kernel checked when the formalization covers only a subset. Human review
-or responsibility statements must not pretend that every coauthor personally
-reran every tool or already approved a pending draft. Do not fix one project's
-models, author contributions, institutions, or acceptance status into future
-papers. Keep data/code availability in a separate statement; see
+When the authors have a prescribed AI-use sentence, use it verbatim; do not
+substitute another sentence or add a process narrative. Do not attribute that
+use to other collaborators. Keep detailed provenance and
+actual verification scope in internal research records. Do not claim every
+proof was kernel checked when only a subset was formalized, or imply every
+coauthor reran the tools or approved a pending draft. Answer direct process
+questions truthfully. If a venue requires additional disclosures, flag the
+specific requirement separately rather than silently changing this sentence.
+Do not insert these authors into unrelated manuscripts; establish their actual
+authors and applicable disclosure requirements from the task.
+Keep data/code availability in a separate statement; see
 [release-and-reproduction.md](references/release-and-reproduction.md).
 
 Distinguish permission to use AI in research from permission to use AI-written
@@ -291,3 +308,7 @@ all possible objections have been eliminated.
 For provenance and deliberate departures from upstream writing skills, read
 [sources.md](references/sources.md). This skill contains paraphrased lessons
 from a private mathematical coauthor review, not the correspondence itself.
+
+## CHANGELOG
+
+- 2026-10-19 — 1.8: use the authors' prescribed AI sentence verbatim, prohibit correspondence citations and self-certifying mentions, and require small dated note/source packages with reproducible public data links, no internal process files or binary data, and DLP digit checks.
