@@ -1,8 +1,8 @@
 ---
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through the NyxID CLI (`nyxid proxy request chrono-cd ...`). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
-compatibility: Requires the nyxid CLI, logged in with `nyxid login`, and access to the NyxID service `chrono-cd`. Private GitHub packages need `nyxid connect github --scope read:packages`. Verified 2026-10-20 against chrono-cd 1f3bf23.
-version: "1.0"
+compatibility: Requires the nyxid CLI, logged in with `nyxid login`. The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-20 against chrono-cd 1f3bf23 on the live platform.
+version: "1.1"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -50,10 +50,13 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 - **Never ask the user for a NyxID token.** `nyxid login` is the only credential step.
 - **Images must be on `ghcr.io`** and run as a non-root user. An image that must start as
   root fails with `CreateContainerConfigError` in status; tell the user to rebuild it.
-- **Private packages:** do not ask the user for a GitHub token. Ask them to run
-  `nyxid connect github --scope read:packages` once; chrono-cd then pulls with that
-  connection. Only when they have no GitHub connection (a CI job on an organization key)
-  send `registry_credential` with a classic token that has `read:packages`.
+- **Private packages** need a pull credential, sent once in the `PUT` body as
+  `"registry_credential": {"username": "<github login>", "token": "<token>"}`. The token
+  is a GitHub personal access token (classic) with the `read:packages` scope; fine-grained
+  tokens and GitHub App tokens do not work with ghcr.io. chrono-cd stores it only as a
+  Kubernetes pull Secret and reuses it on later deploys, so it is sent once. Ask the user
+  to put it in a file or an environment variable rather than typing it into the chat.
+  Public packages need nothing.
 - **Secrets never go in the spec, in chat or in logs.** Declare the names in
   `secret_keys`, then set the values with the secrets endpoint. Responses only ever show
   names.
@@ -148,7 +151,7 @@ Expected non-200 answers and what to do:
 | Answer | Do |
 |---|---|
 | `422 missing_secret_keys` | Normal when the spec declares secrets. The app is stored and everything else is deployed. Go to step 3. |
-| `400 image_unauthorized` | Private package. Relay the message: it says to run `nyxid connect github --scope read:packages` and deploy again. |
+| `400 image_unauthorized` | Private package without a usable credential. Ask for a classic token with `read:packages` and send `registry_credential`. |
 | `400 image_not_found` | Wrong owner, package or tag. Check with the user. |
 | `409 quota_exceeded` | Lower replicas or requests, or go to "Ask for more quota". |
 | `409 service_name_taken` | Another app of this owner uses that service name. Rename the service. |
