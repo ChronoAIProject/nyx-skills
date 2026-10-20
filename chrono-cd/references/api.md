@@ -269,7 +269,7 @@ Live state from the cluster.
             "conditions": [{"type": "Available", "status": "True", "reason": "MinimumReplicasAvailable"}],
             "pods": [{"name": "web-7d9f-abcde", "phase": "Running", "ready": true, "restarts": 0, "state": "running", "started_at": "..."}]}
   },
-  "route": {"found": true, "accepted": true, "resolved_refs": true},
+  "route": {"found": true, "accepted": true, "resolved_refs": true, "serving": true, "serving_status": 200},
   "addons": {"mongodb": {"database": "...", "user": "...", "provisioned_at": "..."}},
   "last_reconcile": {"at": "...", "ok": true, "revision": 2}
 }
@@ -279,6 +279,13 @@ Live state from the cluster.
 `CrashLoopBackOff`, `OOMKilled` or `CreateContainerConfigError`, or the rollout timed out),
 `error` (the last apply failed) or `deleting`. Pod `reason` and `message` carry the
 container's own words.
+
+`ready` means reachable. Once the cluster accepts the route, chrono-cd fetches the app's
+hostname from the public edge on every status call: `route.serving` is `true` when the
+answer came from the app (any status, its own 404 included) and `false` while the edge
+still answers for no route, which lasts a few minutes after a new hostname's route is
+accepted. While it is `false` the phase stays `progressing`. `serving_status` is the
+HTTP status the probe saw. Both are absent when nothing is public yet.
 
 ### `GET /projects/{project}/apps/{app}/logs?service=<name>&tail=100&pod=<pod>`
 

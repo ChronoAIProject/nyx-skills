@@ -1,8 +1,8 @@
 ---
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through the NyxID CLI (`nyxid proxy request chrono-cd ...`). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
-compatibility: Requires the nyxid CLI, logged in with `nyxid login`. The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-20 against chrono-cd 1f3bf23 on the live platform.
-version: "1.1"
+compatibility: Requires the nyxid CLI, logged in with `nyxid login`. The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-20 against chrono-cd on the live platform.
+version: "1.2"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -180,7 +180,10 @@ nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/status --output j
 ```
 
 `phase` is `ready`, `progressing`, `degraded`, `error` or `deleting`. Poll every 15
-seconds for up to 5 minutes. `services.NAME.pods[].reason` carries the container's own
+seconds for up to 8 minutes. `ready` means the public edge answers for the hostname:
+the pods can be up while `route.serving` is still `false`, because the load balancer
+needs a few minutes after a new hostname's route is accepted. Do not tell the user the
+app is live before `phase` is `ready`. `services.NAME.pods[].reason` carries the container's own
 words when something is wrong: `ImagePullBackOff` (image or credential),
 `CrashLoopBackOff` (read the logs), `OOMKilled` (raise `memory_limit`),
 `CreateContainerConfigError` (image runs as root). When `phase` is `ready`, give the user
