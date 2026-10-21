@@ -1,13 +1,14 @@
 ---
 name: chrono-cd
-description: Deploy a user's application to the ChronoAI cluster with chrono-cd through the NyxID CLI (`nyxid proxy request chrono-cd ...`). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
-compatibility: Requires the nyxid CLI, logged in with `nyxid login`. The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-20 against chrono-cd on the live platform.
-version: "1.5"
+description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
+compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-21 against chrono-cd on the live platform.
+version: "2.0"
 license: Apache-2.0
 metadata:
   category: tool-based
   tool-list:
     - Bash
+    - nyxid_proxy
   tag:
     - chrono-cd
     - nyxid
@@ -22,17 +23,44 @@ metadata:
 chrono-cd runs container images from GitHub Packages (`ghcr.io`) on the ChronoAI cluster
 and gives each app a public hostname `https://APP-SLUG.apps.chrono-ai.fun`, where SLUG is
 a hash for a person and the organization's NyxID slug for an organization. It is
-registered in NyxID as the service `chrono-cd`. Every call goes through NyxID's proxy:
+registered in NyxID as the service `chrono-cd`. Every call goes through NyxID, which
+checks the user's login and tells chrono-cd who is calling. There is no other credential
+to manage. Responses are plain JSON objects, errors are
+`{"error": "KEY", "error_code": N, "message": "..."}`.
+
+"You" below means the agent. "The user" is the person you act for.
+
+## Two ways to call, same API
+
+Look at what you have. Use exactly one of these transports for the whole conversation.
+
+**With a shell** (Claude Code, Codex, a CI job): the NyxID CLI.
 
 ```bash
 nyxid proxy request chrono-cd api/v1/PATH [--method PUT|POST|DELETE] [--data 'JSON'] --output json
 ```
 
-NyxID checks the user's login and tells chrono-cd who is calling. There is no other
-credential to manage. Responses are plain JSON objects, errors are
-`{"error": "KEY", "error_code": N, "message": "..."}`.
+**Without a shell** (the NyxID Assistant, NyxBot on Telegram or Lark, an Aevatar agent):
+your NyxID proxy request tool. You give it a service slug, an HTTP method, a path and an
+optional JSON body; NyxID routes the call and adds the identity. For every call in this
+skill:
 
-"You" below means the agent. "The user" is the person you act for.
+- Service: `chrono-cd`
+- Method: `GET`, `PUT`, `POST` or `DELETE`, as the step says
+- Path: the `api/v1/...` path of the step, with a leading slash: `/api/v1/account`.
+  Query parameters stay in the path: `/api/v1/projects/P/apps/A/logs?service=web&tail=200`
+- Body: the JSON object of the step, only for `PUT` and `POST`
+
+The base URL is the service root, so the path always starts with `/api/v1/`. A `404
+route` with the right path usually means the `/api/v1` prefix was dropped. Never
+compose an HTTP request yourself: that runtime has no HTTP tool and no token.
+
+If you have neither the CLI nor a proxy request tool that accepts `chrono-cd`, say so
+plainly: the service has to be exposed to this agent in NyxID. Do not pretend a call
+was made.
+
+Every step below shows the CLI line; the proxy tool call is the same method, path and
+body.
 
 ## The model, in four words
 
@@ -48,7 +76,8 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 
 ## Rules that matter
 
-- **Never ask the user for a NyxID token.** `nyxid login` is the only credential step.
+- **Never ask the user for a NyxID token.** `nyxid login` is the only credential step
+  for the CLI; an agent with a proxy tool has nothing to log in to.
 - **Images must be on `ghcr.io`** and run as a non-root user. An image that must start as
   root fails with `CreateContainerConfigError` in status; tell the user to rebuild it.
 - **Private packages** need a pull credential, sent once in the `PUT` body as
@@ -79,6 +108,8 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 ```bash
 nyxid proxy request chrono-cd api/v1/account --output json
 ```
+
+Proxy tool: `chrono-cd`, `GET`, `/api/v1/account` (add `?org_id=ID` for an organization).
 
 Returns `slug`, `host_slug` (the hostname suffix), `quota`, `usage`, `apps` and `organizations` with the
 user's role in each. If the user wants to deploy for an organization, pick its `id` and add
@@ -137,7 +168,8 @@ A multi-service app, with a frontend, an API behind `/api`, and a worker:
 }
 ```
 
-Write the spec to a file and send it with `--data "$(cat spec.json)"`.
+With the CLI, write the spec to a file and send it with `--data "$(cat spec.json)"`.
+With the proxy tool, the spec object is the body.
 
 ## Step 2: create or update the app
 
@@ -145,6 +177,8 @@ Write the spec to a file and send it with `--data "$(cat spec.json)"`.
 nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP --method PUT \
   --data "$(cat spec.json)" --output json
 ```
+
+Proxy tool: `chrono-cd`, `PUT`, `/api/v1/projects/PROJECT/apps/APP`, body: the spec.
 
 `PROJECT` and `APP` are 1-40 lowercase letters, digits and inner hyphens; the user picks
 them. `201` on create, `200` on update. The response is the app view: `hostname`, `url`,
@@ -172,6 +206,9 @@ nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/services/SERVICE/
   --method PUT --data '{"JWT_KEY": "..."}' --output json
 ```
 
+Proxy tool: `chrono-cd`, `PUT`, `/api/v1/projects/PROJECT/apps/APP/services/SERVICE/secrets`,
+body `{"JWT_KEY": "..."}`.
+
 Returns `{"service": "api", "keys": ["JWT_KEY"]}`. Setting secrets applies the app again
 and starts the waiting service. Secret files work the same way at
 `.../services/SERVICE/secret-files` with `{"files": [{"path": "/etc/app/key.pem", "content": "..."}]}`.
@@ -182,6 +219,8 @@ Delete one key with `DELETE .../secrets/KEY`.
 ```bash
 nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/status --output json
 ```
+
+Proxy tool: `chrono-cd`, `GET`, `/api/v1/projects/PROJECT/apps/APP/status`.
 
 `phase` is `ready`, `progressing`, `degraded`, `error` or `deleting`. Poll every 15
 seconds for up to 8 minutes. `ready` means the public edge answers for the hostname:
@@ -199,7 +238,12 @@ Logs:
 nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/logs?service=SERVICE\&tail=200 --output json
 ```
 
+Proxy tool: `chrono-cd`, `GET`, `/api/v1/projects/PROJECT/apps/APP/logs?service=SERVICE&tail=200`.
+
 ## Everyday operations
+
+Method and path are the same for the CLI and the proxy tool; `...` stands for
+`api/v1/projects/PROJECT/apps/APP`.
 
 | Want | Call |
 |---|---|
@@ -208,11 +252,14 @@ nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/logs?service=SERV
 | read an app | `GET api/v1/projects/PROJECT/apps/APP` |
 | new image tag | `PUT` the spec with the new tag; pods roll without downtime |
 | roll back | `PUT` the spec with the previous tag (`GET .../revisions` lists them) |
-| restart | `POST .../restart?service=NAME` (all services when omitted) |
-| rotate the database password | `POST .../addons/mongodb/rotate` |
+| restart | `POST .../restart?service=NAME` (all services when omitted); no body |
+| rotate the database password | `POST .../addons/mongodb/rotate`; no body |
 | delete | `DELETE api/v1/projects/PROJECT/apps/APP`; add `?purge=true` to drop the add-on data too |
 | live log tail of running pods | `GET .../logs?service=NAME&tail=200` |
 | stored metrics and logs, any window | `GET .../telemetry/metrics`, `GET .../telemetry/logs`, see below |
+
+Deleting is irreversible: confirm with the user before the `DELETE`, and again before
+`purge=true`.
 
 ## Stored metrics and logs
 
@@ -231,6 +278,9 @@ nyxid proxy request chrono-cd 'api/v1/projects/PROJECT/apps/APP/telemetry/metric
 # 3. Error lines of one service over a day.
 nyxid proxy request chrono-cd 'api/v1/projects/PROJECT/apps/APP/telemetry/logs?preset=errors&service=api&start=2026-10-20T00:00:00Z&end=2026-10-21T00:00:00Z' --output json
 ```
+
+Proxy tool: `chrono-cd`, `GET`, and the same three paths with their query strings, for
+example `/api/v1/projects/PROJECT/apps/APP/telemetry/metrics?preset=memory`.
 
 Rules for writing your own query (`query=` instead of `preset=`):
 
@@ -261,6 +311,8 @@ Show the user numbers with units (cores, MiB, restarts) and the window you used.
 nyxid proxy request chrono-cd api/v1/quota-requests --method POST \
   --data '{"cpu_request": "4", "memory_request": "8Gi", "pods": 20, "storage": "40Gi", "reason": "..."}' --output json
 ```
+
+Proxy tool: `chrono-cd`, `POST`, `/api/v1/quota-requests`, body: that object.
 
 One pending request per owner. A platform admin approves or rejects; `GET api/v1/quota-requests`
 shows the state. Tell the user it is not instant.
