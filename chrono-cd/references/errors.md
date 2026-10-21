@@ -21,4 +21,7 @@ chrono-cd codes:
 | `missing_secret_keys` | 13011 | 422 | The spec declares secret keys that are not set yet. The app is stored; set the secrets. |
 | `reconcile_failed` | 13012 | 502 | The desired state was stored but could not be applied. Inspect `status` and retry. |
 | `quota_request_pending` | 13013 | 409 | The owner already has a quota request awaiting a decision. |
+| `telemetry_disabled` | 13014 | 501 | This deployment has no metrics and logs store configured. |
+| `telemetry_unavailable` | 13015 | 502 | The metrics or logs store did not answer. |
+| `query_rejected` | 13016 | 400 | The store refused the PromQL or LogsQL query; the message carries its words. |
 

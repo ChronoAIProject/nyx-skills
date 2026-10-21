@@ -54,6 +54,7 @@ Organization projects carry `owner` = the organization id, `owner_type` = `org`,
   "is_admin": false,
   "nyx_service_id": "...",
   "slug": "7d1c1e3f5b",
+  "host_slug": "7d1c1e3f5b",
   "namespace": "cd-7d1c1e3f5b",
   "quota": {"cpu_request": "2", "memory_request": "4Gi", "pods": 10, "storage": "20Gi"},
   "usage": {"cpu_request": "200m", "memory_request": "256Mi", "pods": 2, "storage": "0"},
@@ -63,7 +64,9 @@ Organization projects carry `owner` = the organization id, `owner_type` = `org`,
 ```
 
 `slug`, `namespace`, `quota`, `usage` and `apps` describe the caller's personal
-account. `organizations` is present when the request carried the caller's credential;
+account. `host_slug` is the label in the caller's app hostnames: the same as `slug` for a
+person. With `org_id`, the same fields describe the organization, whose `host_slug` is
+its NyxID slug once a member has reached it, or the hashed `slug` until then. `organizations` is present when the request carried the caller's credential;
 `organizations_unavailable: true` means NyxID could not be asked. Personal access never
 depends on that lookup.
 
@@ -72,7 +75,10 @@ depends on that lookup.
 A **project** groups the apps that belong together, for example `chronoai` holding
 `chrono-cd` and `chrono-pod`. It is a name, nothing more: it exists while it has at least
 one app, and it needs no create call. An **app** is one deployable application: one
-hostname, `https://<app>-<slug>.<base_domain>`, one or more services, optional add-ons.
+hostname, `https://<app>-<host_slug>.<base_domain>`, one or more services, optional
+add-ons. The host slug is the owner's hashed `slug` for a person and the organization's
+NyxID slug for an organization, for example `mathesis-chronoai.apps.chrono-ai.fun`; it is
+the `host_slug` of `/account`. The hostname is fixed when the app is created.
 All apps of an owner share the owner's namespace and quota, so app names and service
 names are unique per owner, across projects.
 
@@ -110,6 +116,7 @@ selects an organization scope (see above).
       "health_path": "/readyz",
       "replicas": 2,
       "routes": ["/api", "/auth"],
+      "metrics": {"port": 9090, "path": "/metrics"},
       "env": {"WISHPOOL_BIND": "0.0.0.0:8080", "WISHPOOL_ROLE": "api"},
       "secret_keys": ["CHRONO_NYXID_CLIENT_ID", "CHRONO_NYXID_CLIENT_SECRET"],
       "addon_env": {"mongodb": {"uri": "WISHPOOL_MONGODB_URI", "database": "WISHPOOL_MONGODB_DATABASE"}}
@@ -154,6 +161,7 @@ Service fields:
 | `volumes` | Up to 4. `type` `pvc` (persistent, 100Mi or more) or `emptydir` (scratch, up to 32Gi). |
 | `files` | Plain configuration files: `[{"path": "/etc/app/config.yaml", "content": "..."}]`. Up to 16, 64 KiB each, 256 KiB in total. Mounted read-only at the path; versioned with the spec. Secret files go through the secrets endpoint instead. |
 | `resources` | Defaults 100m / 128Mi requests, 500m / 512Mi limits. Limits may not exceed twice the owner's quota request. |
+| `metrics` | Opt-in: `{"port": 9090, "path": "/metrics"}` where the service serves Prometheus text-format metrics (`path` defaults to `/metrics`; the port may equal `port`). The platform scraper then reads it every 20 seconds and the series appear in the telemetry routes with `namespace` and `pod` labels. Only the scraper's namespace is admitted to that port. Without it a service still gets CPU, memory, network and restart series from the node. |
 
 Every service is reachable inside the owner's namespace as `http://<service>:<port>` and
 `http://<service>:80`, so an app's own proxy configuration works unchanged.
@@ -296,6 +304,74 @@ HTTP status the probe saw. Both are absent when nothing is public yet.
 `{"revisions": [{"revision": 2, "generation": 3, "action": "update", "actor": "...", "at": "...", "ok": true,
 "services": {"web": {"image": "...", "image_digest": "sha256:...", "replicas": 2}}}]}`, newest first.
 
+## Telemetry
+
+Stored metrics and logs of an app, from the platform's VictoriaMetrics and VictoriaLogs
+stores (30 days of metrics, 90 days of logs). The live `logs` route above only tails
+running pods; these routes answer for pods that have gone and for any window up to 31
+days. Any member of the scope may read. Every query is pinned on the server to the
+owner's namespace and to the app's pods (or one service's pods with `service=`), so
+query text cannot reach another tenant. A deployment without a store answers
+`501 telemetry_disabled`.
+
+CPU, memory, network and restart series exist for every pod. A service's own metrics
+exist once it declares `metrics` in its spec (see the service fields); `schema` lists
+the names the store has seen.
+
+Time is RFC 3339. `end` defaults to now and `start` to one hour before `end`.
+
+### `GET /projects/{project}/apps/{app}/telemetry/schema`
+
+What can be queried for the app, from the last hour of data.
+
+```json
+{
+  "namespace": "cd-7d1c1e3f5b", "pod_regex": "^(api|web)-[a-z0-9]+-[a-z0-9]+$", "services": ["api", "web"],
+  "start": "...", "end": "...",
+  "metrics": {"names": ["container_cpu_usage_seconds_total", "..."], "labels": ["container", "pod", "..."],
+              "presets": [{"name": "cpu", "query": "...", "description": "..."}]},
+  "logs": {"fields": ["_msg", "_time", "kubernetes.container_name", "kubernetes.pod_name", "..."],
+           "presets": [{"name": "errors", "query": "...", "description": "..."}]},
+  "limits": {"max_window": "744h0m0s", "default_window": "1h0m0s", "max_points": 500, "min_step": "15s",
+             "default_lines": 1000, "max_lines": 10000}
+}
+```
+
+### `GET /projects/{project}/apps/{app}/telemetry/metrics?preset=cpu|query=<PromQL>&service=&start=&end=&step=`
+
+One of `preset` or `query`. Presets: `cpu`, `memory`, `restarts`, `network_rx`,
+`network_tx`, each grouped by pod. `step` is a duration such as `30s` or `5m`; when
+absent it is chosen so the window has at most 500 points, and it is never below 15s.
+
+```json
+{"query": "sum by (pod) (...)", "service": "", "start": "...", "end": "...", "step": "15s",
+ "result_type": "matrix", "partial": false,
+ "series": [{"metric": {"pod": "web-7d9f-abcde"}, "values": [[1792564546, "0.00034"], ["...", "..."]]}]}
+```
+
+`series` is the Prometheus range-query result as the store returned it: a timestamp in
+seconds and a value as a string per point. `partial` is true when the store answered
+from part of its storage.
+
+### `GET /projects/{project}/apps/{app}/telemetry/logs?preset=errors|query=<LogsQL>&service=&start=&end=&limit=1000`
+
+One of `preset` or `query`. Presets: `all`, `errors`, `warnings`. `query` is a LogsQL
+filter, for example `"connection refused"` or `i(timeout) AND kubernetes.container_name:api`;
+pipes such as `| stats` are allowed. `limit` is at most 10000.
+
+```json
+{"query": "i(error) OR ...", "service": "", "start": "...", "end": "...", "limit": 1000, "count": 2, "truncated": false,
+ "lines": [{"_time": "2026-10-21T06:45:44.115Z", "_msg": "...", "kubernetes.pod_name": "web-7d9f-abcde",
+            "kubernetes.container_name": "app", "...": "..."}]}
+```
+
+Lines are newest first, each a flat object of the store's fields. `truncated` is true
+when more lines matched than `limit`; narrow the window or the query.
+
+A query the store cannot parse answers `400 query_rejected` with the store's own
+message. A window longer than 31 days, a step that would exceed 500 points, or a
+missing query answers `400 validation_error`.
+
 ## Quota requests
 
 An owner asks for a different quota; only a platform admin decides. A personal owner, an
@@ -334,7 +410,7 @@ Admin routes need the NyxID RBAC role `admin` in the token.
 |---|---|
 | `GET /admin/settings` | `{"base_domain": "apps.chrono-ai.fun", "updated_at": "...", "updated_by": "...", "applies_to": "new projects"}` |
 | `PUT /admin/settings` | `{"base_domain": "apps.example.com"}`. Existing apps keep their hostnames. |
-| `GET /admin/owners` | `{"owners": [{"id", "slug", "owner_type", "namespace", "quota", "usage", "apps", "created_at", "updated_at"}]}` |
+| `GET /admin/owners` | `{"owners": [{"id", "slug", "host_slug", "owner_type", "namespace", "quota", "usage", "apps", "created_at", "updated_at"}]}` |
 | `GET /admin/owners/{slug}` | One owner. |
 | `PUT /admin/owners/{slug}/quota` | `{"cpu_request": "4", "memory_request": "8Gi", "pods": 20, "storage": "40Gi"}`. Re-renders the namespace ResourceQuota and LimitRange. |
 | `GET /admin/apps?owner=<slug>` | `{"apps": [...]}` across owners. |

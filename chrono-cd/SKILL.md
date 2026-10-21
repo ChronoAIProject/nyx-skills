@@ -1,8 +1,8 @@
 ---
 name: chrono-cd
-description: Deploy a user's application to the ChronoAI cluster with chrono-cd through the NyxID CLI (`nyxid proxy request chrono-cd ...`). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
+description: Deploy a user's application to the ChronoAI cluster with chrono-cd through the NyxID CLI (`nyxid proxy request chrono-cd ...`). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
 compatibility: Requires the nyxid CLI, logged in with `nyxid login`. The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-20 against chrono-cd on the live platform.
-version: "1.2"
+version: "1.5"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -20,7 +20,8 @@ metadata:
 # Deploy an app with chrono-cd
 
 chrono-cd runs container images from GitHub Packages (`ghcr.io`) on the ChronoAI cluster
-and gives each app a public hostname `https://APP-SLUG.apps.chrono-ai.fun`. It is
+and gives each app a public hostname `https://APP-SLUG.apps.chrono-ai.fun`, where SLUG is
+a hash for a person and the organization's NyxID slug for an organization. It is
 registered in NyxID as the service `chrono-cd`. Every call goes through NyxID's proxy:
 
 ```bash
@@ -66,8 +67,9 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 - **A `port` is immutable** and so is a service name. To change a port, add the service
   under a new name and remove the old one.
 - **Replicas are at most 3; a service with a `pvc` volume runs 1.**
-- **Quota is per owner**: default 2 CPU, 4Gi, 10 pods, 20Gi, summed over all apps as
-  replicas times requests plus one surge pod. `409 quota_exceeded` says by how much. The
+- **Quota is per owner**: default 2 CPU, 4Gi, 10 pods, 20Gi for a person and 8 CPU, 16Gi,
+  40 pods, 80Gi for an organization, summed over all apps as replicas times requests plus
+  one surge pod. `409 quota_exceeded` says by how much. The
   user can only request more; a platform admin approves.
 - **Organization scope:** the user must be an `admin` of the organization to deploy;
   `member` and `viewer` can only read. Pass `org_id` on every call for that scope.
@@ -78,7 +80,7 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 nyxid proxy request chrono-cd api/v1/account --output json
 ```
 
-Returns `slug` (the hostname suffix), `quota`, `usage`, `apps` and `organizations` with the
+Returns `slug`, `host_slug` (the hostname suffix), `quota`, `usage`, `apps` and `organizations` with the
 user's role in each. If the user wants to deploy for an organization, pick its `id` and add
 `?org_id=ID` to every path below. If they are not `admin` there, stop and say so.
 
@@ -108,6 +110,7 @@ Per service:
 | `files` | no | plain config files `[{"path": "/etc/app/config.yaml", "content": "..."}]`, 16 of 64 KiB |
 | `volumes` | no | up to 4: `{"name": "data", "mount_path": "/data", "type": "pvc", "size": "5Gi"}` or `"type": "emptydir"` |
 | `egress`, `ingress_from` | no | `"none"` blocks all egress; `["api"]` lets only those sibling services in |
+| `metrics` | no | `{"port": 9090, "path": "/metrics"}` if the image serves Prometheus metrics; they then show up in the telemetry routes and `schema` |
 
 Per app, outside `services`: `addons` (`{"mongodb": {}}` gives the app one database and a
 scoped user; wire it with `addon_env`), `registry_credential` (see the rules), and
@@ -122,6 +125,7 @@ A multi-service app, with a frontend, an API behind `/api`, and a worker:
     "web":    {"image": "ghcr.io/acme/shop-web:1.4", "port": 8080, "routes": ["/"]},
     "api":    {"image": "ghcr.io/acme/shop-api:1.4", "port": 8080, "routes": ["/api"],
                "health_path": "/readyz",
+               "metrics": {"port": 9090, "path": "/metrics"},
                "env": {"LOG_LEVEL": "info"},
                "secret_keys": ["JWT_KEY"],
                "addon_env": {"mongodb": {"uri": "MONGODB_URI", "database": "MONGODB_DATABASE"}}},
@@ -207,6 +211,49 @@ nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/logs?service=SERV
 | restart | `POST .../restart?service=NAME` (all services when omitted) |
 | rotate the database password | `POST .../addons/mongodb/rotate` |
 | delete | `DELETE api/v1/projects/PROJECT/apps/APP`; add `?purge=true` to drop the add-on data too |
+| live log tail of running pods | `GET .../logs?service=NAME&tail=200` |
+| stored metrics and logs, any window | `GET .../telemetry/metrics`, `GET .../telemetry/logs`, see below |
+
+## Stored metrics and logs
+
+The `logs` route only tails pods that are running now. For anything older, for pods that
+crashed or were replaced, and for CPU, memory, restarts and network, use the telemetry
+routes. They read the platform's stores (30 days of metrics, 90 days of logs). You never
+have to build a query from scratch: start with the schema and the presets.
+
+```bash
+# 1. What exists for this app: metric names, labels, log fields, presets, limits.
+nyxid proxy request chrono-cd api/v1/projects/PROJECT/apps/APP/telemetry/schema --output json
+
+# 2. A preset over the last hour (the default window): cpu, memory, restarts, network_rx, network_tx.
+nyxid proxy request chrono-cd 'api/v1/projects/PROJECT/apps/APP/telemetry/metrics?preset=memory' --output json
+
+# 3. Error lines of one service over a day.
+nyxid proxy request chrono-cd 'api/v1/projects/PROJECT/apps/APP/telemetry/logs?preset=errors&service=api&start=2026-10-20T00:00:00Z&end=2026-10-21T00:00:00Z' --output json
+```
+
+Rules for writing your own query (`query=` instead of `preset=`):
+
+- You only ever see this app's pods. chrono-cd pins every query to the owner's namespace
+  and the app's pod names on the server, so do not add namespace or pod selectors yourself;
+  group by `pod` or `container` instead.
+- Metrics are PromQL. Use the names from `schema.metrics.names`; the useful ones are
+  `container_cpu_usage_seconds_total`, `container_memory_working_set_bytes`,
+  `kube_pod_container_status_restarts_total`, `container_network_*_bytes_total`. A
+  service that declared `metrics` in its spec adds its own names to that list. Add
+  `{container!=""}` on `container_*` metrics to skip the pod sandbox. Rates need a range,
+  for example `rate(...[5m])`. `step` defaults to at most 500 points over the window.
+- Logs are LogsQL filters: a word or `"phrase"`, `i(word)` for case-insensitive,
+  `AND`, `OR`, `NOT`, a field filter like `kubernetes.container_name:api`, and pipes such
+  as `| stats count() as n` or `| fields _time, _msg`. The fields come from
+  `schema.logs.fields`. Lines come newest first; `truncated: true` means more matched than
+  `limit` (at most 10000): narrow the window or the query.
+- Time is RFC 3339, `end` defaults to now, `start` to one hour before, the window is at
+  most 31 days. `400 query_rejected` carries the store's own message: fix the query and
+  retry. `501 telemetry_disabled` means this platform has no store.
+
+Show the user numbers with units (cores, MiB, restarts) and the window you used. For a
+"why did it crash" question, combine `restarts` with `preset=errors` around the restart.
 
 ## Ask for more quota
 
