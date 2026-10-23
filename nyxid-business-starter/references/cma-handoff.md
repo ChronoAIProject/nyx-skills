@@ -14,8 +14,12 @@ Call the CMA create-agent operation (`POST /api/v1/agents`) with:
 - `name`: `setup-{business-slug}`
 - `profile.skills`: `[{"id": "0d0e247f-ee1e-4304-95fd-27990d269a26"}]` (Ornn skill
   `nyxid-business-setup-worker`; omit `version` to use its latest)
-- `profile.permissions.services`: `api-notion`, plus `tools-firecrawl` or
-  `api-firecrawl` when the faq module is chosen
+- `profile.permissions.services`: the owner's exact connected slugs recorded in
+  step 3, never catalog names: the Notion connection (e.g. `api-notion-3`, not
+  `api-notion`), plus the Firecrawl connection (e.g. `api-firecrawl`) when the faq
+  module is chosen. A slug the owner has not connected leaves the worker stuck in
+  `waiting_for_connection` (the CMA lifecycle names the missing service); stop it
+  and create a new worker with a new Idempotency-Key and the correct slugs.
 - `profile.system_prompt`: "You are a setup worker for one small business. Follow
   the nyxid-business-setup-worker skill exactly. Never contact customers."
 
@@ -76,5 +80,5 @@ ready again:
    and compare properties with references/notion-hub.md; read the FAQ page.
 3. If the result says `database_create_unavailable`, use the manual fallback.
 
-When setup is finished, ask the owner whether to delete the CMA worker; it is not
-needed for daily operation.
+When setup is finished, stop and then delete the CMA worker (SKILL.md step 10); it
+is not needed for daily operation.
