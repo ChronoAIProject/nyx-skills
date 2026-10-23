@@ -9,6 +9,10 @@
   limit guests to `notion_create_page` with `parent.database_id` pinned to the
   Queue and Reservations databases.
 - Telnyx: `read` (guests can send nothing). Use `use` only for instant SMS mode.
+- `ornn-api`: `read`, the lowest level (the grant exists only so the front desk can
+  read its own skill in owner turns; guests never receive skills). Tell the owner
+  that guests could still look up Ornn skills the owner can see, so private notes
+  do not belong in Ornn skills.
 
 ## Approvals (`nyxid__set_approval_mode`, owner card)
 

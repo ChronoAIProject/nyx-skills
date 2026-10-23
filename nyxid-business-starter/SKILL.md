@@ -1,7 +1,7 @@
 ---
 name: nyxid-business-starter
 description: Owner onboarding for small businesses on NyxBot. Use when the owner asks to set up a queue manager, a business FAQ, or reservations (alone or combined), or names this skill. Interviews the owner, connects Notion, Telnyx and CMA, has a CMA worker build the Notion hub and research the FAQ, creates one customer-facing front-desk specialist, sets guest access and approvals, links a Telegram bot, and runs a test. Guidance only; it grants no permissions.
-version: "0.10"
+version: "0.11"
 metadata:
   category: tool-based
   tool-list:
@@ -99,8 +99,10 @@ send skill files back; it has its own copy.
    `nyxid__spawn_subagent` with name `front-desk` (if listing specialists fails,
    still call spawn; a duplicate name returns an error you can act on), the
    owner's chosen display name,
-   persona from the owner's tone, and services = the Notion slug plus the Telnyx
-   slug if queue SMS is on. Then attach the **latest** version of the Ornn skill
+   persona from the owner's tone, and services = the Notion slug, `ornn-api`
+   (a specialist reads its own attached skill through Ornn; without this grant its
+   skill fails to load with `api_key_scope_forbidden`) and the Telnyx slug if queue
+   SMS is on. Then attach the **latest** version of the Ornn skill
    `nyxid-business-front-desk` (GUID a41f05ed-994f-4f26-ab89-a28ad0b24ccc): look it
    up with `nyxid__agent_skill_versions` (never reuse a version remembered from an
    earlier setup), preview it with `nyxid__preview_agent_skill`, then
