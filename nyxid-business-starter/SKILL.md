@@ -1,7 +1,7 @@
 ---
 name: nyxid-business-starter
 description: Owner onboarding for small businesses on NyxBot. Use when the owner asks to set up a queue manager, a business FAQ, or reservations (alone or combined), or names this skill. Interviews the owner, connects Notion, Telnyx and CMA, has a CMA worker build the Notion hub and research the FAQ, creates one customer-facing front-desk specialist, sets guest access and approvals, links a Telegram bot, and runs a test. Guidance only; it grants no permissions.
-version: "0.9"
+version: "0.10"
 metadata:
   category: tool-based
   tool-list:
@@ -39,6 +39,13 @@ the business's own facts), **reservations** (booking requests saved to Notion).
 Work through the steps in order, one step per message. Never skip the confirmation
 cards NyxID raises, and never ask the owner to paste a secret into chat: use connect
 links and settings links.
+
+**Reading this skill.** The steps point to files under `references/`. Attach this
+skill to yourself first (`nyxid__preview_agent_skill`, then `nyxid__set_agent_skills`
+for NyxBot) and read each reference with `nyxid__skill_read` (`path`
+`references/<file>.md`, following `next_offset`). Reading the whole package from
+Ornn in one call is cut off at your tool-result limit. Never ask the CMA worker to
+send skill files back; it has its own copy.
 
 ## Facts that shape the design
 
