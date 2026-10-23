@@ -1281,6 +1281,46 @@
       "version": "1.3"
     },
     {
+      "name": "nyxid-business-front-desk",
+      "source": "./nyxid-business-front-desk",
+      "description": "Owner and scheduled operations for a NyxBot business front-desk specialist built by nyxid-business-starter. Use in owner chats and schedule runs to show the queue, call the next customer with an SMS, mark served or no-show, send batched queue confirmations, list pending reservations and confirm or decline them. Customer (guest) turns never see this skill; their rules live in the agent description.",
+      "version": "0.2",
+      "keywords": [
+        "nyxbot",
+        "small-business",
+        "queue",
+        "reservations",
+        "notion",
+        "telnyx"
+      ]
+    },
+    {
+      "name": "nyxid-business-setup-worker",
+      "source": "./nyxid-business-setup-worker",
+      "description": "CMA worker procedure for nyxid-business-starter. Use when a task block starts with TASK notion-hub or TASK faq-research. Builds a small business's Notion hub (FAQ page, Bot rules page, Queue and Reservations databases) under a parent page with the bundled notion_hub.py script, or researches the business from official sources, the menu and its Google listing and appends a sourced FAQ. Ends with a SETUP_RESULT JSON line. Never contacts customers.",
+      "version": "1.3",
+      "keywords": [
+        "cma",
+        "notion",
+        "small-business",
+        "faq"
+      ]
+    },
+    {
+      "name": "nyxid-business-starter",
+      "source": "./nyxid-business-starter",
+      "description": "Owner onboarding for small businesses on NyxBot. Use when the owner asks to set up a queue manager, a business FAQ, or reservations (alone or combined), or names this skill. Interviews the owner, connects Notion, Telnyx and CMA, has a CMA worker build the Notion hub and research the FAQ, creates one customer-facing front-desk specialist, sets guest access and approvals, links a Telegram bot, and runs a test. Guidance only; it grants no permissions.",
+      "version": "0.8",
+      "keywords": [
+        "nyxbot",
+        "onboarding",
+        "small-business",
+        "notion",
+        "telnyx",
+        "cma"
+      ]
+    },
+    {
       "name": "nyxid-read-receipt-probe",
       "source": "./nyxid-read-receipt-probe",
       "description": "验证 managed workflow 的 NyxID provider receipt、首步输出或 issue 3161 回归。用户提到“NyxID 只读回执探针”、对应英文名称或要求运行该验收 workflow 时使用。",
