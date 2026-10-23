@@ -29,8 +29,10 @@ turn instead of polling.
 ## Send a task
 
 Use the agent input operation (`POST /api/v1/agents/{id}/input`) with a new
-`Idempotency-Key` per task and `text` containing exactly one task block, filled
-in, and nothing else. The worker's own skill holds the procedure and the safety
+`Idempotency-Key` and `text` containing the filled-in task blocks and nothing else.
+When the faq module is chosen, send `notion-hub` and `faq-research` together in one
+input (hub first; FAQ_PAGE_ID: "the FAQ page the hub creates"): each CMA wake-up
+counts against your automatic wake-ups (SKILL.md, Rules). The worker's own skill holds the procedure and the safety
 rules (published NyxID operations only, never raw proxy calls); do not restate,
 add or override rules, and do not pass Google short links (`share.google`):
 give GOOGLE_QUERY instead.
