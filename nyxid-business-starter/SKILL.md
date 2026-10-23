@@ -1,7 +1,7 @@
 ---
 name: nyxid-business-starter
 description: Owner onboarding for small businesses on NyxBot. Use when the owner asks to set up a queue manager, a business FAQ, or reservations (alone or combined), or names this skill. Interviews the owner, connects Notion, Telnyx and CMA, has a CMA worker build the Notion hub and research the FAQ, creates one customer-facing front-desk specialist, sets guest access and approvals, links a Telegram bot, and runs a test. Guidance only; it grants no permissions.
-version: "0.8"
+version: "0.9"
 metadata:
   category: tool-based
   tool-list:
@@ -127,5 +127,10 @@ links and settings links.
   completion. If specialist listing or waiting tools fail, continue: spawning and
   messaging still work, and specialist reports arrive on their own. Re-running a step must not duplicate databases or specialists: check
   for existing ones first.
+- After an interrupted turn, a restart or a context reset you see a recap in which
+  long owner messages may be cut short (marked truncated, or with a "…" in the
+  middle). Before treating any interview answer as missing, read the owner's full
+  messages with `nyx__conversation_history`. Never ask the owner again for, or tell
+  a worker it lacks, something the owner already sent.
 - Customer data lives only in the owner's Notion. Never put it in skills, memory,
   descriptions or CMA prompts.
