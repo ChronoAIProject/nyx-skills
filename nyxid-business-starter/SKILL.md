@@ -1,7 +1,7 @@
 ---
 name: nyxid-business-starter
 description: Owner onboarding for small businesses on NyxBot. Use when the owner asks to set up a queue manager, a business FAQ, or reservations (alone or combined), or names this skill. Interviews the owner, connects Notion, Telnyx and CMA, has a CMA worker build the Notion hub and research the FAQ, creates one customer-facing front-desk specialist, sets guest access and approvals, links a Telegram bot, and runs a test. Guidance only; it grants no permissions.
-version: "0.12"
+version: "0.13"
 metadata:
   category: tool-based
   tool-list:
@@ -74,8 +74,13 @@ send skill files back; it has its own copy.
    owner's preferred customer language. If the owner arrived from a checklist
    message, read the modules from it and confirm them.
 2. **Interview.** Ask only the questions for the chosen modules
-   (references/interview.md). Keep answers in this thread; save hub IDs with
-   `nyxid__remember` later, never customer data.
+   (references/interview.md). As soon as you have the answers (often already in
+   the owner's first message), and before ending that turn, save them with
+   `nyxid__remember` as 1-3 notes starting "{business} setup:" (each at most 500
+   characters; policies, contacts and sources only, never customer data).
+   Attaching this skill and every CMA wait can reset your working context, and long
+   owner messages then come back truncated. At hand-over, replace these notes with
+   the hub IDs note.
 3. **Connect services** (references/services.md). Use `nyx__connect_service` and
    `nyx__wait_for_connection`. Needed: Notion (always), CMA (for setup), Telnyx
    (queue SMS), Firecrawl (FAQ research, optional). Ask the owner to create an
