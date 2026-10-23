@@ -1,0 +1,5 @@
+{
+  "name": "nyxid-business-front-desk",
+  "version": "0.2",
+  "description": "Owner and scheduled operations for a NyxBot business front-desk specialist built by nyxid-business-starter. Use in owner chats and schedule runs to show the queue, call the next customer with an SMS, mark served or no-show, send batched queue confirmations, list pending reservations and confirm or decline them. Customer (guest) turns never see this skill; their rules live in the agent description."
+}
