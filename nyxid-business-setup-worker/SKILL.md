@@ -1,7 +1,7 @@
 ---
 name: nyxid-business-setup-worker
 description: CMA worker procedure for nyxid-business-starter. Use when a task block starts with TASK notion-hub or TASK faq-research. Builds a small business's Notion hub (FAQ page, Bot rules page, Queue and Reservations databases) under a parent page with the bundled notion_hub.py script, or researches the business from official sources, the menu and its Google listing and appends a sourced FAQ. Ends with a SETUP_RESULT JSON line. Never contacts customers.
-version: "1.4"
+version: "1.5"
 metadata:
   category: mixed
   output-type: text
@@ -35,8 +35,11 @@ Use only NyxID's published operations, through the bundled
   `api-firecrawl__scrape` or `tools-firecrawl__search`, and prints its result.
 
 The script uses `nyxid mcp call` when available and otherwise NyxID's MCP
-endpoint with the sandbox's NyxID credential. Never call service APIs through
-raw proxy requests, other credentials or other connections, and never touch
+endpoint with the sandbox's NyxID credential. When NyxID's MCP endpoint refuses
+that credential (CMA sandboxes reach NyxID through a local broker), the script
+runs the same published operations, exactly as NyxID's MCP config lists them,
+through `nyxid proxy request`; this is expected, not an error. Never write your
+own proxy requests, use other credentials or other connections, and never touch
 pages outside PARENT_PAGE_ID. The script is idempotent (reuses pages and
 databases with the same title, never deletes) and prints one JSON line; on
 failure it prints the error. Include that error text in SETUP_RESULT

@@ -1,5 +1,5 @@
 {
   "name": "nyxid-business-setup-worker",
-  "version": "1.4",
+  "version": "1.5",
   "description": "CMA worker procedure for nyxid-business-starter. Use when a task block starts with TASK notion-hub or TASK faq-research. Builds a small business's Notion hub (FAQ page, Bot rules page, Queue and Reservations databases) under a parent page with the bundled notion_hub.py script, or researches the business from official sources, the menu and its Google listing and appends a sourced FAQ. Ends with a SETUP_RESULT JSON line. Never contacts customers."
 }

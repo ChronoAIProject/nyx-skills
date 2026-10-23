@@ -26,6 +26,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 
 QUEUE = {
@@ -147,21 +148,82 @@ class McpHttp:
             raise NotionError(f"MCP {method}: {json.dumps(reply['error'])[:600]}")
         return reply.get("result", {})
 
-    def call_tool(self, name, args):
+    def ensure_session(self):
         if not self.session:
             self._rpc("initialize", {"protocolVersion": self.VERSION, "capabilities": {},
                                      "clientInfo": {"name": "nyxid-business-setup-worker", "version": "2"}})
             self._post({"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
                        notification=True)
+
+    def call_tool(self, name, args):
+        self.ensure_session()
         # The universal dispatcher activates the service in this session and
         # applies the same authorization gates as a direct tool call.
         return self._rpc("tools/call", {"name": "nyx__call_tool", "arguments": {
             "tool_name": name, "arguments_json": json.dumps(args)}})
 
 
+class PublishedOps:
+    """Fallback when NyxID's /mcp refuses the credential. CMA sandboxes reach
+    NyxID through a local broker that injects the key as a Bearer token, which
+    /mcp does not accept. This runs the same published operations, exactly as
+    GET /api/v1/mcp/config lists them (method, path, parameters), through
+    `nyxid proxy request`; anything not listed there is refused."""
+
+    def __init__(self, http, cli="nyxid"):
+        self.cli = cli
+        req = urllib.request.Request(http.base + "/api/v1/mcp/config")
+        req.add_header("Authorization", f"Bearer {http.token}")
+        req.add_header("User-Agent", "nyxid-business-setup-worker")
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                config = json.loads(resp.read().decode("utf-8", "replace"))
+        except urllib.error.HTTPError as err:
+            raise NotionError(f"MCP config HTTP {err.code}: {err.read().decode('utf-8', 'replace')[:600]}")
+        self.ops = {f"{svc.get('service_slug')}__{ep.get('name')}": ep
+                    for svc in config.get("services", []) for ep in svc.get("endpoints") or []}
+
+    def call(self, service, operation, args):
+        ep = self.ops.get(f"{service}__{operation}")
+        if not ep:
+            raise NotionError(f"{service}__{operation} is not a published NyxID operation")
+        args, path, query = dict(args), ep["path"], []
+        for param in ep.get("parameters") or []:
+            if param.get("name") not in args:
+                continue
+            value = args.pop(param["name"])
+            if param.get("in") == "path":
+                path = path.replace("{" + param["name"] + "}", urllib.parse.quote(str(value), safe=""))
+            elif param.get("in") == "query":
+                query.append((param["name"], value if isinstance(value, str) else json.dumps(value)))
+        if "{" in path:
+            raise NotionError(f"{operation}: missing path parameter for {path}")
+        if query:
+            path += "?" + urllib.parse.urlencode(query)
+        method = ep["method"].upper()
+        cmd = [self.cli, "proxy", "request", service, path.lstrip("/"), "-m", method, "--output", "json"]
+        body = None
+        if method not in ("GET", "HEAD", "DELETE") and (args or ep.get("request_body_required")):
+            body = args["body"] if set(args) == {"body"} else args
+            # Older CLIs default -d bodies to application/octet-stream.
+            cmd += ["-H", f"Content-Type:{ep.get('request_content_type') or 'application/json'}", "-d", "-"]
+        res = subprocess.run(cmd, input=json.dumps(body) if body is not None else None,
+                             capture_output=True, text=True)
+        out = (res.stdout or "").strip()
+        try:
+            data = json.loads(out) if out else {}
+        except json.JSONDecodeError:
+            raise NotionError(f"{operation}: non-JSON response (exit {res.returncode}): "
+                              f"{out[:800]} {res.stderr[:800]}")
+        if res.returncode != 0 or (isinstance(data, dict) and data.get("object") == "error"):
+            raise NotionError(f"{operation}: exit {res.returncode}: {json.dumps(data)[:1200]} {res.stderr[:600]}")
+        return data
+
+
 class Notion:
     """Calls NyxID MCP operations named {service}__{operation}: through
-    `nyxid mcp call` when the CLI has it, otherwise through McpHttp."""
+    `nyxid mcp call` when the CLI has it, otherwise through McpHttp, and
+    through PublishedOps when /mcp refuses the credential (CMA sandboxes)."""
 
     def __init__(self, service, cli="nyxid"):
         self.service = service
@@ -172,8 +234,18 @@ class Notion:
         token = McpHttp.stored_token() or ""
         human = token and not McpHttp.is_api_key(token) and not os.environ.get("NYXID_API_KEY")
         self.http = None if probe.returncode == 0 and human else McpHttp()
+        self.ops = None
+        if self.http:
+            try:
+                self.http.ensure_session()
+            except NotionError as err:
+                if not str(err).startswith(("MCP HTTP 401", "MCP HTTP 403")):
+                    raise
+                self.ops, self.http = PublishedOps(self.http, cli), None
 
     def call(self, operation, args):
+        if self.ops:
+            return self.ops.call(self.service, operation, args)
         if self.http:
             envelope = self.http.call_tool(f"{self.service}__{operation}", args)
             return self._unwrap(operation, envelope, 0, "")
