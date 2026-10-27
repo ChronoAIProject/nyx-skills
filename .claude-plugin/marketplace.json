@@ -488,8 +488,8 @@
     {
       "name": "chrono-cd",
       "source": "./chrono-cd",
-      "description": "Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.",
-      "version": "2.0",
+      "description": "Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.",
+      "version": "2.1",
       "keywords": [
         "chrono-cd",
         "nyxid",
@@ -1573,7 +1573,7 @@
       "name": "restaurant-reservation-onboarding",
       "source": "./restaurant-reservation-onboarding",
       "description": "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files.",
-      "version": "1.5",
+      "version": "1.6",
       "keywords": [
         "restaurant",
         "reservation",
