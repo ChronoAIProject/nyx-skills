@@ -1,6 +1,6 @@
 # restaurant-reservation-desk
 
-> 餐厅 订位 入座 离店 翻台 换桌 散客 改期 取消 桌况 余量 restaurant table check-in check-out walk-in reservation desk. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 入座, B3 离店), a walk-in party sat down, a booking moved table, a guest did not show, a booking changed or was cancelled, or asks today's bookings, live table status or remaining tables. Reads and updates the reservation Google Sheet; never deletes rows; never used on customer turns.
+> 餐厅 订位 入座 离店 翻台 换桌 散客 排位 改期 取消 待确认 特殊要求 场合 桌况 余量 restaurant table check-in check-out walk-in reservation desk. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 入座, B3 离店), a walk-in party sat down, a booking moved table, a guest did not show, a booking changed or was cancelled, a pending booking is approved or declined, or asks today's bookings, live table status or remaining tables. Reads and updates the reservation Google Sheet; never deletes rows; never used on customer turns.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.0`
-- Last synced: `2026-10-27T06:00:00.811Z`
+- Latest version: `1.3`
+- Last synced: `2026-10-27T06:28:18.332Z`
 
 ## Install
 
