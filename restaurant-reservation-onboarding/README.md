@@ -1,6 +1,6 @@
 # restaurant-reservation-onboarding
 
-> Onboarding desk for a restaurant owner who wants a reservation NyxBot. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner says they run a restaurant and want an assistant that handles table bookings. Collects the restaurant profile, the menu (photo, PDF or text), the table and private-room inventory and the booking rules, then builds the working files in the owner's Google Workspace (already bound in NyxID): a Drive folder, a menu sheet, a restaurant-info doc, a reservation log sheet with a live table-status board, and a private-room calendar. Ends with the links, the points the owner must check, and the Role text for the reservation specialist. Never used on customer turns; never deletes or overwrites files the owner already has.
+> 餐厅 订位 订座 预定 订桌 包间 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.0`
-- Last synced: `2026-10-27T05:00:00.888Z`
+- Latest version: `1.1`
+- Last synced: `2026-10-27T05:49:28.715Z`
 
 ## Install
 
