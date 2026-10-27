@@ -1558,6 +1558,19 @@
       ]
     },
     {
+      "name": "restaurant-reservation-onboarding",
+      "source": "./restaurant-reservation-onboarding",
+      "description": "Onboarding desk for a restaurant owner who wants a reservation NyxBot. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner says they run a restaurant and want an assistant that handles table bookings. Collects the restaurant profile, the menu (photo, PDF or text), the table and private-room inventory and the booking rules, then builds the working files in the owner's Google Workspace (already bound in NyxID): a Drive folder, a menu sheet, a restaurant-info doc, a reservation log sheet with a live table-status board, and a private-room calendar. Ends with the links, the points the owner must check, and the Role text for the reservation specialist. Never used on customer turns; never deletes or overwrites files the owner already has.",
+      "version": "1.0",
+      "keywords": [
+        "restaurant",
+        "reservation",
+        "onboarding",
+        "google-workspace",
+        "google-sheets"
+      ]
+    },
+    {
       "name": "resume-screening-payload-builder",
       "source": "./resume-screening-payload-builder",
       "description": "Runs the HR resume screening flow end to end — collects the candidate's form/chat fields and resume PDF, screens the resume with your own model, uploads the passing resume to Lark Drive, writes the Bitable record, and posts a summary to the chat.",
