@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.6"
+version: "1.7"
 metadata:
   category: tool-based
   tool-list:
@@ -124,7 +124,11 @@ metadata:
 5. 老板要手动做的事：
    - 打开订位登记表，文件 › 设置 › 计算，把重算改成「每分钟」。
    - 订位登记表里有顾客电话，只共享给前台和店长（新加坡受 PDPA 约束）。
-6. 下一步：用另一个账号当顾客，在渠道里试订一桌。
+6. 下一步：用另一个账号当顾客，在渠道里按下面三句试订，对照预期检查，有一条不对就告诉 NyxBot：
+   - 只发「你好」。预期：专员第一条回复就一次问齐日期、时间、人数、称呼、电话（人数大厅包间都能坐时还问坐大厅还是包间），不一项一项问。
+   - 发「下周六中午 12 点，6 到 8 个人」。预期：先问「按 8 位准备可以吗」和坐大厅还是包间，不自己取整、不自己选区域。
+   - 补齐信息后。预期：确认信息里有桌号和桌型（例如「P01 小包间」），订位登记表 C 列有同一个桌号；同一时段小包间订满后再订 6 人包间，专员提议大厅大圆桌或其他时段，不排大包间。
+   测完让 NyxBot 把测试订位的状态改成「取消」，或由老板自己在表里删掉。
 
 不写计划、不写过程、不写客套。
 
