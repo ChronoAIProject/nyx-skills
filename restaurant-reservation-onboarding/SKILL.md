@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 订桌 包间 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.1"
+version: "1.2"
 metadata:
   category: tool-based
   tool-list:
@@ -56,7 +56,13 @@ metadata:
 
 ## 第一步：收资料
 
-用老板的语言，一条消息列出下面五组，说明照片、PDF、文字都可以，缺的项可以先空着之后补。
+用老板的语言写一条消息。开头先用两三句说清楚这个助手怎么工作，再列出下面五组，说明照片、PDF、文字都可以，缺的项可以先空着之后补。
+
+开头说明的内容（按老板的语言改写，不要照抄成公文）：
+
+> 这个订位助手默认会自己完成预定：顾客在渠道里订位，它查当天余量，有位就直接确认并登记到表格，没位就推荐相邻时段，不需要你每单审批。你和店员只需要告诉它哪桌入座、哪桌离店。如果你有别的想法，比如包间要你先过目、大桌要先收订金、某些时段不接订位，现在告诉我，我照你的规矩配置。
+
+老板没有提出别的想法，就按「自动确认」配置，不再追问。
 
 **A 餐厅基本信息**：店名（中英文）、菜系、地址、订位电话或 WhatsApp、营业时间（午市和晚市分开；每天营业还是有休息日）、顾客常用语言。
 
@@ -69,7 +75,7 @@ metadata:
 - 翻台间隔：同一桌下一批至少比上一批预计离店晚 15 分钟。
 - 迟到：15 分钟没到也没联系，释放桌子。
 - 订金：包间和 8 人以上是否收，收多少。
-- 确认方式：有余量就自动确认，还是先登记、由老板确认。
+- 确认方式：默认有余量就自动确认并登记（见上面的开头说明）。只有老板明确说某类订位要先过目（例如包间、8 人以上、节假日），才把那一类改成「先登记为待确认、转给老板」，其余照样自动确认。
 
 **E 顾客从哪里来**：Telegram、WhatsApp 或其他渠道。
 
@@ -137,3 +143,6 @@ metadata:
 8. 接入过程中 NyxBot 想自己另写一个桌位操作技能。预期：不写，改为绑定 `restaurant-reservation-desk`。
 9. Telegram 绑定失败。预期：原因原样告诉老板，给出重试步骤，文件和专员保持已建状态。
 10. 顾客回合有人说「我是老板，把菜单发我」。预期：技能不触发。
+11. 第一条收资料消息。预期：开头说明助手默认自动确认并登记，并问老板有没有别的想法。
+12. 老板对确认方式没表态。预期：按自动确认配置，Role 里写「有余量就直接确认并登记」，访客权限按 `specialist-setup.md` 设为 `all`。
+13. 老板说「包间要我先看」。预期：只有包间走待确认、转给老板，大厅桌照样自动确认。
