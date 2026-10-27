@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.8"
+version: "1.9"
 metadata:
   category: tool-based
   tool-list:
@@ -69,6 +69,8 @@ metadata:
 **B 菜单**：菜单照片、PDF 或文字，多张照片一次发完。
 
 **C 桌位**：大厅每种桌型的数量和每桌座位数，包间数量和每间容纳人数范围（最少几位、最多几位，例如 6–8 人），有桌号就一并给。老板发桌位图也可以，从图上数，数完请老板确认。
+
+桌位数清后，按区域列出桌号，请老板给每个区域选特点标签（可多选，没有就不选）：靠窗、靠门、里侧、安静、热闹、靠传菜口、宽敞（方便轮椅或儿童椅）。可以先按桌位图给出建议，例如「A 区沿临街窗：靠窗；C 区挨着传菜口：靠传菜口」，让老板改或确认，不要不问就当成定论。老板说某几张桌例外，单独标。
 
 **D 订位规矩**（都有默认值，老板不答就用默认）：
 - 用餐时长：2 到 4 人 90 分钟，6 到 8 人圆桌 120 分钟，包间 150 分钟。老板说不限时，就不按时长自动释放，桌子只在老板或店员说「某桌离店」时释放。
@@ -160,6 +162,9 @@ metadata:
 18. 老板没回答「大包间能否给少人数客人用」。预期：Role 写明人数低于最少人数的桌型不安排，小包间满时推荐大厅大圆桌或其他时段。
 23. 订一个包间。预期：订位登记 C 列是包间号，备注有「日历事件：…」，包间预订日历里有同一时间的事件。
 24. 建专员后读操作范围。预期：Sheets 读写和日历事件五个接口都在；缺了就补。
+25. 老板发了桌位图。预期：按区域列出桌号和建议的特点标签，请老板确认后写进桌位表 I 列。
+26. 顾客说「想坐安静点的」或「靠窗」。预期：在该桌型的可用桌号里挑 I 列含这个标签的；没有就照常分配并说明会尽量安排，不承诺。
+27. 在 NyxID 应用里下单。预期：来源列填「NyxID」，不填渠道名。
 20. 顾客第一句只说「你好」。预期：专员第一次回复就把日期、时间、人数、称呼、电话（以及大厅或包间）一次问齐。
 21. 6–8 人订位没说区域。预期：问坐大厅还是包间，不自行选择。
 22. 订位确认。预期：订位登记 C 列有桌号，确认信息写明桌号和桌型。
