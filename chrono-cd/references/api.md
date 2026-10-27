@@ -68,8 +68,7 @@ account. `host_slug` is the label in the caller's app hostnames: the same as `sl
 person. With `org_id`, the same fields describe the organization, whose `host_slug` is
 its NyxID slug once a member has reached it, or the hashed `slug` until then. `organizations` is present when the request carried the caller's credential;
 `organizations_unavailable: true` means NyxID could not be asked. Personal access never
-depends on that lookup. `is_admin` is true for platform admins, who have further routes
-and fields described in the `chrono-cd-internal` skill.
+depends on that lookup.
 
 ## Projects and apps
 
@@ -79,9 +78,7 @@ one app, and it needs no create call. An **app** is one deployable application: 
 hostname, `https://<app>-<host_slug>.<base_domain>`, one or more services, optional
 add-ons. The host slug is the owner's hashed `slug` for a person and the organization's
 NyxID slug for an organization, for example `mathesis-chronoai.apps.chrono-ai.fun`; it is
-the `host_slug` of `/account`. The base domain is the platform's current app domain,
-`apps.nyxid.ai`; an app keeps the one it was created with (`base_domain` in the app view),
-so older apps stay on `apps.chrono-ai.fun`. The hostname is fixed when the app is created.
+the `host_slug` of `/account`. The hostname is fixed when the app is created.
 All apps of an owner share the owner's namespace and quota, so app names and service
 names are unique per owner, across projects.
 
@@ -96,7 +93,7 @@ lowercase letters, digits and inner hyphens; for `app`, `admin`, `api`, `www`,
 `chrono-cd`, `nyx`, `nyx-api` and `gateway` are reserved. `PUT` is declarative: the body
 replaces the whole spec. An app cannot move: a `PUT` under another project answers
 `409 app_exists`. Optional header `If-Match: <generation>`. Optional `target_org_id`
-selects an organization scope.
+selects an organization scope (see above).
 
 ```json
 {
@@ -291,8 +288,7 @@ Live state from the cluster.
 `error` (the last apply failed) or `deleting`. Pod `reason` and `message` carry the
 container's own words.
 
-`ready` means reachable. An app with a public service is `progressing` until the cluster
-has accepted its route and resolved its references, however ready its pods are. Once the cluster accepts the route, chrono-cd fetches the app's
+`ready` means reachable. Once the cluster accepts the route, chrono-cd fetches the app's
 hostname from the public edge on every status call: `route.serving` is `true` when the
 answer came from the app (any status, its own 404 included) and `false` while the edge
 still answers for no route, which lasts a few minutes after a new hostname's route is
@@ -405,3 +401,21 @@ differ from `requested`).
 ### `GET /quota-requests`
 
 `{"quota_requests": [...]}` for the scope, newest first. Members and viewers may read.
+
+## Admin
+
+Admin routes need the NyxID RBAC role `admin` in the token.
+
+| Method and path | Body / response |
+|---|---|
+| `GET /admin/settings` | `{"base_domain": "apps.chrono-ai.fun", "updated_at": "...", "updated_by": "...", "applies_to": "new projects"}` |
+| `PUT /admin/settings` | `{"base_domain": "apps.example.com"}`. Existing apps keep their hostnames. |
+| `GET /admin/owners` | `{"owners": [{"id", "slug", "host_slug", "owner_type", "namespace", "quota", "usage", "apps", "created_at", "updated_at"}]}` |
+| `GET /admin/owners/{slug}` | One owner. |
+| `PUT /admin/owners/{slug}/quota` | `{"cpu_request": "4", "memory_request": "8Gi", "pods": 20, "storage": "40Gi"}`. Re-renders the namespace ResourceQuota and LimitRange. |
+| `GET /admin/apps?owner=<slug>` | `{"apps": [...]}` across owners. |
+| `GET /admin/apps/{slug}/{app}` | One app, by owner slug and app name. |
+| `POST /admin/apps/{slug}/{app}/reconcile` | Re-applies the stored desired state. Repairs drift; does not re-resolve images or move hostnames. |
+| `GET /admin/quota-requests?status=pending&limit=100` | Requests across owners, newest first. |
+| `POST /admin/quota-requests/{id}/approve` | `{"note": "...", "quota": {...}}`. `quota` is optional and replaces the requested numbers. Applies the quota to the owner and re-renders the namespace limits. |
+| `POST /admin/quota-requests/{id}/reject` | `{"note": "..."}`. |

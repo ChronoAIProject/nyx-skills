@@ -1,8 +1,8 @@
 ---
 name: chrono-cd
-description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
-compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-27 against chrono-cd on the live platform.
-version: "2.1"
+description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on apps.chrono-ai.fun, or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
+compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-21 against chrono-cd on the live platform.
+version: "2.0"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -21,10 +21,8 @@ metadata:
 # Deploy an app with chrono-cd
 
 chrono-cd runs container images from GitHub Packages (`ghcr.io`) on the ChronoAI cluster
-and gives each app a public hostname `https://APP-SLUG.apps.nyxid.ai`, where SLUG is
-a hash for a person and the organization's NyxID slug for an organization. Apps created
-before 2026-10-27 keep their `apps.chrono-ai.fun` hostname; always give the user the
-`url` from the app view rather than building it yourself. It is
+and gives each app a public hostname `https://APP-SLUG.apps.chrono-ai.fun`, where SLUG is
+a hash for a person and the organization's NyxID slug for an organization. It is
 registered in NyxID as the service `chrono-cd`. Every call goes through NyxID, which
 checks the user's login and tells chrono-cd who is calling. There is no other credential
 to manage. Responses are plain JSON objects, errors are
@@ -104,8 +102,6 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
   user can only request more; a platform admin approves.
 - **Organization scope:** the user must be an `admin` of the organization to deploy;
   `member` and `viewer` can only read. Pass `org_id` on every call for that scope.
-- **Platform admins** (`is_admin` on `/account`) can also deploy the platform's own
-  internal apps; that is the `chrono-cd-internal` skill. Nothing here needs it.
 
 ## Step 0: check the account
 
