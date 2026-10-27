@@ -1,12 +1,14 @@
 ---
 name: restaurant-reservation-desk
 description: "餐厅 订位 入座 离店 翻台 换桌 散客 排位 改期 取消 待确认 特殊要求 场合 桌况 余量 restaurant table check-in check-out walk-in reservation desk. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 入座, B3 离店), a walk-in party sat down, a booking moved table, a guest did not show, a booking changed or was cancelled, a pending booking is approved or declined, or asks today's bookings, live table status or remaining tables. Reads and updates the reservation Google Sheet; never deletes rows; never used on customer turns."
-version: "1.3"
+version: "2.0"
 metadata:
   category: tool-based
   tool-list:
     - api-google-workspace__sheets_get_values
     - api-google-workspace__sheets_update_values
+    - api-google-workspace__calendar_update_event
+    - api-google-workspace__calendar_delete_event
   tag:
     - restaurant
     - reservation
@@ -68,7 +70,7 @@ metadata:
 
 **未到**：「王先生没来」「7 点那桌 B3 没来」。O 写「未到」。
 
-**改期或取消**：按姓名、电话或桌号找到那一行。改期只改 A、B、H、I 中老板说到的项；取消把 O 写「取消」。老板给的备注写进 P 列，接在原内容后面。
+**改期或取消**：按姓名、电话或桌号找到那一行。改期只改 A、B、H、I、R、S 中老板说到的项；取消把 O 写「取消」。老板给的备注写进 P 列，接在原内容后面。包间订位的备注里有「日历事件：ID」时，改期用 api-google-workspace 的 calendar_update_event 同步改时间和标题，取消用 calendar_delete_event 删除；日历 ID 见专员 Role。换桌换到另一个包间时同步改事件标题。
 
 **查询**：
 - 「现在桌况」：读 `'当日桌况'!A4:H`。先看 B1 是否今天，不是就说明看板日期。按状态分组报：用餐中几桌（桌号和已坐分钟），预留中几桌（桌号和下一批时间），其余可坐。
