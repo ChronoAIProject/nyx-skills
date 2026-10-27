@@ -1560,8 +1560,8 @@
     {
       "name": "restaurant-reservation-desk",
       "source": "./restaurant-reservation-desk",
-      "description": "餐厅 订位 入座 离店 翻台 换桌 散客 改期 取消 待确认 特殊要求 场合 桌况 余量 restaurant table check-in check-out walk-in reservation desk. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 入座, B3 离店), a walk-in party sat down, a booking moved table, a guest did not show, a booking changed or was cancelled, a pending booking is approved or declined, or asks today's bookings, live table status or remaining tables. Reads and updates the reservation Google Sheet; never deletes rows; never used on customer turns.",
-      "version": "1.2",
+      "description": "餐厅 订位 入座 离店 翻台 换桌 散客 排位 改期 取消 待确认 特殊要求 场合 桌况 余量 restaurant table check-in check-out walk-in reservation desk. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 入座, B3 离店), a walk-in party sat down, a booking moved table, a guest did not show, a booking changed or was cancelled, a pending booking is approved or declined, or asks today's bookings, live table status or remaining tables. Reads and updates the reservation Google Sheet; never deletes rows; never used on customer turns.",
+      "version": "1.3",
       "keywords": [
         "restaurant",
         "reservation",
@@ -1572,8 +1572,8 @@
     {
       "name": "restaurant-reservation-onboarding",
       "source": "./restaurant-reservation-onboarding",
-      "description": "餐厅 订位 订座 预定 订桌 包间 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files.",
-      "version": "1.3",
+      "description": "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files.",
+      "version": "1.4",
       "keywords": [
         "restaurant",
         "reservation",

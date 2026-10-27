@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
-description: "餐厅 订位 订座 预定 订桌 包间 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.3"
+description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
+version: "1.4"
 metadata:
   category: tool-based
   tool-list:
@@ -68,7 +68,7 @@ metadata:
 
 **B 菜单**：菜单照片、PDF 或文字，多张照片一次发完。
 
-**C 桌位**：大厅每种桌型的数量和每桌座位数，包间数量和每间容纳人数，有桌号就一并给。老板发桌位图也可以，从图上数，数完请老板确认。
+**C 桌位**：大厅每种桌型的数量和每桌座位数，包间数量和每间容纳人数范围（最少几位、最多几位，例如 6–8 人），有桌号就一并给。老板发桌位图也可以，从图上数，数完请老板确认。
 
 **D 订位规矩**（都有默认值，老板不答就用默认）：
 - 用餐时长：2 到 4 人 90 分钟，6 到 8 人圆桌 120 分钟，包间 150 分钟。老板说不限时，就不按时长自动释放，桌子只在老板或店员说「某桌离店」时释放。
@@ -76,6 +76,7 @@ metadata:
 - 迟到：15 分钟没到也没联系，释放桌子。
 - 订金：包间和 8 人以上是否收，收多少。
 - 特殊要求和场合：默认开启，顾客给完必填信息后问一句，记到订位登记的 R 列（特殊要求）和 S 列（场合）。老板可以只开其中一项，或都关掉；关掉的那项在 Role 里不出现。老板想对某类场合做安排（例如生日送长寿面、纪念日安排靠窗），记下来写进 Role。
+- 包间订满时：人数少的客人能不能用更大的包间（例如 6 位用 10–15 人的大包间），如果可以，有没有最低消费或包间费。默认不可以：小包间满了就推荐大厅大圆桌或其他时段。
 - 确认方式：默认有余量就自动确认并登记（见上面的开头说明）。只有老板明确说某类订位要先过目（例如包间、8 人以上、节假日），才把那一类改成「先登记为待确认、转给老板」，其余照样自动确认。
 
 **E 顾客从哪里来**：Telegram、WhatsApp 或其他渠道。
@@ -85,7 +86,8 @@ metadata:
 ## 第二步：整理
 
 - 菜单逐项录入，保留原编号和分类，规格拆列，价格用数字。编号重复、分类错位、看不清的字照原样录入并在备注列说明。细则见 `references/menu-transcription.md`。
-- 桌位整理成两层：逐桌清单进表格，桌型库存进专员 Role。见 `references/table-setup.md`。
+- 桌位整理成两层：逐桌清单进表格，桌型库存进专员 Role。见 `references/table-setup.md`。每种桌型都要有最少和最多人数；容纳区间不同的包间分成不同桌型（如小包间、大包间），不能合成一个「包间」。
+- 排位规则见 `references/seat-assignment.md`，写进专员 Role 的是它的精简版。
 - 加总时自己算一遍：每种桌型张数乘座位数，包间按最大人数相加。老板给的合计和你算的不一致，指出来请老板确认，不要沿用其中一个。
 - 营业信息只收老板确认的内容。菜单上印的其他门店电话、外卖打包费、促销语不写进餐厅信息。缺的项写「待定」。
 
@@ -150,3 +152,6 @@ metadata:
 14. 第一条收资料消息。预期：开头说明里提到会问顾客特殊要求和场合，并告诉老板可以关掉。
 15. 老板说「场合不用问」。预期：Role 只问特殊要求，S 列照建但专员不主动问。
 16. 老板说「生日的话送一份长寿面」。预期：Role 写明场合为生日时在确认信息里告诉顾客会准备长寿面，并在 R 列备注。
+17. 老板说小包间 6–8 人、大包间 10–15 人。预期：桌位表 G 列分成小包间、大包间两种桌型，H 列最少人数分别为 6 和 10；时段余量分两行；Role 写明区间。
+18. 老板没回答「大包间能否给少人数客人用」。预期：Role 写明人数低于最少人数的桌型不安排，小包间满时推荐大厅大圆桌或其他时段。
+19. 老板只说包间「最多 8 人」。预期：问一次最少几位；不答就按 4 位作下限，交付时列出请老板核对。
