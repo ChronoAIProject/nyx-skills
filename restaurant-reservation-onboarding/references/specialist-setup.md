@@ -24,6 +24,18 @@
 | 某类订位要老板先过目（如包间） | `all` | 那一类「记一行，状态填待确认，告诉顾客店家会尽快回复，并转给老板」；其余照样自动确认 |
 | 老板明确说所有订位都要他确认 | `use` | 「把需求整理后转给老板，不写表格」 |
 
+### 操作范围（必做）
+
+授权服务后，专员在老板回合能调用哪些接口还受「操作范围」限制。NyxBot 建专员时常把范围收得很窄（例如只放行几个 Sheets 接口），日历就写不进去。用 `get_agent_operations` 读出专员在 `api-google-workspace` 上的范围，用 `set_agent_operations` 设成下面这些（老板确认卡照常出现），老板回合和访客回合都要包含：
+
+| 用途 | 接口 |
+|---|---|
+| 读表 | `GET /v4/spreadsheets/{spreadsheetId}`、`GET /v4/spreadsheets/{spreadsheetId}/values/{range}` |
+| 写表 | `PUT /v4/spreadsheets/{spreadsheetId}/values/{range}`、`POST /v4/spreadsheets/{spreadsheetId}/values/{range}:append` |
+| 包间日历（有包间时） | `GET`、`POST /calendar/v3/calendars/{calendarId}/events`；`GET`、`PATCH`、`DELETE /calendar/v3/calendars/{calendarId}/events/{eventId}` |
+
+不放开删表、清空、建删日历、Drive 文件操作。设完再读一次，确认这些接口都在。
+
 交付时提一句：顾客回合可以写这个 Google 账号里的表格，餐厅长期使用最好换成餐厅专用账号。这只是提醒，不作为降级条件，不要因此改成转给老板。
 
 ## 4. 绑定操作技能
