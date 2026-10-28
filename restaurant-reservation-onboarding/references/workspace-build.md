@@ -197,10 +197,10 @@ B3  =TEXT(A3,"dddd")
 C3（午市）：
 
 ```
-=TEXTJOIN("；",TRUE,MAP(FILTER('时段余量'!$A$4:$A$20,'时段余量'!$A$4:$A$20<>""),LAMBDA(t,t&"（"&MINIFS('桌位表'!$H:$H,'桌位表'!$G:$G,t)&"–"&MAXIFS('桌位表'!$C:$C,'桌位表'!$G:$G,t)&"人）："&IFERROR(TEXTJOIN("、",TRUE,FILTER('桌位表'!$A$2:$A&IF('桌位表'!$I$2:$I<>"","["&'桌位表'!$I$2:$I&"]",""),'桌位表'!$G$2:$G=t,'桌位表'!$A$2:$A<>"",ISNA(MATCH('桌位表'!$A$2:$A,FILTER('订位登记'!$C$2:$C,'订位登记'!$A$2:$A=$A3,'订位登记'!$B$2:$B="午市",REGEXMATCH('订位登记'!$O$2:$O&"","^(待确认|已确认|已到|用餐中)$")),0)))),"满"))))
+=TEXTJOIN("；",TRUE,MAP(FILTER('时段余量'!$A$4:$A$20,'时段余量'!$A$4:$A$20<>""),LAMBDA(t,t&"（"&MINIFS('桌位表'!$H:$H,'桌位表'!$G:$G,t)&"–"&MAXIFS('桌位表'!$C:$C,'桌位表'!$G:$G,t)&"人）："&IFERROR(TEXTJOIN("、",TRUE,FILTER('桌位表'!$A$2:$A&IF('桌位表'!$I$2:$I<>"","["&'桌位表'!$I$2:$I&"]",""),'桌位表'!$G$2:$G=t,'桌位表'!$A$2:$A<>"",ISNA(MATCH('桌位表'!$A$2:$A,FILTER('订位登记'!$C$2:$C,TEXT('订位登记'!$A$2:$A,"yyyy-mm-dd")=TEXT($A3,"yyyy-mm-dd"),'订位登记'!$B$2:$B="午市",REGEXMATCH('订位登记'!$O$2:$O&"","^(待确认|已确认|已到|用餐中)$")),0)))),"满"))))
 ```
 
-D3 把其中的 `"午市"` 换成 `"晚市"`。A4 写 `=A3+1`。然后一个 batch 两次 `copyPaste`（`PASTE_FORMULA`）：A4 复制到 A5:A62（`source` `{"sheetId":6,"startRowIndex":3,"endRowIndex":4,"startColumnIndex":0,"endColumnIndex":1}`，`destination` 的 `startRowIndex` 4、`endRowIndex` 62）；B3:D3 复制到 B4:D62（`source` 行 2 到 3、列 1 到 4，`destination` 行 3 到 62、列 1 到 4）。
+D3 把其中的 `"午市"` 换成 `"晚市"`。日期用 `TEXT(…,"yyyy-mm-dd")` 两边比，是因为专员偶尔会把日期按文字写进订位登记（RAW 写入），直接用 `=` 比会对不上，那张桌就一直显示空着，造成撞单。A4 写 `=A3+1`。然后一个 batch 两次 `copyPaste`（`PASTE_FORMULA`）：A4 复制到 A5:A62（`source` `{"sheetId":6,"startRowIndex":3,"endRowIndex":4,"startColumnIndex":0,"endColumnIndex":1}`，`destination` 的 `startRowIndex` 4、`endRowIndex` 62）；B3:D3 复制到 B4:D62（`source` 行 2 到 3、列 1 到 4，`destination` 行 3 到 62、列 1 到 4）。
 
 结果一格的样子：`2人桌（1–2人）：A01[靠窗]、A02；4人桌（3–4人）：B01、B02[安静]；小包间（6–8人）：满`。桌型取「时段余量」A 列，顺序从小到大、包间最后；人数区间取桌位表 H、C 列。晚市分两批的店，D 列改成「晚市一批」，E 列加「晚市二批」，公式里的时段文字跟着换，Role 里的读取范围改成 `A{n}:E{n}`。
 
@@ -232,4 +232,5 @@ D3 把其中的 `"午市"` 换成 `"晚市"`。A4 写 `=A3+1`。然后一个 bat
 | 一次写入被截断 | 行数太多 | 每次不超过 300 行分段写 |
 | 餐厅设置里「11:00–16:59」变成小数或日期 | 用了 `USER_ENTERED` | 4.8 改用 `RAW` 重写 B 列 |
 | 订位速查某天显示有空桌但其实订满了 | 订位登记 B 列时段文字和公式里的「午市」「晚市」不一致，或状态拼错 | 时段、状态都用下拉选，不要手打 |
+| 订位登记里某行已订，订位速查仍显示那张桌空着 | 那行日期是文字（RAW 写入），旧版公式用 `=` 比对不上 | 用 4.9 的 TEXT 比较公式；把那行 A 列用 USER_ENTERED 重写成日期 |
 | 订位速查整格「满」 | 桌位表 G 列桌型名和时段余量 A 列不一致 | 两边改成同一个名字 |

@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.16"
+version: "1.17"
 metadata:
   category: tool-based
   tool-list:
@@ -198,3 +198,4 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 36. 建专员时回合中断，老板问「怎么了」。预期：核对已建好的部分，接着做没完成的步骤，最后做核对并发交付消息。
 37. 读回的操作范围是全部接口，接口编号列表被截断。预期：保持全部接口，访客级别照样设为 `all`，交付里注明范围偏宽；不因此把顾客写入权限留在 `use`。
 38. 老板说每天 11:00–23:00 连续营业、不限时。预期：「餐厅设置」午市 11:00–16:59、晚市 17:00–22:00（或老板给的分界），不出现「晚市=不营业」；同一张桌中午和晚上各能订一次。
+39. 顾客订位后读订位登记那一行。预期：A 列是日期、H 列是时间（不是文字），电话保留「+」和空格；订位速查里那张桌那个时段不再显示为空。
