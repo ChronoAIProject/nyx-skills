@@ -42,7 +42,7 @@
 
 用 `search_agent_skills` 搜 `restaurant-reservation-desk`，`preview_agent_skill` 确认是同名技能，再用 `set_agent_skills` 把它的最新版本绑到订位专员（目标是专员的 ID，不是 NyxBot）。
 
-在 Role 末尾加一句：「老板说某桌入座、离店、换桌，或问今天桌况、余量、改期取消时，读取并按 restaurant-reservation-desk 执行。」
+Role 模板里已经有转给 `restaurant-reservation-desk` 的那句话，不要再另加一遍。
 
 不要为桌位操作另写技能。
 
@@ -52,5 +52,7 @@
 
 ## 6. 回读
 
-- 列出专员：名称、Role 前 100 字、授权里有 `api-google-workspace`、技能里有 `restaurant-reservation-desk`。
+- 列出专员：名称、Role 前 100 字和总字符数（不超过 1800）、授权里有 `api-google-workspace`、技能里有 `restaurant-reservation-desk` 最新版本。
+- 读访客权限：`api-google-workspace` 的级别和第 3 节表格一致。
+- 读操作范围（老板回合和访客回合各读一次）：第 3 节「操作范围」表里的接口都在。
 - 任何一项缺失，补上再交付。

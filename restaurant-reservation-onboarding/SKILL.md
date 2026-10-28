@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.9"
+version: "1.10"
 metadata:
   category: tool-based
   tool-list:
@@ -109,7 +109,7 @@ metadata:
 
 ## 第五步：建订位专员
 
-按 `references/specialist-setup.md`：用 `references/role-snippet.md` 填好 Role，建专员，授权 `api-google-workspace`，把 `restaurant-reservation-desk` 绑到专员，设好访客权限。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
+按 `references/specialist-setup.md`：用 `references/role-snippet.md` 填好 Role，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
 
 ## 第六步：接顾客渠道
 
@@ -160,12 +160,12 @@ metadata:
 16. 老板说「生日的话送一份长寿面」。预期：Role 写明场合为生日时在确认信息里告诉顾客会准备长寿面，并在 R 列备注。
 17. 老板说小包间 6–8 人、大包间 10–15 人。预期：桌位表 G 列分成小包间、大包间两种桌型，H 列最少人数分别为 6 和 10；时段余量分两行；Role 写明区间。
 18. 老板没回答「大包间能否给少人数客人用」。预期：Role 写明人数低于最少人数的桌型不安排，小包间满时推荐大厅大圆桌或其他时段。
+19. 老板只说包间「最多 8 人」。预期：问一次最少几位；不答就按 4 位作下限，交付时列出请老板核对。
+20. 顾客第一句只说「你好」。预期：专员第一次回复就把日期、时间、人数、称呼、电话（以及大厅或包间）一次问齐。
+21. 6–8 人订位没说区域。预期：问坐大厅还是包间，不自行选择。
+22. 订位确认。预期：订位登记 C 列有桌号，确认信息写明桌号和桌型。
 23. 订一个包间。预期：订位登记 C 列是包间号，备注有「日历事件：…」，包间预订日历里有同一时间的事件。
 24. 建专员后读操作范围。预期：Sheets 读写和日历事件五个接口都在；缺了就补。
 25. 老板发了桌位图。预期：按区域列出桌号和建议的特点标签，请老板确认后写进桌位表 I 列。
 26. 顾客说「想坐安静点的」或「靠窗」。预期：在该桌型的可用桌号里挑 I 列含这个标签的；没有就照常分配并说明会尽量安排，不承诺。
 27. 在 NyxID 应用里下单。预期：来源列填「NyxID」，不填渠道名。
-20. 顾客第一句只说「你好」。预期：专员第一次回复就把日期、时间、人数、称呼、电话（以及大厅或包间）一次问齐。
-21. 6–8 人订位没说区域。预期：问坐大厅还是包间，不自行选择。
-22. 订位确认。预期：订位登记 C 列有桌号，确认信息写明桌号和桌型。
-19. 老板只说包间「最多 8 人」。预期：问一次最少几位；不答就按 4 位作下限，交付时列出请老板核对。
