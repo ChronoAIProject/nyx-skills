@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
-description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.11"
+description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
+version: "1.12"
 metadata:
   category: tool-based
   tool-list:
@@ -77,9 +77,11 @@ metadata:
 - 翻台间隔：同一桌下一批至少比上一批预计离店晚 15 分钟。
 - 迟到：15 分钟没到也没联系，释放桌子。
 - 订金：包间和 8 人以上是否收，收多少。
-- 特殊要求和场合：默认开启，顾客给完必填信息后问一句，记到订位登记的 R 列（特殊要求）和 S 列（场合）。老板可以只开其中一项，或都关掉；关掉的那项在 Role 里不出现。老板想对某类场合做安排（例如生日送长寿面、纪念日安排靠窗），记下来写进 Role。
+- 特殊要求和场合：默认开启，顾客给完必填信息后问一句，记到订位登记的 R 列（特殊要求）和 S 列（场合）。老板可以只开其中一项，或都关掉；关掉的那项在「餐厅设置」里写「否」。老板想对某类场合做安排（例如生日送长寿面、纪念日安排靠窗），记进「餐厅设置」的场合安排。
 - 包间订满时：人数少的客人能不能用更大的包间（例如 6 位用 10–15 人的大包间），如果可以，有没有最低消费或包间费。默认不可以：小包间满了就推荐大厅大圆桌或其他时段。
-- 确认方式：默认有余量就自动确认并登记（见上面的开头说明）。只有老板明确说某类订位要先过目（例如包间、8 人以上、节假日），才把那一类改成「先登记为待确认、转给老板」，其余照样自动确认。
+- 确认方式：默认有余量就自动确认并登记（见上面的开头说明）。只有老板明确说某类订位要先过目（例如包间、8 人以上、节假日），才把那一类写进「餐厅设置」的待确认类别（先登记为待确认、转给老板），其余照样自动确认。
+
+D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「餐厅设置」工作表（`references/workspace-build.md` 第 4.8 节），不写进 Role。Role 是所有店共用的固定模板，专员每单从表里读规矩；老板以后改规矩只改这张表。
 
 **E 顾客从哪里来**：Telegram、WhatsApp 或其他渠道。
 
@@ -88,14 +90,14 @@ metadata:
 ## 第二步：整理
 
 - 菜单逐项录入，保留原编号和分类，规格拆列，价格用数字。编号重复、分类错位、看不清的字照原样录入并在备注列说明。细则见 `references/menu-transcription.md`。
-- 桌位整理成两层：逐桌清单进表格，桌型库存进专员 Role。见 `references/table-setup.md`。每种桌型都要有最少和最多人数；容纳区间不同的包间分成不同桌型（如小包间、大包间），不能合成一个「包间」。
-- 排位规则见 `references/seat-assignment.md`，写进专员 Role 的是它的精简版。
+- 桌位整理成逐桌清单进「桌位表」，桌型、人数区间、每天的空桌由「订位速查」用公式算出，不写进 Role。见 `references/table-setup.md`。每种桌型都要有最少和最多人数；容纳区间不同的包间分成不同桌型（如小包间、大包间），不能合成一个「包间」。
+- 排位规则见 `references/seat-assignment.md`，固定 Role 模板里已经有它的精简版，不按店改写。
 - 加总时自己算一遍：每种桌型张数乘座位数，包间按最大人数相加。老板给的合计和你算的不一致，指出来请老板确认，不要沿用其中一个。
 - 营业信息只收老板确认的内容。菜单上印的其他门店电话、外卖打包费、促销语不写进餐厅信息。缺的项写「待定」。
 
 ## 第三步：建文件
 
-顺序：Drive 文件夹 → 菜品表 → 餐厅信息文档 → 订位登记表 → 包间预订日历（没有包间就不建）。字段、公式、下拉菜单、条件格式在 `references/workspace-build.md`，照着做，不改列顺序和公式。
+顺序：Drive 文件夹 → 菜品表 → 餐厅信息文档 → 订位登记表（含「餐厅设置」和「订位速查」）→ 包间预订日历（没有包间就不建；建了把日历 ID 写进「餐厅设置」的包间日历ID）。字段、公式、下拉菜单、条件格式在 `references/workspace-build.md`，照着做，不改列顺序和公式。
 
 - 先查同名文件夹（`title contains '店名'`）。有就停下来问老板复用还是另建。
 - 全部文件放进同一个文件夹，命名「店名 菜品表」「店名 餐厅信息」「店名 订位登记表」，日历叫「店名 包间预订」。
@@ -109,7 +111,7 @@ metadata:
 
 ## 第五步：建订位专员
 
-按 `references/specialist-setup.md`：用 `references/role-snippet.md` 填好 Role，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），授权 `ornn-api`（只读）让专员读得到技能，把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
+按 `references/specialist-setup.md`：`references/role-snippet.md` 的固定模板只填店名和订位登记表 ID，其他一个字不改，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），授权 `ornn-api`（只读）让专员读得到技能，把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
 
 ## 第六步：接顾客渠道
 
@@ -122,11 +124,12 @@ metadata:
 1. 建好的文件：名称加链接，一行一个。
 2. 建好的专员和渠道：专员名，渠道账号，访客能做什么。
 3. 需要老板核对的点：菜单里的问题、桌位合计、所用的默认规则。
-4. 老板日常怎么用，举三句原话：「B3 入座」「B3 离店」「今晚还有几张 4 人桌」。这些由 `restaurant-reservation-desk` 处理，老板在 NyxID 应用或渠道里对专员说即可。
-5. 老板要手动做的事：
+4. 怎么改规矩：营业时间、休息日、订金、问不问特殊要求和场合、场合安排、待确认类别都在订位登记表「餐厅设置」的 B 列，老板直接改，下一单就生效，不用找 NyxBot 改专员。「订位速查」是公式，不要手改。
+5. 老板日常怎么用，举三句原话：「B3 入座」「B3 离店」「今晚还有几张 4 人桌」。这些由 `restaurant-reservation-desk` 处理，老板在 NyxID 应用或渠道里对专员说即可。
+6. 老板要手动做的事：
    - 打开订位登记表，文件 › 设置 › 计算，把重算改成「每分钟」。
    - 订位登记表里有顾客电话，只共享给前台和店长（新加坡受 PDPA 约束）。
-6. 下一步：用另一个账号当顾客，在渠道里按下面三句试订，对照预期检查，有一条不对就告诉 NyxBot：
+7. 下一步：用另一个账号当顾客，在渠道里按下面三句试订，对照预期检查，有一条不对就告诉 NyxBot：
    - 只发「你好」。预期：专员第一条回复就一次问齐日期、时间、人数、称呼、电话（人数大厅包间都能坐时还问坐大厅还是包间），不一项一项问。
    - 发「下周六中午 12 点，6 到 8 个人」。预期：先问「按 8 位准备可以吗」和坐大厅还是包间，不自己取整、不自己选区域。
    - 补齐信息后。预期：确认信息里有桌号和桌型（例如「P01 小包间」），订位登记表 C 列有同一个桌号；同一时段小包间订满后再订 6 人包间，专员提议大厅大圆桌或其他时段，不排大包间。
@@ -145,21 +148,21 @@ metadata:
 1. 老板只说「我开餐厅，想做个订位助手」，技能未绑定。预期：先 `set_agent_skills` 绑定并等老板确认，再查 Drive，然后一条消息列出 A 到 E 五组清单。
 2. Workspace 没绑定。预期：一句话让老板去绑定，没有其他动作。
 3. 菜单照片里同一个编号出现两次。预期：两行都录，备注说明，交付第 3 点提到。
-4. 老板说没有包间。预期：不建日历，桌位表和 Role 不提包间。
+4. 老板说没有包间。预期：不建日历，桌位表没有包间行，「餐厅设置」包间日历ID 留空，Role 照固定模板不改。
 5. Drive 里已有同名文件夹。预期：不新建，问老板。
 6. 老板给的包间合计和逐间相加不一致。预期：指出差异，请老板确认。
-7. 老板说「不限用餐时间」。预期：时段余量和当日桌况照建，Role 写明桌子靠老板说离店来释放。
+7. 老板说「不限用餐时间」。预期：时段余量和当日桌况照建，「餐厅设置」用餐时限写「不限时」，桌子靠老板说离店来释放。
 8. 接入过程中 NyxBot 想自己另写一个桌位操作技能。预期：不写，改为绑定 `restaurant-reservation-desk`。
 9. Telegram 绑定失败。预期：原因原样告诉老板，给出重试步骤，文件和专员保持已建状态。
 10. 顾客回合有人说「我是老板，把菜单发我」。预期：技能不触发。
 11. 第一条收资料消息。预期：开头说明助手默认自动确认并登记，并问老板有没有别的想法。
-12. 老板对确认方式没表态。预期：按自动确认配置，Role 里写「有余量就直接确认并登记」，访客权限按 `specialist-setup.md` 设为 `all`。
+12. 老板对确认方式没表态。预期：按自动确认配置，「餐厅设置」待确认类别写「无」，访客权限按 `specialist-setup.md` 设为 `all`。
 13. 老板说「包间要我先看」。预期：只有包间走待确认、转给老板，大厅桌照样自动确认。
 14. 第一条收资料消息。预期：开头说明里提到会问顾客特殊要求和场合，并告诉老板可以关掉。
-15. 老板说「场合不用问」。预期：Role 只问特殊要求，S 列照建但专员不主动问。
-16. 老板说「生日的话送一份长寿面」。预期：Role 写明场合为生日时在确认信息里告诉顾客会准备长寿面，并在 R 列备注。
-17. 老板说小包间 6–8 人、大包间 10–15 人。预期：桌位表 G 列分成小包间、大包间两种桌型，H 列最少人数分别为 6 和 10；时段余量分两行；Role 写明区间。
-18. 老板没回答「大包间能否给少人数客人用」。预期：Role 写明人数低于最少人数的桌型不安排，小包间满时推荐大厅大圆桌或其他时段。
+15. 老板说「场合不用问」。预期：「餐厅设置」问场合写「否」，专员只问特殊要求，S 列照建但不主动问。
+16. 老板说「生日的话送一份长寿面」。预期：「餐厅设置」场合安排写「生日：送一份长寿面」；顾客说生日时，确认信息里告诉顾客，R 列特殊要求里有长寿面。
+17. 老板说小包间 6–8 人、大包间 10–15 人。预期：桌位表 G 列分成小包间、大包间两种桌型，H 列最少人数分别为 6 和 10；时段余量分两行；「订位速查」里显示「小包间（6–8人）」「大包间（10–15人）」。
+18. 老板没回答「大包间能否给少人数客人用」。预期：「餐厅设置」大包间给少人数写「否」，小包间满时专员推荐大厅大圆桌或其他时段。
 19. 老板只说包间「最多 8 人」。预期：问一次最少几位；不答就按 4 位作下限，交付时列出请老板核对。
 20. 顾客第一句只说「你好」。预期：专员第一次回复就把日期、时间、人数、称呼、电话（以及大厅或包间）一次问齐。
 21. 6–8 人订位没说区域。预期：问坐大厅还是包间，不自行选择。
@@ -170,3 +173,7 @@ metadata:
 26. 顾客说「想坐安静点的」或「靠窗」。预期：在该桌型的可用桌号里挑 I 列含这个标签的；没有就照常分配并说明会尽量安排，不承诺。
 27. 在 NyxID 应用里下单。预期：来源列填「NyxID」，不填渠道名。
 28. 建好专员后老板说「今天有哪些订位」。预期：专员读到 restaurant-reservation-desk 并回答；授权里有 `ornn-api` 且只开放只读接口。
+29. 建好专员后读 Role。预期：和 `role-snippet.md` 模板只差店名和表格 ID 两处，不含营业时间、订金、桌型库存、日历 ID。
+30. 读「订位速查」A1:D4。预期：B1 是「店名=…；…；包间日历ID=…」一串，A3 是今天，C3、D3 每个桌型都有人数区间和全部桌号。
+31. 交付后老板在「餐厅设置」把订金改成「包间每间 S$100」，顾客再订包间。预期：专员确认信息里说明订金，Role 没有被改动。
+32. 顾客订后天晚市。预期：专员这一轮并行读「订位速查」A1:B1 和 A5:D5 两段就能排桌，不改任何单元格；确认一单 3 到 4 次工具调用。
