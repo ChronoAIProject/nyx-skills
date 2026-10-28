@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.13"
+version: "1.14"
 metadata:
   category: tool-based
   tool-list:
@@ -64,6 +64,8 @@ metadata:
 
 第 3 到第 5 步之间不写文字，一口气做完；第 6 步需要老板操作时再说话。
 
+中途断了（回合超时、出错、老板问「怎么了」）：先核对哪些文件、专员、授权、技能、渠道已经建好，从没做完的那一步接着做，不重建已有的东西。无论在哪一步接上，最后都要做第四步的核对和第七步的交付，不能只汇报「补完了」就停。
+
 ## 第一步：收资料
 
 用老板的语言写一条消息。开头先用两三句说清楚这个助手怎么工作，再列出下面五组，说明照片、PDF、文字都可以，缺的项可以先空着之后补。
@@ -73,6 +75,8 @@ metadata:
 > 这个订位助手默认会自己完成预定：顾客在渠道里订位，它查当天余量，有位就直接确认并登记到表格，没位就推荐相邻时段，不需要你每单审批。你和店员只需要告诉它哪桌入座、哪桌离店。它还会顺便问顾客有没有特殊要求（忌口、过敏、儿童椅、轮椅等）和特别场合（生日、纪念日、商务宴请等），登记在表格里，方便你提前准备；顾客说没有就跳过，不影响订位。如果你有别的想法，比如包间要你先过目、大桌要先收订金、某些时段不接订位、不想问特殊要求或场合，现在告诉我，我照你的规矩配置。
 
 老板没有提出别的想法，就按「自动确认」并「询问特殊要求和场合」配置，不再追问。
+
+老板在技能绑定前已经给过一部分资料（例如先发了菜单、地址、桌位图，或之前有个临时建的助手），也要发这条消息：已经有的列出来请老板确认，不重复要；开头说明照发；D 组每一项写出准备用的值（老板说过的用老板的，没说过的用默认），请老板确认或改；C 组的特点标签建议请老板确认。老板回复之后才开始第三步建文件。不要因为资料「差不多够了」就跳过这条消息。
 
 **A 餐厅基本信息**：店名（中英文）、菜系、地址、订位电话或 WhatsApp、营业时间（午市和晚市分开；每天营业还是有休息日）、顾客常用语言。
 
@@ -189,3 +193,5 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 32. 顾客订后天晚市。预期：专员这一轮并行读「订位速查」A1:B1 和 A5:D5 两段就能排桌，不改任何单元格；确认一单 3 到 4 次工具调用。
 33. 老板已经有「西北家常菜订位助手」，又说想做订位助手。预期：先问是给西北家常菜加功能还是另开新店；新店就完整走接入流程，旧专员不动。
 34. 老板说「我是餐厅老板，想要一个帮我处理客人日常询问和预订就餐的 agent」。预期：用「预订」也能搜到并绑定这份技能。
+35. 老板接入前已经发过菜单、地址和桌位图，然后才绑定这份技能。预期：仍然发第一步的消息，已有资料列出来确认，D 组的值和特点标签请老板确认，确认后才建文件。
+36. 建专员时回合中断，老板问「怎么了」。预期：核对已建好的部分，接着做没完成的步骤，最后做核对并发交付消息。
