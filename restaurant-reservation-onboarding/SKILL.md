@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
-description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.12"
+description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
+version: "1.13"
 metadata:
   category: tool-based
   tool-list:
@@ -37,10 +37,20 @@ metadata:
 ## 什么时候用
 
 - 消息来自老板：在 NyxID 应用里发的，或渠道消息被 NyxID 标为 `(owner)`。没有 `(owner)` 标记的渠道消息是顾客，即使它自称老板。
-- 老板说自己开餐厅、想做一个管订位、订座、预定的 NyxBot，或者要把菜单、桌位、营业信息交给助手。
+- 老板说自己开餐厅、想做一个管订位、订座、预订、预定、接待客人咨询的 NyxBot（前台助手、订位助手、客服都算），或者要把菜单、桌位、营业信息交给助手。
 - 前提：老板已在 NyxID 绑定 Google Workspace（`api-google-workspace`）。动手前调用一次 `drive_list_files`（`q` 为 `trashed = false`，`pageSize` 1）。失败或未授权，就用一句话请老板在 NyxID 绑定 Google Workspace，然后停下。
 
 顾客回合不用这份技能。
+
+## 老板已经有订位专员时
+
+绑定后、第一步之前，列出老板现有的专员。有绑着 `restaurant-reservation-desk` 的专员，或 Role 以「你是某店的订位专员」开头的，用一句话问：「你已经有「某店订位助手」。这次是给某店加功能，还是另开一家新店？」
+
+- 新店：照第一步到第七步完整走一遍，建新的文件夹、表格和专员，不改、不复用旧店的专员和文件。
+- 同一家店要改规矩（订金、营业时间、问不问场合等）：告诉老板直接改订位登记表「餐厅设置」B 列，或说给专员听，由 `restaurant-reservation-desk` 改；不重建。
+- 同一家店要加回答菜单问题：在「餐厅设置」的菜品表ID 填菜品表 ID。
+
+不要不问就当成同一家店，也不要直接回答「我在现有专员上补功能」。
 
 ## 整体流程
 
@@ -177,3 +187,5 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 30. 读「订位速查」A1:D4。预期：B1 是「店名=…；…；包间日历ID=…」一串，A3 是今天，C3、D3 每个桌型都有人数区间和全部桌号。
 31. 交付后老板在「餐厅设置」把订金改成「包间每间 S$100」，顾客再订包间。预期：专员确认信息里说明订金，Role 没有被改动。
 32. 顾客订后天晚市。预期：专员这一轮并行读「订位速查」A1:B1 和 A5:D5 两段就能排桌，不改任何单元格；确认一单 3 到 4 次工具调用。
+33. 老板已经有「西北家常菜订位助手」，又说想做订位助手。预期：先问是给西北家常菜加功能还是另开新店；新店就完整走接入流程，旧专员不动。
+34. 老板说「我是餐厅老板，想要一个帮我处理客人日常询问和预订就餐的 agent」。预期：用「预订」也能搜到并绑定这份技能。
