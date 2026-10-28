@@ -83,6 +83,28 @@ especially prominent in mathematical physics. Ethical attribution requires
 citing all known related work, including recent preprints answering neighboring
 questions, with a precise account of their relation to the present result.
 
+### Hard literature gate before calling a manuscript ready
+
+Before calling a manuscript or short note ready, run and document an actual
+literature search. Search the relevant arXiv listings or search interface for
+roughly the last three years, search MathSciNet or zbMATH (or the relevant
+publisher pages when those indexes are unavailable), and inspect Google Scholar
+citation results for the source paper. Record the search date, queries or
+filters, sources consulted, and the papers that changed the comparison or
+claim wording. A bibliography that cites only the source paper's own papers is
+a blocking defect, not a complete literature review.
+
+The bibliography must cover four roles: (a) the origin of the problem, (b) the
+standard theory used by the argument, (c) the closest recent and competing or
+overlapping work, and (d) every place where the manuscript claims novelty.
+Verify every reference exists and has the applicable DOI, arXiv identifier, or
+publisher URL; cite it at the sentence or theorem where the manuscript relies
+on it. A metadata record without a supporting source passage is not enough.
+Within one month of finalizing, repeat the search for newly posted preprints and
+check especially the last month's results for work that anticipates or
+supersedes the headline example. Record an unresolved access limitation or
+possible overlap and narrow the claim until it is checked.
+
 Before finalizing a manuscript, obtain an independent referee pass specifically
 for missing literature, using a separate reviewer or agent when available.
 Check the wider field, borrowed methods, adjacent questions and recent
@@ -115,6 +137,12 @@ hide the method's provenance behind "related background" when it is actually
 used. A formalization of a published theorem can be valuable; call it that.
 Bounded literature searches cannot certify "first ever". Record the scope of
 a priority search when it matters without flooding the paper with disclaimers.
+
+For a correspondent-facing note, keep an explicit attribution ledger while
+writing. Separate (i) results proved by the present authors, (ii) independent
+verification performed here of another author's result, and (iii) consequences
+that follow directly from a cited theorem. The note may explain why (ii) or
+(iii) is useful, but it must not present either category as a new advance.
 
 ## Scoped private claim map
 

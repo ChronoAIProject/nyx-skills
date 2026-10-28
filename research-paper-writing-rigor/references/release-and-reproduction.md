@@ -42,6 +42,16 @@ inputs, bibliography material, figures, and generated tables. Keep a separate
 supplement only when the intended submission actually has one. Do not leave
 an obsolete alternative main document in the submission ZIP.
 
+### One deliverable, minimal attachments
+
+Fold meaningful results into the paper or note itself. For a coauthor package,
+send the manuscript PDF and at most one source archive; do not split the result
+into a separate note, findings memo, or second archive. Put verification code,
+certificates, and detailed reproduction material in the public repository at a
+commit- or release-pinned link, and give that link in the manuscript or package
+README. Keep the attachment set sufficient for the recipient to read the
+result and locate its verification without duplicating the paper.
+
 If delivering both a small source ZIP and a larger reproducibility ZIP, explain
 their purposes. Any duplicate manuscript inside the latter must match the
 delivered source/PDF. Include a root reproduction guide with paths relative to

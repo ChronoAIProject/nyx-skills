@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.8"
+version: "1.9"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -112,7 +112,8 @@ prefix match with an all-input proof. Read
 [argument-and-evidence.md](references/argument-and-evidence.md) for proofs,
 computer-assisted results, literature placement and application, or mixed
 verification. Its literature review includes a dedicated independent referee
-pass before finalizing a manuscript.
+pass and a hard documented search gate before calling a manuscript or short note
+ready.
 
 Call something a "counterexample" only when it falsifies a precisely quoted
 statement: quote that statement, check its hypotheses, and identify the failed
@@ -217,6 +218,10 @@ else to one closing remark or cut it.
   relation to known results, what remains open. Then setting in the source's
   notation, results with complete proofs, examples or certificates, open
   problems, references.
+- Keep an attribution ledger for a correspondent-facing note: identify which
+  results are proved by the present authors, which are independent checks of
+  another author's result, and which are direct consequences of cited theorems.
+  Describe the latter two as verification or consequences, never as advances.
 - Computation supports but never replaces a proof of an all-parameter
   statement; give finite ranges explicitly. Never cite your own unpublished
   drafts; fold what is needed into the note. Credit the correspondent's
@@ -234,6 +239,10 @@ else to one closing remark or cut it.
 For delivery of a research note by email, package one merged PDF named
 note_YYYYMMDD.pdf and one dated source ZIP (for example
 verification_YYYYMMDD.zip), with total attachments <= 5 MB (5,000,000 bytes).
+Fold every meaningful result into that manuscript or note. The coauthor package
+has one deliverable: the manuscript PDF and at most one source archive. Put
+verification material in the public repository at a pinned link instead of
+adding separate result notes or extra archives.
 The ZIP contains text/source and concise readable outputs only; exclude binary
 files (.bin, .dat, .npz, .gz, .pkl), third-party copyrighted PDFs, and internal
 RESULTS-r*, REVIEW-r* and NOTES files, including nested copies. The merged note
@@ -311,4 +320,8 @@ from a private mathematical coauthor review, not the correspondence itself.
 
 ## CHANGELOG
 
+- 2026-10-29 — 1.9: add a hard, documented literature gate covering recent
+  searches and overlap checks; require minimal manuscript packages with a
+  pinned public verification link; and separate our results from independent
+  checks and cited consequences in correspondent-facing notes.
 - 2026-10-19 — 1.8: use the authors' prescribed AI sentence verbatim, prohibit correspondence citations and self-certifying mentions, and require small dated note/source packages with reproducible public data links, no internal process files or binary data, and DLP digit checks.
