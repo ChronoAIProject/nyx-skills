@@ -40,6 +40,13 @@
 
 ## 4. 绑定操作技能
 
+专员要读得到绑定的技能，必须先授权 Ornn 服务（`ornn-api`），否则 `skill_read` 会失败，老板的入座、离店、换桌等指令就只能靠 Role 硬撑。授权时：
+
+- 授权列表同时包含 `api-google-workspace` 和 `ornn-api`（授权是整体替换，不要漏掉前者，也不要改掉它的访客级别）。
+- `ornn-api` 的老板回合操作范围只放行只读接口（读出操作列表，`read_only` 为真的那些）。
+- `ornn-api` 的访客级别设为 `read`。访客回合本来就读不到技能，不需要更高的级别。
+
+
 用 `search_agent_skills` 搜 `restaurant-reservation-desk`，`preview_agent_skill` 确认是同名技能，再用 `set_agent_skills` 把它的最新版本绑到订位专员（目标是专员的 ID，不是 NyxBot）。
 
 Role 模板里已经有转给 `restaurant-reservation-desk` 的那句话，不要再另加一遍。
@@ -54,5 +61,6 @@ Role 模板里已经有转给 `restaurant-reservation-desk` 的那句话，不�
 
 - 列出专员：名称、Role 前 100 字和总字符数（不超过 1800）、授权里有 `api-google-workspace`、技能里有 `restaurant-reservation-desk` 最新版本。
 - 读访客权限：`api-google-workspace` 的级别和第 3 节表格一致。
-- 读操作范围（老板回合和访客回合各读一次）：第 3 节「操作范围」表里的接口都在。
+- 读操作范围（老板回合和访客回合各读一次）：第 3 节「操作范围」表里的接口都在；`ornn-api` 只有只读接口。
+- 让老板对专员说一句「今天有哪些订位」：能正常回答说明专员读得到操作台技能；回答「缺少 Ornn 访问」就回到第 4 节补授权。
 - 任何一项缺失，补上再交付。

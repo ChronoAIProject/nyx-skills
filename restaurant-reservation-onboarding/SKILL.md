@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 订桌 包间 排位 菜单 开店 接入 restaurant reservation booking table onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆) and want a NyxBot agent that takes table bookings (订位助手、预定助手、订座). Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board and remaining-capacity tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the Role text, grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.10"
+version: "1.11"
 metadata:
   category: tool-based
   tool-list:
@@ -109,7 +109,7 @@ metadata:
 
 ## 第五步：建订位专员
 
-按 `references/specialist-setup.md`：用 `references/role-snippet.md` 填好 Role，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
+按 `references/specialist-setup.md`：用 `references/role-snippet.md` 填好 Role，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），授权 `ornn-api`（只读）让专员读得到技能，把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
 
 ## 第六步：接顾客渠道
 
@@ -169,3 +169,4 @@ metadata:
 25. 老板发了桌位图。预期：按区域列出桌号和建议的特点标签，请老板确认后写进桌位表 I 列。
 26. 顾客说「想坐安静点的」或「靠窗」。预期：在该桌型的可用桌号里挑 I 列含这个标签的；没有就照常分配并说明会尽量安排，不承诺。
 27. 在 NyxID 应用里下单。预期：来源列填「NyxID」，不填渠道名。
+28. 建好专员后老板说「今天有哪些订位」。预期：专员读到 restaurant-reservation-desk 并回答；授权里有 `ornn-api` 且只开放只读接口。
