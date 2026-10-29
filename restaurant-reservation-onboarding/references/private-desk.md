@@ -7,7 +7,7 @@
 1. 用 `search_agent_skills` 找到 `restaurant-reservation-desk`，记下最新版本号 X.Y，用 Ornn 的读技能工具（例如 `ornn-api__getskilljson`）读出它的 SKILL.md 全文。
 2. 在全文上只改这几处：
    - `name`：店名拼音或英文 + `-reservation-desk`，例如 `xibei-reservation-desk`、`laosuiyuan-reservation-desk`。全小写，单词之间用连字符。
-   - `description` 开头加「{店名}专用（基于公开模板 restaurant-reservation-desk X.Y，加本店规矩）。」，后面照抄。
+   - `description` 开头加「{店名}专用（基于公开模板 restaurant-reservation-desk X.Y，加本店规矩）。」，后面照抄。用 NyxBot 的建技能工具时描述可能限 400 字符：超了就只保留开头这句和中文关键词（入座 离店 换桌 散客 改期 取消 待确认 桌况 余量 包间日历），不用另加附录。
    - `version` 改为 `"1.0"`。
    - 标题改为「# {店名}：老板日常操作台」，标题下加一段：
      ```
@@ -16,7 +16,7 @@
      模板来源：restaurant-reservation-desk X.Y
      ```
    - 在「## 操作」之前加一节「## 本店规矩」，老板接入时没提店内规矩就写「（暂无，老板说要加时写在这里）」。
-3. 打成 zip（目录名和 `name` 一致，里面只有 SKILL.md），用 Ornn 的建技能接口（`POST /api/v1/skills`，`application/zip`）上传。新建的技能默认私有；上传后读一次，确认 `isPrivate` 为真，不是就用权限接口（`PUT /api/v1/skills/{id}/permissions`，`{"isPrivate":true,"grants":[]}`）改成私有。
+3. 打成 zip（目录名和 `name` 一致，里面只有 SKILL.md），用 Ornn 的建技能接口（`POST /api/v1/skills`，`application/zip`）上传。新建的技能默认私有；上传后读一次，确认 `isPrivate` 为真，并在回复老板时写出来；不是就用权限接口（`PUT /api/v1/skills/{id}/permissions`，`{"isPrivate":true,"grants":[]}`）改成私有。
 4. 用 `set_agent_skills` 把这份私有技能绑到订位专员。不要再绑公开的 `restaurant-reservation-desk`，两份都绑会冲突。
 
 建副本失败（老板没有 Ornn 访问、上传报错）：把原因告诉老板，改为直接绑定公开的 `restaurant-reservation-desk` 最新版本，交付时写明「目前用的是公开模板，还没有本店私有版」。
