@@ -1,0 +1,45 @@
+# 本店私有操作台技能
+
+公开的 `restaurant-reservation-desk` 是所有店共用的模板。每家店在 Ornn 上有一份自己的私有副本，专员绑定的是这份副本。店里的规矩加在副本里，公开模板升级时不会覆盖它。
+
+## 1. 建副本（第五步里做，代替直接绑定公开模板）
+
+1. 用 `search_agent_skills` 找到 `restaurant-reservation-desk`，记下最新版本号 X.Y，用 Ornn 的读技能工具（例如 `ornn-api__getskilljson`）读出它的 SKILL.md 全文。
+2. 在全文上只改这几处：
+   - `name`：店名拼音或英文 + `-reservation-desk`，例如 `xibei-reservation-desk`、`laosuiyuan-reservation-desk`。全小写，单词之间用连字符。
+   - `description` 开头加「{店名}专用（基于公开模板 restaurant-reservation-desk X.Y，加本店规矩）。」，后面照抄。
+   - `version` 改为 `"1.0"`。
+   - 标题改为「# {店名}：老板日常操作台」，标题下加一段：
+     ```
+     这是{店名}的私有技能，从公开模板 restaurant-reservation-desk X.Y 复制而来，只有店主账号能看到。本店规矩写在「本店规矩」一节，和模板冲突时以本店规矩为准。
+
+     模板来源：restaurant-reservation-desk X.Y
+     ```
+   - 在「## 操作」之前加一节「## 本店规矩」，老板接入时没提店内规矩就写「（暂无，老板说要加时写在这里）」。
+3. 打成 zip（目录名和 `name` 一致，里面只有 SKILL.md），用 Ornn 的建技能接口（`POST /api/v1/skills`，`application/zip`）上传。新建的技能默认私有；上传后读一次，确认 `isPrivate` 为真，不是就用权限接口（`PUT /api/v1/skills/{id}/permissions`，`{"isPrivate":true,"grants":[]}`）改成私有。
+4. 用 `set_agent_skills` 把这份私有技能绑到订位专员。不要再绑公开的 `restaurant-reservation-desk`，两份都绑会冲突。
+
+建副本失败（老板没有 Ornn 访问、上传报错）：把原因告诉老板，改为直接绑定公开的 `restaurant-reservation-desk` 最新版本，交付时写明「目前用的是公开模板，还没有本店私有版」。
+
+## 2. 老板要加店内规矩
+
+老板说「以后换包间要提醒通知厨房」「拼桌只拼 B1 和 B2」之类：
+
+1. 读私有技能当前版本的 SKILL.md。
+2. 在「本店规矩」一节加一条，编号接着往下；只影响某个操作的，在那个操作里加一句「按本店规矩第 N 条」。
+3. 版本号次版本加一（1.0 → 1.1），用 Ornn 更新接口（`PUT /api/v1/skills/{id}`，zip）上传，读回确认仍是私有。
+4. 用 `set_agent_skills` 把专员改绑到新版本。
+5. 回老板一句：加了哪条、私有技能新版本号。
+
+只改「本店规矩」相关的地方，不改模板部分，不碰 Role。
+
+## 3. 公开模板升级时合并
+
+老板说「操作台有更新吗」「更新一下操作台」，或者接入技能对已有的店重新运行时：
+
+1. 读私有技能里的「模板来源：restaurant-reservation-desk X.Y」，再查公开模板的最新版本。
+2. 一样就回「已是最新」。不一样，用一两句告诉老板新模板改了什么（用 Ornn 的版本对比，或读两版正文比较），问要不要合并。
+3. 老板同意：拿新模板全文，按第 1 节重做一遍改名和标题，把旧副本的「本店规矩」整节和各操作里「按本店规矩第 N 条」的句子原样搬过去，「模板来源」改成新版本，私有技能版本号主版本加一（1.x → 2.0），上传并改绑。
+4. 老板不同意：什么都不改。
+
+不要在老板没同意时自动合并。

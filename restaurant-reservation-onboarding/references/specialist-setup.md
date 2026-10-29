@@ -51,9 +51,9 @@
 - `ornn-api` 的访客级别设为 `read`。访客回合本来就读不到技能，不需要更高的级别。
 
 
-用 `search_agent_skills` 搜 `restaurant-reservation-desk`，`preview_agent_skill` 确认是同名技能，再用 `set_agent_skills` 把它的最新版本绑到订位专员（目标是专员的 ID，不是 NyxBot）。
+用 `search_agent_skills` 搜 `restaurant-reservation-desk`，`preview_agent_skill` 确认是同名技能，然后按 `private-desk.md` 第 1 节复制成本店私有技能，用 `set_agent_skills` 把私有技能绑到订位专员（目标是专员的 ID，不是 NyxBot）。复制失败时才直接绑公开模板的最新版本。
 
-Role 模板里已经有转给 `restaurant-reservation-desk` 的那句话，不要再另加一遍。
+Role 模板里已经有转给操作台技能的那句话（公开版和私有版都适用），不要再另加一遍。
 
 不要为桌位操作另写技能。
 
@@ -63,7 +63,7 @@ Role 模板里已经有转给 `restaurant-reservation-desk` 的那句话，不�
 
 ## 6. 回读
 
-- 列出专员：名称、Role 和模板只差店名和表格 ID、总字符数（不超过 2048）、授权里有 `api-google-workspace`、技能里有 `restaurant-reservation-desk` 最新版本。
+- 列出专员：名称、Role 和模板只差店名和表格 ID、总字符数（不超过 2048）、授权里有 `api-google-workspace`、技能里只有本店私有操作台技能（`isPrivate` 为真），或在复制失败时有 `restaurant-reservation-desk` 最新版本。
 - 读访客权限：`api-google-workspace` 的级别和第 3 节表格一致。
 - 读操作范围（老板回合和访客回合各读一次）：只读 `api-google-workspace` 这一个服务，逐个对照第 3 节「操作范围」表，读写表格和日历事件的接口都要在。`ornn-api` 不要把整份操作列表展开（有 70 多条，结果会被截断），只看它没有放开全部操作、条数大于 0。
 - 让老板对专员说一句「今天有哪些订位」：能正常回答说明专员读得到操作台技能；回答「缺少 Ornn 访问」就回到第 4 节补授权。

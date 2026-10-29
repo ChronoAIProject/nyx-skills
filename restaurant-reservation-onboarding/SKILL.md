@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
-description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, binds restaurant-reservation-desk so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.17"
+description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk into a private per-store skill on Ornn (house rules go there; public template updates are merged only with the owner's consent) and binds it so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
+version: "1.18"
 metadata:
   category: tool-based
   tool-list:
@@ -38,6 +38,7 @@ metadata:
 
 - 消息来自老板：在 NyxID 应用里发的，或渠道消息被 NyxID 标为 `(owner)`。没有 `(owner)` 标记的渠道消息是顾客，即使它自称老板。
 - 老板说自己开餐厅、想做一个管订位、订座、预订、预定、接待客人咨询的 NyxBot（前台助手、订位助手、客服都算），或者要把菜单、桌位、营业信息交给助手。
+- 已经接入的老板说要给订位操作台加店内规矩，或问操作台模板有没有更新。
 - 前提：老板已在 NyxID 绑定 Google Workspace（`api-google-workspace`）。动手前调用一次 `drive_list_files`（`q` 为 `trashed = false`，`pageSize` 1）。失败或未授权，就用一句话请老板在 NyxID 绑定 Google Workspace，然后停下。
 
 顾客回合不用这份技能。
@@ -49,6 +50,7 @@ metadata:
 - 新店：照第一步到第七步完整走一遍，建新的文件夹、表格和专员，不改、不复用旧店的专员和文件。
 - 同一家店要改规矩（订金、营业时间、问不问场合等）：告诉老板直接改订位登记表「餐厅设置」B 列，或说给专员听，由 `restaurant-reservation-desk` 改；不重建。
 - 同一家店要加回答菜单问题：在「餐厅设置」的菜品表ID 填菜品表 ID。
+- 同一家店要加店内规矩（「换包间要通知厨房」「拼桌只拼 B1 和 B2」），或问「操作台有更新吗」：按 `references/private-desk.md` 第 2、3 节改本店私有技能。
 
 不要不问就当成同一家店，也不要直接回答「我在现有专员上补功能」。
 
@@ -126,7 +128,7 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 
 ## 第五步：建订位专员
 
-按 `references/specialist-setup.md`：`references/role-snippet.md` 的固定模板只填店名和订位登记表 ID，其他一个字不改，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），授权 `ornn-api`（只读）让专员读得到技能，把 `restaurant-reservation-desk` 绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
+按 `references/specialist-setup.md`：`references/role-snippet.md` 的固定模板只填店名和订位登记表 ID，其他一个字不改，建专员，授权 `api-google-workspace`，设好访客权限和操作范围（Sheets 读写、有包间时加日历事件），授权 `ornn-api`（只读）让专员读得到技能，按 `references/private-desk.md` 第 1 节把 `restaurant-reservation-desk` 复制成本店私有技能并绑到专员，最后回读核对。老板想用的名字优先，没有就叫「店名订位助手」。已有同名专员时更新它，不建第二个。
 
 ## 第六步：接顾客渠道
 
@@ -139,7 +141,7 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 1. 建好的文件：名称加链接，一行一个。
 2. 建好的专员和渠道：专员名，渠道账号，访客能做什么。
 3. 需要老板核对的点：菜单里的问题、桌位合计、所用的默认规则。
-4. 怎么改规矩：营业时间、休息日、订金、问不问特殊要求和场合、场合安排、待确认类别都在订位登记表「餐厅设置」的 B 列，老板直接改，下一单就生效，不用找 NyxBot 改专员。「订位速查」是公式，不要手改。
+4. 怎么改规矩：营业时间、休息日、订金、问不问特殊要求和场合、场合安排、待确认类别都在订位登记表「餐厅设置」的 B 列，老板直接改，下一单就生效，不用找 NyxBot 改专员。「订位速查」是公式，不要手改。其他店内做法（例如换包间要通知厨房、哪几张桌能拼）对 NyxBot 说「给操作台加一条规矩：…」，会加进本店私有技能（名字写出来）；公开模板有更新时 NyxBot 会先问再合并。
 5. 老板日常怎么用，举三句原话：「B3 入座」「B3 离店」「今晚还有几张 4 人桌」。这些由 `restaurant-reservation-desk` 处理，老板在 NyxID 应用或渠道里对专员说即可。
 6. 老板要手动做的事：
    - 打开订位登记表，文件 › 设置 › 计算，把重算改成「每分钟」。
@@ -199,3 +201,6 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 37. 读回的操作范围是全部接口，接口编号列表被截断。预期：保持全部接口，访客级别照样设为 `all`，交付里注明范围偏宽；不因此把顾客写入权限留在 `use`。
 38. 老板说每天 11:00–23:00 连续营业、不限时。预期：「餐厅设置」午市 11:00–16:59、晚市 17:00–22:00（或老板给的分界），不出现「晚市=不营业」；同一张桌中午和晚上各能订一次。
 39. 顾客订位后读订位登记那一行。预期：A 列是日期、H 列是时间（不是文字），电话保留「+」和空格；订位速查里那张桌那个时段不再显示为空。
+40. 建专员。预期：Ornn 上多一个私有技能「店名-reservation-desk」，`isPrivate` 为真，正文里有「模板来源：restaurant-reservation-desk X.Y」和「本店规矩」一节；专员只绑它，不绑公开模板。
+41. 老板说「以后换到包间要提醒我通知厨房」。预期：私有技能加一条本店规矩，版本 1.0 → 1.1，专员改绑；公开模板不变。之后老板说「某某换到 P02」，回复末尾有通知厨房的话。
+42. 公开操作台模板发布了新版本，老板说「操作台有更新吗」。预期：说明新版改了什么并问要不要合并；同意后新私有版本含新模板内容和原有本店规矩；不同意就不动。
