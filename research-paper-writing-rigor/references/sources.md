@@ -82,6 +82,14 @@ It also adds a feedback loop that separates explicit coauthor comments from
 editorial interpretations and checks whether a defect recurs in later drafts.
 The examples remain generalized; raw correspondence stays in private records.
 
+A private coauthor manuscript revision reviewed on 2026-10-29 motivates the
+proof-completeness reference: retain the reasoning behind normalization and
+subset coefficients, separate the compact main argument from checkable appendix
+derivations, and follow domain, dimension, boundary, and equality conditions
+through later uses. This is a generalized writing lesson, not a claim that
+every step of the motivating draft was correct. No private manuscript formula,
+correspondence, author identifier, or project validation result is distributed.
+
 ## Skill discovery documentation
 
 Official Codex documentation inspected:

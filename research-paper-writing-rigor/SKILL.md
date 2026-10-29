@@ -1,6 +1,6 @@
 ---
 name: research-paper-writing-rigor
-version: "1.9"
+version: "1.10"
 description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
@@ -96,6 +96,15 @@ Identify the question, main result, key obstacle, proof or method mechanism,
 closest prior result, and remaining uncertainty. For long work, use a short
 private outline or claim-source map if it helps; reuse existing records.
 Do not insert drafting labels or audit tables into the manuscript by default.
+
+For substantial mathematical-note drafting, coauthor revisions, or feedback
+that proofs are too compressed, read
+[proof-completeness.md](references/proof-completeness.md). Check the actual
+inference chain before shortening it: changes of representation, normalization,
+dimension, summation order, and boundary cases need their mathematical reasons.
+Keep the main argument readable and place longer necessary derivations in
+precisely referenced appendices. Length is a constraint on scope and exposition,
+not evidence that a proof is complete.
 
 For substantial revision, check which auxiliary results and appendices the
 main argument actually uses. Keep an independent proof or example when it
@@ -203,10 +212,16 @@ in [discipline-and-voice.md](references/discipline-and-voice.md).
 
 ## Short result notes for a correspondent
 
-A short note (2 to 10 pages) answers one reader's question first: the author
+A short note answers one reader's question first: the author
 whose open problem, conjecture or request it addresses. Read their exact
 statement (paper version, section, equation) and answer that; move anything
 else to one closing remark or cut it.
+
+Follow the requested or venue length rather than imposing a fixed page range.
+Write the complete argument for the retained claims before compressing its
+presentation. Under a tight page limit, remove secondary claims or use allowed
+appendices before deleting a necessary inference. Standard tools can be cited
+with their applicable hypotheses; a central new step needs a written proof.
 
 - Before writing, list each claim with its status: proved here, known (exact
   source), known in a special case (state precisely what is new), computed
@@ -320,6 +335,10 @@ from a private mathematical coauthor review, not the correspondence itself.
 
 ## CHANGELOG
 
+- 2026-10-29 — 1.10: make proof completeness operational for compact notes:
+  explicit transformation and coefficient checks, domain and dimension tracking,
+  justified boundary limits, equality arguments, and precise appendix links.
+  Preserve coauthor scope and remove the fixed short-note page range.
 - 2026-10-29 — 1.9: add a hard, documented literature gate covering recent
   searches and overlap checks; require minimal manuscript packages with a
   pinned public verification link; and separate our results from independent
