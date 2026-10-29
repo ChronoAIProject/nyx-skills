@@ -2,7 +2,7 @@
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
 compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-27 against chrono-cd on the live platform.
-version: "2.1"
+version: "2.2"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -104,8 +104,9 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
   user can only request more; a platform admin approves.
 - **Organization scope:** the user must be an `admin` of the organization to deploy;
   `member` and `viewer` can only read. Pass `org_id` on every call for that scope.
-- **Platform admins** (`is_admin` on `/account`) can also deploy the platform's own
-  internal apps; that is the `chrono-cd-internal` skill. Nothing here needs it.
+- **Permissions:** every call here needs `can_deploy` on `/account` (the NyxID role
+  `chrono-cd-user`, which every user has by default). People with `can_internal` can
+  also deploy the platform's own internal apps; that is the `chrono-cd-internal` skill.
 
 ## Step 0: check the account
 
@@ -115,8 +116,10 @@ nyxid proxy request chrono-cd api/v1/account --output json
 
 Proxy tool: `chrono-cd`, `GET`, `/api/v1/account` (add `?org_id=ID` for an organization).
 
-Returns `slug`, `host_slug` (the hostname suffix), `quota`, `usage`, `apps` and `organizations` with the
-user's role in each. If the user wants to deploy for an organization, pick its `id` and add
+Returns `can_deploy`, `slug`, `host_slug` (the hostname suffix), `quota`, `usage`, `apps` and
+`organizations` with the user's role in each. If `can_deploy` is false, stop: the user
+lacks the NyxID role `chrono-cd-user` and every other call answers `403`; a platform
+admin can grant it. If the user wants to deploy for an organization, pick its `id` and add
 `?org_id=ID` to every path below. If they are not `admin` there, stop and say so.
 
 ## Step 1: write the spec
@@ -145,6 +148,7 @@ Per service:
 | `files` | no | plain config files `[{"path": "/etc/app/config.yaml", "content": "..."}]`, 16 of 64 KiB |
 | `volumes` | no | up to 4: `{"name": "data", "mount_path": "/data", "type": "pvc", "size": "5Gi"}` or `"type": "emptydir"` |
 | `egress`, `ingress_from` | no | `"none"` blocks all egress; `["api"]` lets only those sibling services in |
+| `ingress_from_namespaces` | no | `["monitoring"]` lets pods of those namespaces reach this service's port; siblings unaffected |
 | `metrics` | no | `{"port": 9090, "path": "/metrics"}` if the image serves Prometheus metrics; they then show up in the telemetry routes and `schema` |
 
 Per app, outside `services`: `addons` (`{"mongodb": {}}` gives the app one database and a

@@ -51,6 +51,8 @@ Organization projects carry `owner` = the organization id, `owner_type` = `org`,
   "subject": "11111111-1111-4111-8111-111111111111",
   "owner_type": "person",
   "roles": [],
+  "can_deploy": true,
+  "can_internal": false,
   "is_admin": false,
   "nyx_service_id": "...",
   "slug": "7d1c1e3f5b",
@@ -68,7 +70,8 @@ account. `host_slug` is the label in the caller's app hostnames: the same as `sl
 person. With `org_id`, the same fields describe the organization, whose `host_slug` is
 its NyxID slug once a member has reached it, or the hashed `slug` until then. `organizations` is present when the request carried the caller's credential;
 `organizations_unavailable: true` means NyxID could not be asked. Personal access never
-depends on that lookup. `is_admin` is true for platform admins, who have further routes
+depends on that lookup. `can_deploy` is what every route here needs (permission
+`chrono-cd:deploy`; without it `403`). `can_internal` and `is_admin` unlock the routes
 and fields described in the `chrono-cd-internal` skill.
 
 ## Projects and apps
@@ -161,6 +164,7 @@ Service fields:
 | `addon_env` | Per add-on, which variable receives which connection field. MongoDB fields: `uri`, `database`, `username`, `password`. |
 | `egress` | Empty (internet allowed, private ranges blocked) or `none`. |
 | `ingress_from` | Sibling services that may reach this one; others in the namespace are blocked. |
+| `ingress_from_namespaces` | Other namespaces whose pods may reach this service on its `port`, up to 8 names: `["monitoring"]` lets the platform's Alertmanager post to an internal app. Siblings are unaffected. The caller's namespace must allow the egress on its side. |
 | `volumes` | Up to 4. `type` `pvc` (persistent, 100Mi or more) or `emptydir` (scratch, up to 32Gi). |
 | `files` | Plain configuration files: `[{"path": "/etc/app/config.yaml", "content": "..."}]`. Up to 16, 64 KiB each, 256 KiB in total. Mounted read-only at the path; versioned with the spec. Secret files go through the secrets endpoint instead. |
 | `resources` | Defaults 100m / 128Mi requests, 500m / 512Mi limits. Limits may not exceed twice the owner's quota request. |
