@@ -175,7 +175,9 @@ Every service is reachable inside the owner's namespace as `http://<service>:<po
 
 Images run as plain containers under the strict profile: non-root, no capabilities, no
 privilege escalation. An image that must start as root fails with
-`CreateContainerConfigError` in `status`; rebuild it to run as a non-root user.
+`CreateContainerConfigError` in `status`; rebuild it to run as a non-root user. The user
+must be numeric (`USER 65532:65532`): a name such as distroless's `nonroot` fails the same
+way, with "image has non-numeric user" in the message.
 
 Private packages need a pull credential. Two ways:
 
@@ -191,6 +193,12 @@ Private packages need a pull credential. Two ways:
   CI job on an organization key: `{"username": "<github login>", "token": "<classic PAT
   with read:packages>"}`. It wins over the connection and shows as
   `"registry_credential_source": "request"`.
+- **The platform's own credential**, internal scope only. An internal app whose request
+  brings no `registry_credential` pulls a private image with the platform's machine user
+  (`CHRONO_CD_INTERNAL_REGISTRY_USERNAME`); the app view shows
+  `"registry_credential_source": "platform"` and that user as `registry_username`. A
+  rotated token reaches the pull Secret on the next deploy or admin reconcile. Tenants
+  never get it.
 
 Either way the token is write-only: it is stored as a pull Secret in the owner's
 namespace and never returned, logged or audited. `{"remove": true}` deletes it.
@@ -230,6 +238,29 @@ Response: the app view.
 
 `generation` increases on every accepted spec change and is the optimistic lock.
 `revision` increases on every successful apply.
+
+### `PATCH /projects/{project}/apps/{app}`
+
+Changes part of an existing app and applies it, answering like a `PUT` of the result
+(200 with the app view). The body is a JSON merge patch (RFC 7386) over the stored spec:
+name only what changes. A member set to `null` is removed, an object merges into the
+object of the same name, an array or scalar replaces. The merged spec is validated like
+any `PUT`. A missing app answers `404`. `domain` cannot be patched. `registry_credential`
+and `target_org_id` are taken as on a `PUT`, not merged into the spec.
+
+```json
+{"services": {"web": {"image": "ghcr.io/the-omega-institute/wishpool-web:0.2.1"}}}
+```
+
+bumps one image and leaves every other field of every service untouched. This is the
+right call for a new tag; `PUT` is for declaring the whole app, and two callers doing a
+`PUT` from different bodies overwrite each other's fields.
+
+Both `PUT` and `PATCH` take `If-Match: <generation>` and answer `409 stale_generation`
+when the stored generation differs. A `PATCH` without the header is pinned to the
+generation it read, so a change that lands in between is never overwritten. For a `PUT`,
+read the app first and send its `generation` as `If-Match` when someone else may be
+deploying the same app.
 
 ### `GET /projects/{project}/apps` and `GET /projects/{project}/apps/{app}`
 

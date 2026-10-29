@@ -2,7 +2,7 @@
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
 compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-27 against chrono-cd on the live platform.
-version: "2.2"
+version: "2.3"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -39,7 +39,7 @@ Look at what you have. Use exactly one of these transports for the whole convers
 **With a shell** (Claude Code, Codex, a CI job): the NyxID CLI.
 
 ```bash
-nyxid proxy request chrono-cd api/v1/PATH [--method PUT|POST|DELETE] [--data 'JSON'] --output json
+nyxid proxy request chrono-cd api/v1/PATH [--method PUT|PATCH|POST|DELETE] [--data 'JSON'] --output json
 ```
 
 **Without a shell** (the NyxID Assistant, NyxBot on Telegram or Lark, an Aevatar agent):
@@ -48,10 +48,10 @@ optional JSON body; NyxID routes the call and adds the identity. For every call 
 skill:
 
 - Service: `chrono-cd`
-- Method: `GET`, `PUT`, `POST` or `DELETE`, as the step says
+- Method: `GET`, `PUT`, `PATCH`, `POST` or `DELETE`, as the step says
 - Path: the `api/v1/...` path of the step, with a leading slash: `/api/v1/account`.
   Query parameters stay in the path: `/api/v1/projects/P/apps/A/logs?service=web&tail=200`
-- Body: the JSON object of the step, only for `PUT` and `POST`
+- Body: the JSON object of the step, only for `PUT`, `PATCH` and `POST`
 
 The base URL is the service root, so the path always starts with `/api/v1/`. A `404
 route` with the right path usually means the `/api/v1` prefix was dropped. Never
@@ -81,7 +81,9 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 - **Never ask the user for a NyxID token.** `nyxid login` is the only credential step
   for the CLI; an agent with a proxy tool has nothing to log in to.
 - **Images must be on `ghcr.io`** and run as a non-root user. An image that must start as
-  root fails with `CreateContainerConfigError` in status; tell the user to rebuild it.
+  root, or as a named user such as distroless `nonroot`, fails with
+  `CreateContainerConfigError` in status; tell the user to rebuild it with a numeric
+  `USER 65532:65532`.
 - **Private packages** need a pull credential, sent once in the `PUT` body as
   `"registry_credential": {"username": "<github login>", "token": "<token>"}`. The token
   is a GitHub personal access token (classic) with the `read:packages` scope; fine-grained
@@ -92,9 +94,11 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
 - **Secrets never go in the spec, in chat or in logs.** Declare the names in
   `secret_keys`, then set the values with the secrets endpoint. Responses only ever show
   names.
-- **`PUT` is declarative.** The body replaces the whole spec. To change one thing, send
-  the whole spec again with that thing changed. Read the app first when you did not write
-  the current spec yourself.
+- **`PUT` is declarative, `PATCH` is partial.** A `PUT` body replaces the whole spec;
+  anything you leave out is gone. To change one thing, such as the image tag, `PATCH`
+  with only that field: `{"services":{"web":{"image":"...:TAG"}}}`. `PATCH` is pinned to
+  the generation it read, so it never overwrites a deploy that landed in between. When
+  you must `PUT` an app you did not write, read it first and send `If-Match: <generation>`.
 - **A `port` is immutable** and so is a service name. To change a port, add the service
   under a new name and remove the old one.
 - **Replicas are at most 3; a service with a `pvc` volume runs 1.**
@@ -258,8 +262,9 @@ Method and path are the same for the CLI and the proxy tool; `...` stands for
 | list projects | `GET api/v1/projects` |
 | list apps of a project | `GET api/v1/projects/PROJECT/apps` |
 | read an app | `GET api/v1/projects/PROJECT/apps/APP` |
-| new image tag | `PUT` the spec with the new tag; pods roll without downtime |
-| roll back | `PUT` the spec with the previous tag (`GET .../revisions` lists them) |
+| new image tag | `PATCH ...` with `{"services":{"NAME":{"image":"...:TAG"}}}`; nothing else changes, pods roll without downtime |
+| roll back | `PATCH` the same way with the previous tag (`GET .../revisions` lists them) |
+| change the whole spec | `PUT` the full spec; it replaces everything, so read the app first and send `If-Match: <generation>` |
 | restart | `POST .../restart?service=NAME` (all services when omitted); no body |
 | rotate the database password | `POST .../addons/mongodb/rotate`; no body |
 | delete | `DELETE api/v1/projects/PROJECT/apps/APP`; add `?purge=true` to drop the add-on data too |

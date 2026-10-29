@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `2.2`
-- Last synced: `2026-10-29T09:09:00.934Z`
+- Latest version: `2.3`
+- Last synced: `2026-10-29T09:57:57.998Z`
 
 ## Install
 
