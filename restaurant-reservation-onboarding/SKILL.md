@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk into a private per-store skill on Ornn (house rules go there; public template updates are merged only with the owner's consent) and binds it so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.19"
+version: "1.20"
 metadata:
   category: tool-based
   tool-list:
@@ -202,5 +202,5 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 38. 老板说每天 11:00–23:00 连续营业、不限时。预期：「餐厅设置」午市 11:00–16:59、晚市 17:00–22:00（或老板给的分界），不出现「晚市=不营业」；同一张桌中午和晚上各能订一次。
 39. 顾客订位后读订位登记那一行。预期：A 列是日期、H 列是时间（不是文字），电话保留「+」和空格；订位速查里那张桌那个时段不再显示为空。
 40. 建专员。预期：Ornn 上多一个私有技能「店名-reservation-desk」，`isPrivate` 为真，正文里有「模板来源：restaurant-reservation-desk X.Y」和「本店规矩」一节；专员只绑它，不绑公开模板。
-41. 老板说「以后换到包间要提醒我通知厨房」。预期：私有技能加一条本店规矩，版本 1.0 → 1.1，专员改绑；公开模板不变。之后老板说「某某换到 P02」，回复末尾有通知厨房的话。
-42. 公开操作台模板发布了新版本，老板说「操作台有更新吗」。预期：说明新版改了什么并问要不要合并；同意后新私有版本含新模板内容和原有本店规矩；不同意就不动。
+41. 老板说「以后换到包间要提醒我通知厨房」。预期：私有技能加一条本店规矩并发布新版本（版本号以发布工具实际返回为准），专员改绑；公开模板不变。之后老板说「某某换到 P02」，回复末尾有通知厨房的话。
+42. 公开操作台模板发布了新版本，老板说「操作台有更新吗」。预期：说明新版改了什么并问要不要合并；同意后新私有版本含新模板内容和原有本店规矩，「模板来源」是新模板版本，回复里报实际版本号；不同意就不动。
