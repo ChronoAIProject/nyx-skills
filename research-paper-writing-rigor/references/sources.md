@@ -1,6 +1,7 @@
 # Sources and adaptation decisions
 
-Reviewed on 2026-09-26. This is a synthesized writing method, not a verbatim
+Initially reviewed on 2026-09-26; expanded on 2026-10-29 for version 2.0.
+This is a synthesized writing method, not a verbatim
 bundle of upstream skills. References below identify the exact repositories
 and versions read. Their authors do not endorse this synthesis.
 
@@ -50,6 +51,46 @@ and versions read. Their authors do not endorse this synthesis.
   mandatory per-claim status syntax, compulsory registry inputs, and automatic
   human checkpoints for every section. A compact map is optional working
   support, not a publication requirement. No scripts or templates were copied.
+
+## Version 2.0 public-source review
+
+Read on 2026-10-29. The dates below are repository commit dates, not asserted
+publication dates of every file. These nine sources were inspected at the
+pinned revisions; none endorses this synthesis. All new guidance and examples
+are written for this skill. No upstream scripts, checklists, templates, or
+example passages were imported.
+
+| Source and inspected file | Repository revision; commit date | Contribution and adaptation |
+| --- | --- | --- |
+| [Anthropic, doc-coauthoring](https://github.com/anthropics/skills/blob/ca45fc496a3436251f191354091d557da31c15b5/skills/doc-coauthoring/SKILL.md) | `ca45fc496a3436251f191354091d557da31c15b5`; 2026-10-28 | Reader perspective, section purpose, and a final test without hidden conversation context. Do not import repeated questionnaires, approval pauses, or product-document structure. |
+| [Siqi Chen, Humanizer](https://github.com/blader/humanizer/blob/0ef9fe5bc3572734fd3ae6c448fe00a30cd5dcf0/SKILL.md) | `0ef9fe5bc3572734fd3ae6c448fe00a30cd5dcf0`; 2026-10-28 | Identify empty contrasts, defensive objections, stacked qualifiers, repeated endings, and monotonous rhythm. Retain real mathematical distinctions and necessary uncertainty; no detector scores or provenance claims. |
+| [K-Dense, scientific-writing](https://github.com/K-Dense-AI/claude-scientific-skills/blob/5f2bc0341354fd5590aef76a533ada1e1e5b4e62/skills/scientific-writing/SKILL.md) | `5f2bc0341354fd5590aef76a533ada1e1e5b4e62`; 2026-10-26 | Separate source identity from claim support, preserve factual consistency, and remove unsupported content. Do not require clinical reporting structures, inline evidence IDs, registries, or universal human checkpoints. |
+| [Master-cai, research-paper-writing](https://github.com/Master-cai/Research-Paper-Writing-Skills/blob/77e7c2c1ba06f7d71844873147665437a03aac1b/research-paper-writing/SKILL.md) | `77e7c2c1ba06f7d71844873147665437a03aac1b`; 2026-06-23 | Revisit paragraph purpose and reverse outlining before sentence polish. Translate empirical claim checks into complete proofs and matched citations for theorem papers; do not import mandatory ablations or promotional figures. |
+| [David Sosa, sciwrite-prose](https://github.com/dvdsosa/scientific-writing-skills/blob/9e9e87adedcda0224a9a74a4ba9cb7ed0452d2b8/skills/sciwrite-prose/SKILL.md) | `9e9e87adedcda0224a9a74a4ba9cb7ed0452d2b8`; 2026-10-07 | Compare paragraph meanings to find duplication, remove empty openers, use precise verbs, and preserve technical repetition. Do not turn stylistic shortening into stronger mathematical or causal claims. |
+| [Seifallah El Fetni, claim calibration](https://github.com/SFETNI/Scientific-Writing-Skills-Claude-Code-Codex/blob/ae6cdf414fd0c1f745b219e2ac741a52a99dec9c/skills/writing/skill_claim_calibration.md) | `ae6cdf414fd0c1f745b219e2ac741a52a99dec9c`; 2026-06-26 | Recheck unsupported assertions and the separation between evidence review and prose polish. Also read prose-quality and anti-AI-style guidance; keep scientific uncertainty without universal word bans or per-claim labels in the paper. |
+| [dontbesilent, dbs-ai-check](https://github.com/dontbesilent2025/dbskill/blob/bab93c0376ced995c30cb841cb0d12622a430bcc/skills/dbs-ai-check/SKILL.md) | `bab93c0376ced995c30cb841cb0d12622a430bcc`; 2026-10-28 | Comparison reading on repetitive rhetorical forms and genre dependence. No text, taxonomy, thresholds, diagnostic format, or question-by-question workflow is incorporated. Do not manufacture hesitation or treat prose traits as authorship evidence. |
+| [fcescob, mathematical-writing](https://github.com/fcescob/terence-tao-skills/blob/a35929906b50b803e436f9a1e8d33190d781a24e/skills/mathematical-writing/SKILL.md) | `a35929906b50b803e436f9a1e8d33190d781a24e`; 2026-09-06 | A secondary synthesis of Tao's advice: organize by proof milestones, explain the difficult inference, and make the result visible. Do not convert brevity into removal of necessary explanation or impose a theorem-label quota. |
+| [inverno15, Notes on Mathematical Writing](https://github.com/inverno15/math-writing-notes/blob/c4f9813abce669393081e8ffc23b5dd1784926d9/main.tex) | `c4f9813abce669393081e8ffc23b5dd1784926d9`; 2025-12-19 | Secondary notes based on Knuth–Larrabee–Roberts's 1987 course: reader expectations, prose around formulas, semantic precision, and reading aloud at natural speed. No quoted attribution in these notes is treated as independently checked against the original course or Halmos essay. |
+
+Additional inspected files: the first source's README; Humanizer's LICENSE;
+K-Dense's writing-principles and source-ledger references; Master-cai's
+paper-review reference; sciwrite-prose's clutter-lexicon and paragraphs
+references; El Fetni's prose-quality and anti-AI-style files; dbskill's README;
+the Tao synthesis's REFERENCE.md; and the mathematical notes' README. Licenses
+were read for the MIT and CC BY sources identified below.
+
+Tao's primary writing index, supplied by the secondary synthesis, is
+https://terrytao.wordpress.com/advice-on-writing-papers/ . This review does not
+claim a new reading of every linked original essay. Likewise the mathematical
+notes are a secondary source for the 1987 course, not a substitute for its
+original publication or an audited Halmos quotation.
+
+The first-paragraph acceptance check, one-home verification status rule,
+complete-support requirement, and 12–20-reference short-paper search target are
+the present synthesis's editorial choices. The public sources do not establish
+a universal reference-count standard. The target always requires relevant
+citations and verified source support, with a documented reason for a smaller
+bibliography in a genuinely narrower note.
 
 ## Direct mathematical review
 
@@ -106,9 +147,17 @@ package; do not mislabel the whole package as solely MIT.
 
 MIT notice for the consulted/adapted repository material:
 
+Copyright (c) 2025 K-Dense Inc.
+
+Copyright (c) 2025 Siqi Chen
+
+Copyright (c) 2025 inverno15
+
 Copyright (c) 2026 Master-cai
 
 Copyright (c) 2026 David Sosa
+
+Copyright (c) 2026 fcescob
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -127,3 +176,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+El Fetni's skills/documentation remain attributed under CC BY 4.0 as specified
+above; the existing adaptations and this revision change their application
+to proof-based writing. K-Dense, Humanizer, the Tao synthesis, and the course
+notes declare MIT for their original repository material; that declaration
+does not independently license quotations from their underlying sources.
+Anthropic was consulted for workflow ideas without copying its document.
+dbskill declares CC BY-NC 4.0 in its README; it was read for comparison only,
+and none of its licensed expressive material is included in this package.

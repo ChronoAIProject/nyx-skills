@@ -35,9 +35,11 @@ Concentrate detail where a reader would otherwise have to invent an argument.
   hides a central new step. A standard theorem can supply a short proof when
   its precise statement is cited and its hypotheses are checked here.
 
-If a needed step cannot be proved, repair it, narrow the claim, or mark the
-precise issue. Adding explanatory sentences around a missing inference does
-not establish the result.
+If a needed step cannot be proved, repair it, prove a narrower claim, or remove
+the conclusion and its dependent assertions from the completed results. Record
+the precise gap in working notes; retain an open question separately only when
+it serves the paper. Hedging or explanatory sentences around a missing inference
+cannot establish the result.
 
 ## Keep the objects and their domains visible
 

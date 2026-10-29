@@ -74,54 +74,18 @@ conditions and do not remove H from neighboring steps without checking them.
 
 ## Literature and contribution
 
-Situate the question and contribution in the wider literature, beyond the
-paper that posed the problem. Treat a very short reference list as a defect
-in literature placement to investigate, rather than a citation quota to fill. Support
-general claims such as "various approaches have been introduced" or "it is
-known that" with relevant examples or a survey. This evidentiary role is
-especially prominent in mathematical physics. Ethical attribution requires
-citing all known related work, including recent preprints answering neighboring
-questions, with a precise account of their relation to the present result.
-
-### Hard literature gate before calling a manuscript ready
-
-Before calling a manuscript or short note ready, run and document an actual
-literature search. Search the relevant arXiv listings or search interface for
-roughly the last three years, search MathSciNet or zbMATH (or the relevant
-publisher pages when those indexes are unavailable), and inspect Google Scholar
-citation results for the source paper. Record the search date, queries or
-filters, sources consulted, and the papers that changed the comparison or
-claim wording. A bibliography that cites only the source paper's own papers is
-a blocking defect, not a complete literature review.
-
-The bibliography must cover four roles: (a) the origin of the problem, (b) the
-standard theory used by the argument, (c) the closest recent and competing or
-overlapping work, and (d) every place where the manuscript claims novelty.
-Verify every reference exists and has the applicable DOI, arXiv identifier, or
-publisher URL; cite it at the sentence or theorem where the manuscript relies
-on it. A metadata record without a supporting source passage is not enough.
-Within one month of finalizing, repeat the search for newly posted preprints and
-check especially the last month's results for work that anticipates or
-supersedes the headline example. Record an unresolved access limitation or
-possible overlap and narrow the claim until it is checked.
-
-Before finalizing a manuscript, obtain an independent referee pass specifically
-for missing literature, using a separate reviewer or agent when available.
-Check the wider field, borrowed methods, adjacent questions and recent
-preprints. If independent review is unavailable, report that gap rather than
-label a self-review independent. Verify every added reference against Crossref
-or arXiv as appropriate: authors, title, year, DOI or identifier, and version.
-Read the source passage supporting the cited sentence; metadata verification
-alone does not establish support. Add citations only where they substantiate
-a specific sentence, never to pad the bibliography.
+Read [literature-and-citations.md](literature-and-citations.md) for the required
+documented search, coverage roles, recent-overlap and independent-referee checks,
+reference target, and separate identity/support verification. Support broad
+background claims with actual sources; a very short bibliography merits another
+search across the field. Verification of a reference's identity does not verify
+its mathematical applicability.
 
 Match references to precise claims: existence of normalization, finite
 expansions, regularity of a language, conversion from automatic to morphic,
-or an effective optimization method are not interchangeable topics. Read the
-relevant statement and assumptions in the primary source when a proof depends
-on it. A title or abstract cannot establish all its hypotheses. Mark inaccessible
-or unverified bibliographic details in working notes; do not silently upgrade
-them to independently verified facts.
+and an effective optimization method are different topics. Read the applicable
+statement and match its assumptions. Unavailable support stays an identified
+issue; remove a dependent assertion from the completed results until resolved.
 
 For an application, compare the base, polynomial, initial values, digit set,
 recognition order, and indexing against the theorem's assumptions. Explain a
@@ -135,8 +99,8 @@ State prior method and present contribution separately, for example:
 Do not require every theorem paper to outperform an empirical baseline. Do not
 hide the method's provenance behind "related background" when it is actually
 used. A formalization of a published theorem can be valuable; call it that.
-Bounded literature searches cannot certify "first ever". Record the scope of
-a priority search when it matters without flooding the paper with disclaimers.
+Bounded literature searches cannot certify "first ever". Give the checked
+comparison and keep search details in working notes.
 
 For a correspondent-facing note, keep an explicit attribution ledger while
 writing. Separate (i) results proved by the present authors, (ii) independent

@@ -1,7 +1,7 @@
 ---
 name: research-paper-writing-rigor
-version: "1.10"
-description: Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
+version: "2.0"
+description: Draft, revise, or review focused research manuscripts with complete arguments, verified literature, and direct prose. Remove defensive wording and repeated summaries while preserving exact claims, attribution, authors' voice, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 metadata:
   category: tool-based
   tool-list: [filesystem, shell, web-search]
@@ -14,7 +14,9 @@ metadata:
 Write a paper that lets a knowledgeable reader see the result, understand why
 it follows, identify what is new, and obtain the evidence needed to check it.
 Use direct language for established facts and precise uncertainty for open
-questions. Concision must preserve the mathematical or scientific meaning.
+questions. A short note earns its concision through a focused question, removal
+of repetition, and clear organization. Every core conclusion it retains needs
+a complete argument.
 
 ## Primary principle: make the completed contribution visible
 
@@ -41,6 +43,32 @@ contribution paragraph with a catalogue of things the paper does not do.
 Use evidence checks to earn confident writing. A review finding should lead
 to the strongest accurate statement supported by the work; default hedging is
 not the goal. The final reader should remember the result and its mechanism.
+
+For a new draft or substantial revision, apply these checks in order:
+
+1. State the question and main result in the first paragraph of the introduction;
+   do the same within the abstract if there is one. Give the actual scope, using
+   a faithful plain-language version when formal notation must come later.
+2. Keep material that answers the question, proves the result, explains its
+   mechanism, or places it in the literature. Cut unrelated claims and repeated
+   narrative across the abstract, introduction, body, and conclusion.
+3. Give every retained mathematical conclusion a complete proof or a precise,
+   checked reference with its hypotheses matched here. Remove an unsupported
+   conclusion from the results; hedging cannot supply its missing argument.
+4. Replace routine defensive phrases with the supported statement, attribution,
+   or one relevant open question. State mixed verification scope once in a
+   status sentence or table; preserve the hypotheses and finite premises in
+   the statements that need them.
+5. Cover the literature systematically. For a short paper, plan 12–20 or more
+   relevant, verified references; follow the coverage and verification checks in
+   [literature-and-citations.md](references/literature-and-citations.md).
+6. Finish with a read-aloud pass for rhythm, then recheck mathematical meaning
+   after any sentence changed for fluency.
+
+Read [focus-and-structure.md](references/focus-and-structure.md) for the scope
+test, repetition audit, 2–4 page note and short-paper templates, and final
+acceptance checklist. Apply these to the requested passage for a local edit;
+do not turn it into an unsolicited full-paper audit.
 
 ## Choose the requested work
 
@@ -128,8 +156,11 @@ Call something a "counterexample" only when it falsifies a precisely quoted
 statement: quote that statement, check its hypotheses, and identify the failed
 conclusion. Otherwise call it an example or illustration and say what it shows.
 
-Unsupported claims need a narrower statement, evidence, or a clearly marked
-open question. Do not invent proof steps, references, numbers, author actions,
+If support is missing, complete the argument, prove a narrower statement, or
+remove the claim and its dependent assertions. Keep a conjecture or open question
+only when it serves the paper, clearly separated from established results.
+Do not retain an unsupported conclusion by adding "may", "appears", or a
+disclaimer. Do not invent proof steps, references, numbers, author actions,
 model identities, successful checks, or public artifact links. A blocked claim
 need not stop independent writing work on supported results.
 
@@ -157,8 +188,8 @@ need not stop independent writing work on supported results.
    support the exact attached claim.
 5. Separate indispensable limitations from defensive repetition. Keep a
    qualification beside a claim if omitting it would change its interpretation;
-   consolidate remaining scope details in the verification or limitations
-   section. There is no fixed quota for caveats.
+   consolidate verification status in one sentence or table. Use a limitations
+   section when it has substantive content, not as a ritual closing paragraph.
 6. State open problems as open problems. Distinguish an unproved identity,
    minimality, attainment, asymptotic behavior, and a dynamical interpretation.
    Do not replace "not established" with "false" or "unnecessary".
@@ -230,9 +261,10 @@ with their applicable hypotheses; a central new step needs a written proof.
   affiliations the task supplies. Abstract gives the main statement exactly
   and its scope in three to six sentences.
 - Introduction: the question as the source states it, the answer, its
-  relation to known results, what remains open. Then setting in the source's
-  notation, results with complete proofs, examples or certificates, open
-  problems, references.
+  relation to known results. Then setting in the source's notation and results
+  with complete proofs. Include examples, certificates, or open problems when
+  they add information; finish with references. Use the templates in
+  [focus-and-structure.md](references/focus-and-structure.md) at the requested length.
 - Keep an attribution ledger for a correspondent-facing note: identify which
   results are proved by the present authors, which are independent checks of
   another author's result, and which are direct consequences of cited theorems.
@@ -313,7 +345,10 @@ Check that the abstract, introduction, theorem statements, tables, conclusion,
 and verification description agree on the central claims. Read the abstract
 and conclusion once just for emphasis: do they make the completed result and
 its significance clear, or does a list of exclusions obscure them? Correct
-unnecessary hedging as well as overstatement. For changed LaTeX,
+unnecessary hedging as well as overstatement. Run the cross-section repetition
+audit and final read-aloud pass in
+[focus-and-structure.md](references/focus-and-structure.md#final-read-aloud-and-acceptance-pass).
+For changed LaTeX,
 compile the affected deliverable when available and inspect relevant rendered
 pages; report unavailable validation honestly. Do not rerun expensive formal
 jobs solely for prose changes unless changed claims or project rules require it.
@@ -335,6 +370,12 @@ from a private mathematical coauthor review, not the correspondence itself.
 
 ## CHANGELOG
 
+- 2026-10-29 — 2.0: make focus, cross-section deduplication, complete support
+  for retained conclusions, and removal of defensive boilerplate explicit
+  acceptance checks. Add note/paper templates, systematic literature coverage
+  with a 12–20-reference short-paper target and index verification, and a final
+  read-aloud pass. Synthesize nine public writing skills and guides with pinned
+  source attribution; retain the proof, authorship, and reproduction guidance.
 - 2026-10-29 — 1.10: make proof completeness operational for compact notes:
   explicit transformation and coefficient checks, domain and dimension tracking,
   justified boundary limits, equality arguments, and precise appendix links.

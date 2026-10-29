@@ -3,6 +3,36 @@
 These are original generalized examples. They preserve lessons from a
 mathematical coauthor review without reproducing the private email.
 
+## Defensive patterns to remove in manuscript prose
+
+The following patterns are banned as routine rhetorical padding. Search for
+them and read each hit in context; rewrite the whole sentence when needed.
+Quoted language, analysis of these phrases, and indispensable mathematical
+negation are not padding. A hypothesis or uncertainty that changes the claim
+must survive the edit. Replacements below are examples, usable only when the
+stated proof or source supports them.
+
+| Pattern | Replacement or action |
+| --- | --- |
+| "We do not claim ..." / "No claim is made ..." | State the proved result with its scope. If a relevant extension is open, name that question once. |
+| "It should be noted that ..." / "It is worth noting that ..." | Delete the opener; give the fact, equation, or citation directly. |
+| "To the best of our knowledge ..." stacked with "appears", "may", or "subject to ..." | Give a checked comparison with the closest sources. Remove unsupported priority language. |
+| "This does not establish ..." / "This should not be taken as ..." after each result | State the result actually obtained. Put one relevant unresolved question in the discussion, or cut the aside. |
+| "We merely ..." / "only a modest ..." / "we attempt to prove ..." for a completed proof | "We prove ...", "We construct ...", or "Applying [source, theorem] gives ...", as supported. |
+| "It may possibly suggest ..." for an established conclusion | State the conclusion and its proof/reference. For a genuine estimate or interpretation, keep its actual uncertainty. |
+| Repeated "exactly computed", "not independently verified", "we did not verify", or "not kernel checked" | Give one status sentence/table identifying the results and actual checking scope. Keep the finite range and arithmetic assumptions where logically needed. |
+| "This is not X; rather, it is Y" when X is an invented objection | State Y. Keep a contrast when both sides distinguish actual mathematical objects or correct a documented misunderstanding. |
+| "Clearly", "obviously", "by a standard calculation" at the decisive new step | Write the missing calculation or inference. For a borrowed standard tool, give a precise citation and its instantiation. |
+| "It is well known ..." / "Various approaches exist ..." with no source | State the relevant fact or comparison and cite its actual sources. |
+| "This rigorous/comprehensive/robust framework ..." without a defined property | Name the construction and the property proved. Keep technical uses of these words when defined and supported. |
+| "In conclusion, we have shown ..." repeating the abstract | Cut the repeated summary; give a new consequence or relevant open question if one is needed. |
+
+For example, after proving an upper bound, replace "We do not claim optimality"
+with the bound itself; if sharpness matters, say "Whether the bound is sharp
+remains open" once. Never change this to "The bound is sharp" without a proof.
+Likewise, removing "we did not verify" does not permit inventing a completed
+check. Unsupported result claims must be repaired or removed before polishing.
+
 ## State the result and mechanism
 
 When a theorem is established, "We prove that every admissible input has a
@@ -126,10 +156,18 @@ accessible README exists. Do not describe an archived local run as hosted CI.
 
 ## Keep necessary scope statements without repeating them mechanically
 
-If fine numerical bounds are not kernel checked, state that at their first
-potentially ambiguous presentation or in a nearby verification description,
-and give the exact scope in the verification appendix. Remove repetitive copies
-only when a reader can still tell which results are formalized.
+For mixed verification, choose one nearby status sentence or table as the home
+of the distinction. For example, when accurate: "The formal development covers
+Theorems 1–2; Table 1 reports rational-arithmetic checks for 1 <= n <= N."
+Point to it when needed instead of adding a disclaimer after every result.
+If a later result has a different status, update that single account and make
+the result's own scope explicit. A separately distributed supplement may need
+its own self-contained status statement.
+
+Keep arithmetic exactness where it is a premise of a proof, finite ranges with
+computational claims, and hypotheses in theorem statements. These carry
+mathematical information. Machine identities, source hashes, commands, and
+archived-run details belong in the supporting package.
 
 Keep AI disclosure focused on roles and responsibility. A separate discussion
 of model reliability or an internal audit history is unnecessary unless it

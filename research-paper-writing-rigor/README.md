@@ -1,6 +1,6 @@
 # research-paper-writing-rigor
 
-> Draft, revise, or review research manuscripts that foreground completed contributions with confident, evidence-grounded prose. Remove excessive modesty and defensive repetition while preserving exact claims, attribution, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
+> Draft, revise, or review focused research manuscripts with complete arguments, verified literature, and direct prose. Remove defensive wording and repeated summaries while preserving exact claims, attribution, authors' voice, and reproducibility. Especially useful for mathematical, theoretical-CS, and computer-assisted papers, short notes, and coauthor revisions; adaptable to empirical papers. Use for manuscript work, not outreach campaigns or standalone theorem proving.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.10`
-- Last synced: `2026-10-29T10:08:56.312Z`
+- Latest version: `2.0`
+- Last synced: `2026-10-29T10:40:32.510Z`
 
 ## Install
 
