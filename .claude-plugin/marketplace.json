@@ -1570,6 +1570,19 @@
       ]
     },
     {
+      "name": "restaurant-reservation-desk-en",
+      "source": "./restaurant-reservation-desk-en",
+      "description": "Restaurant reservation desk: seated, left, table turnover, move table, walk-in, seating, reschedule, cancel, pending, special requests, occasion, table status, free tables, room calendar, check-in, check-out, settings. Owner-side daily operations for a restaurant reservation specialist set up by restaurant-reservation-onboarding-en. Use only on owner turns (NyxID app, or channel messages marked (owner)) when the owner or staff says a table was seated or left (for example B3 seated, B3 left), a walk-in party sat down, a booking moved table, a guest did not show, a booking was rescheduled or cancelled, a pending booking is approved or declined, asks for bookings, live table status or free tables for a date, or changes a house rule in the Settings tab. Reads and updates the reservation Google Sheet and keeps the room calendar in step; never deletes rows; never used on customer turns.",
+      "version": "1.0",
+      "keywords": [
+        "restaurant",
+        "reservation",
+        "table-management",
+        "google-sheets",
+        "english"
+      ]
+    },
+    {
       "name": "restaurant-reservation-onboarding",
       "source": "./restaurant-reservation-onboarding",
       "description": "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk into a private per-store skill on Ornn (house rules go there; public template updates are merged only with the owner's consent) and binds it so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files.",
@@ -1580,6 +1593,20 @@
         "onboarding",
         "google-workspace",
         "google-sheets"
+      ]
+    },
+    {
+      "name": "restaurant-reservation-onboarding-en",
+      "source": "./restaurant-reservation-onboarding-en",
+      "description": "Restaurant reservation, booking, table and front desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant and want a NyxBot agent that answers guest questions and takes table bookings (reservation assistant, booking assistant, front desk assistant), even if the owner already has a reservation specialist; ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills first. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant info doc, reservation sheet with live table board, a Settings tab for house rules and a Lookup tab of free tables per day, and a private-room calendar in the owner's Google Workspace; creates the specialist from the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk-en into a private per-store Ornn skill and binds it, and links the guest channel. Never used on guest turns; never deletes or overwrites owner files.",
+      "version": "1.0",
+      "keywords": [
+        "restaurant",
+        "reservation",
+        "onboarding",
+        "google-workspace",
+        "google-sheets",
+        "english"
       ]
     },
     {
