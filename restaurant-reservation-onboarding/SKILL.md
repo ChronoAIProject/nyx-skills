@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding
 description: "餐厅 订位 订座 预定 预订 订餐 订台 订桌 包间 排位 菜单 前台 接待 客服 咨询 开店 接入 restaurant reservation booking table front-desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant (餐厅、饭店、餐馆、饭馆) and want a NyxBot agent that handles customer enquiries and table bookings (订位助手、预订助手、预定助手、前台助手、接待客人询问和预订就餐), even if the owner already has another reservation specialist — ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant-info doc, reservation sheet with live table board, a 餐厅设置 settings tab holding the house rules and a 订位速查 per-day free-table tab, and a private-room calendar in the owner's Google Workspace; then creates the reservation specialist with the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk into a private per-store skill on Ornn (house rules go there; public template updates are merged only with the owner's consent) and binds it so the owner can say which table checked in or left, and links the customer channel. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.22"
+version: "1.23"
 metadata:
   category: tool-based
   tool-list:
@@ -49,7 +49,7 @@ metadata:
 
 - 新店：照第一步到第七步完整走一遍，建新的文件夹、表格和专员，不改、不复用旧店的专员和文件。
 - 同一家店要改规矩（订金、营业时间、问不问场合等）：告诉老板直接改订位登记表「餐厅设置」B 列，或说给专员听，由 `restaurant-reservation-desk` 改；不重建。
-- 同一家店要加回答菜单问题：在「餐厅设置」的菜品表ID 填菜品表 ID。
+- 同一家店的专员答不了菜品（Role 是 1.23 以前的模板，或「餐厅设置」的菜品表ID 是空的）：把 Role 换成 `references/role-snippet.md` 的当前模板（只填店名和表格 ID），菜品表ID 填菜品表 ID，读回核对。
 - 同一家店要加店内规矩（「换包间要通知厨房」「拼桌只拼 B1 和 B2」），或问「操作台有更新吗」：按 `references/private-desk.md` 第 2、3 节改本店私有技能。
 
 不要不问就当成同一家店，也不要直接回答「我在现有专员上补功能」。
@@ -146,7 +146,8 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 6. 老板要手动做的事：
    - 打开订位登记表，文件 › 设置 › 计算，把重算改成「每分钟」。
    - 订位登记表里有顾客电话，只共享给前台和店长（新加坡受 PDPA 约束）。
-7. 下一步：用另一个账号当顾客，在渠道里按下面三句试订，对照预期检查，有一条不对就告诉 NyxBot：
+7. 下一步：用另一个账号当顾客，在渠道里按下面四句试，对照预期检查，有一条不对就告诉 NyxBot：
+   - 问「你们有某某菜吗，多少钱」（换成菜单上的一道菜）。预期：按菜品表回答有没有、规格和价格；菜单上没有的就说没有。
    - 只发「你好」。预期：专员第一条回复就一次问齐日期、时间、人数、称呼、电话（人数大厅包间都能坐时还问坐大厅还是包间），不一项一项问。
    - 发「下周六中午 12 点，6 到 8 个人」。预期：先问「按 8 位准备可以吗」和坐大厅还是包间，不自己取整、不自己选区域。
    - 补齐信息后。预期：确认信息里有桌号和桌型（例如「P01 小包间」），订位登记表 C 列有同一个桌号；同一时段小包间订满后再订 6 人包间，专员提议大厅大圆桌或其他时段，不排大包间。
@@ -204,3 +205,5 @@ D 组每一条和 A 组的营业时间、休息日都写进订位登记表的「
 40. 建专员。预期：Ornn 上多一个私有技能「店名-reservation-desk」，`isPrivate` 为真，正文里有「模板来源：restaurant-reservation-desk X.Y」和「本店规矩」一节；专员只绑它，不绑公开模板。
 41. 老板说「以后换到包间要提醒我通知厨房」。预期：私有技能加一条本店规矩并发布新版本（版本号以发布工具实际返回为准），专员改绑；公开模板不变。之后老板说「某某换到 P02」，回复末尾有通知厨房的话。
 42. 公开操作台模板发布了新版本，老板说「操作台有更新吗」。预期：说明新版改了什么并问要不要合并；同意后新私有版本含新模板内容和原有本店规矩，「模板来源」是新模板版本，回复里报实际版本号；不同意就不动。
+43. 顾客问「你们店里有烧麦吗」，菜品表里有烧麦。预期：读菜品表，列出馅料、规格和价格；备注列写着待核对的，说以门店为准。菜品表里没有的菜就说没有，不推荐表外的菜。
+44. 顾客问地址或营业时间。预期：按「餐厅设置」回答，没写进设置的（停车等）请顾客问门店。
