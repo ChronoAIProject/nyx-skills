@@ -10,7 +10,7 @@ First list the existing specialists. If there is already a reservation specialis
 
 - Name: the name the owner chose; otherwise "{Store} Reservation Assistant".
 - Role: the fixed template in `role-snippet.md`, with only the store name and reservation sheet ID filled in and nothing else changed (about 2040 characters; the limit is 2048). Guest turns cannot read skills, so the guest flow lives in the Role and the store rules live in Settings.
-- Persona: one or two sentences on tone and language habits, no rules.
+- Persona: the Persona template in `role-snippet.md` (store and menu answers plus one tone line). Guest turns read the Persona too.
 
 If creating the specialist fails, read the failure reason: if it says quota or permission is missing, tell the owner exactly that and stop at this step, keeping the files already built. Do not keep retrying with a different tool.
 

@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding-en
 description: "Restaurant reservation, booking, table and front desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant and want a NyxBot agent that answers guest questions and takes table bookings (reservation assistant, booking assistant, front desk assistant), even if the owner already has a reservation specialist; ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills first. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant info doc, reservation sheet with live table board, a Settings tab for house rules and a Lookup tab of free tables per day, and a private-room calendar in the owner's Google Workspace; creates the specialist from the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk-en into a private per-store Ornn skill and binds it, and links the guest channel. Never used on guest turns; never deletes or overwrites owner files."
-version: "1.1"
+version: "1.2"
 metadata:
   category: tool-based
   tool-list:
@@ -50,7 +50,7 @@ After binding and before Step 1, list the owner's existing specialists. If one i
 
 - New restaurant: run Steps 1 to 7 in full. Build a new folder, sheets and specialist. Do not change or reuse the old store's specialist or files.
 - Same restaurant, rule change (deposit, opening hours, whether to ask about occasions, etc.): tell the owner to edit column B of the Settings tab in the reservation sheet directly, or tell the specialist, and `restaurant-reservation-desk-en` will make the change. Do not rebuild.
-- Same restaurant, wants menu questions answered: fill the menu sheet ID into Menu sheet ID in the Settings tab.
+- Same restaurant, the specialist cannot answer menu questions (its Role and Persona predate 1.2, or Menu sheet ID in Settings is empty): replace the Role and Persona with the current templates in `references/role-snippet.md` (fill only the store name and sheet ID), fill Menu sheet ID, and read back.
 - Same restaurant, wants house rules ("tell the kitchen when a booking moves to a room", "only join B1 and B2"), or asks "Is there a desk update?": update the store's private skill per `references/private-desk.md` sections 2 and 3.
 
 Do not assume it is the same restaurant without asking, and do not just reply "I'll add features to your existing specialist".
@@ -147,7 +147,8 @@ In the owner's language, plain text, in this order:
 6. Things the owner must do by hand:
    - Open the reservation sheet, go to File › Settings › Calculation, and set recalculation to "On change and every minute".
    - The reservation sheet holds guest phone numbers. Share it only with front desk staff and the manager (Singapore PDPA applies).
-7. Next: use another account as a guest and try these three messages in the channel. Compare with the expected result; if any one is wrong, tell NyxBot:
+7. Next: use another account as a guest and try these four messages in the channel. Compare with the expected result; if any one is wrong, tell NyxBot:
+   - Ask "Do you have <a dish from the menu>? How much?". Expected: it answers from the menu sheet with sizes and prices; for a dish not on the menu it says so.
    - Send only "Hi". Expected: the specialist's first reply asks for date, time, party size, name and phone all at once (and hall or room, if the party size fits both), not one item at a time.
    - Send "Next Saturday 12 noon, 6 to 8 people". Expected: it first asks "Shall we prepare for 8?" and hall or room; it does not round on its own or pick the area on its own.
    - After giving all details. Expected: the confirmation includes the table number and table type (e.g. "P01 Small room"), and Bookings column C has the same table number. Once Small rooms are full for that session, book another 6-guest room: the specialist suggests a large round table in the hall or another time, and does not assign a Large room.
@@ -205,3 +206,5 @@ No plans, no process notes, no pleasantries.
 40. Create the specialist. Expected: Ornn has a new private skill "{store}-reservation-desk" with `isPrivate` true, whose text contains "Template source: restaurant-reservation-desk-en X.Y" and a "House rules" section; the specialist is bound only to it, not to the public template.
 41. The owner says "From now on, when a booking moves to a room, remind me to tell the kitchen". Expected: the private skill gets a new house rule and a new version is published (version number as actually returned by the publish tool), and the specialist is rebound; the public template is unchanged. Later, when the owner says "Move {guest} to P02", the reply ends with a reminder to tell the kitchen.
 42. The public desk template publishes a new version, and the owner asks "Is there a desk update?". Expected: explain what the new version changed and ask whether to merge; if yes, the new private version contains the new template text plus the existing house rules, "Template source" is the new template version, and the reply reports the actual version number; if no, change nothing.
+43. A guest asks "Do you have shaomai?" and the menu sheet lists shaomai. Expected: it reads the menu sheet and lists fillings, sizes and prices; if Notes marks an item as to be checked, it says the store will confirm. A dish not on the menu: it says so and suggests nothing off-menu.
+44. A guest asks for the address or opening hours. Expected: it answers from the Settings tab; for anything not in Settings (parking, etc.) it asks the guest to contact the store.

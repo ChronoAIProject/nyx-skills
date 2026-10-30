@@ -176,7 +176,7 @@ All store facts and rules live here. The specialist reads them once per booking 
 | Large room for small parties | {No or Yes: condition} | No | No; or "Yes: minimum spend S$500" |
 | Needs approval | {None or the categories} | None | Bookings the owner reviews first, e.g. "Rooms", "8+ guests"; everything else is confirmed automatically |
 | Room calendar ID | {calendar ID from section 5; leave empty if there are no rooms} | | Empty means no room calendar |
-| Menu sheet ID | {menu sheet ID, or leave empty} | | Empty means menu questions are not answered |
+| Menu sheet ID | {menu sheet ID from section 2} | | The specialist answers dishes and prices from this sheet; empty means menu questions are not answered |
 
 Keep the rows in the order above; section 5 writes the calendar ID into B17 by row number. The specialist and the desk skill (`restaurant-reservation-desk-en`) look values up by key, so rows the owner adds later do not affect them. Convert Lunch and Dinner from the Step 1 group D opening hours into arrival-time ranges. Restaurants open all day still get two ranges (split at 17:00 by default); do not merge them into one. With No limit, each table takes one party per session, so a single merged range would mean each table can be booked only once a day. Only a restaurant that truly opens for lunch only or dinner only writes "Closed" in the other row. Formatting: header in dark blue, white bold text; column A width 130, B 420, C 260, D 360; wrap text in B and D; column B background light yellow (1, 0.97, 0.8) to show it is editable; column C in gray font.
 
