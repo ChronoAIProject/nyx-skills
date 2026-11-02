@@ -11,7 +11,7 @@ The goal is a menu sheet that both the owner and the reservation specialist can 
 | C | Dish | Exactly as printed on the menu. Do not change characters or translate. Move any notes in brackets after the dish name to column D. |
 | D | Size / Unit | Small or large portion, flavor choices, unit (piece, portion, skewer, plate, 10 pcs), alcohol content, bottle or can. Leave empty if none. |
 | E | Price (SGD) | A number, no currency symbol, excluding GST. Change the currency in the header to match the owner's country. |
-| F | Notes | Only things the owner needs to check: duplicate numbers, item printed under another category, unreadable text, no number. |
+| F | Notes | Spice markers printed on the menu (number of chillies, written as "Menu spice marker N/3", using the menu's maximum), signature or recommended marks, the English or local name, and things the owner needs to check: duplicate numbers, item printed under another category, unreadable text, no number, no price on the menu. Separate items with "; ". |
 
 ## Rules
 
