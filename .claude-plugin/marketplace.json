@@ -436,6 +436,18 @@
       ]
     },
     {
+      "name": "cake-order-desk",
+      "source": "./cake-order-desk",
+      "description": "蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns.",
+      "version": "1.0",
+      "keywords": [
+        "cake-shop",
+        "bakery",
+        "orders",
+        "google-sheets"
+      ]
+    },
+    {
       "name": "candidate-document-compliance-preview",
       "source": "./candidate-document-compliance-preview",
       "description": "检查候选人附件、材料完整性或隐私约束。用户提到“候选人材料完整性预览”、对应英文名称或要求运行该验收 workflow 时使用。",
