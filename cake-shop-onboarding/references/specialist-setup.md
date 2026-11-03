@@ -20,7 +20,7 @@
 - 名称：「{店名}订单管家」。
 - Role 和 Persona：`role-snippet.md` 的订单管家模板。
 - 授权 `api-google-workspace`，访客级别设为 `read`（订单管家不接顾客渠道，访客本来进不来）；操作范围同顾客专员。
-- 授权 `ornn-api`：老板回合只放行只读接口（读出操作列表里 `read_only` 为真的那些），访客级别 `read`。没有它，订单管家读不到自己绑定的技能。授权是整体替换，`api-google-workspace` 和 `ornn-api` 要写在同一次里。
+- 授权 `ornn-api`：老板回合放行操作列表里 `read_only` 为真的**全部**接口（约 70 个），不要只挑几个；只放行读技能元数据的一两个接口时，`skill_read` 会失败，订单管家每次都要绕路读技能。访客级别 `read`。没有它，订单管家读不到自己绑定的技能。授权是整体替换，`api-google-workspace` 和 `ornn-api` 要写在同一次里。
 - 技能：按 `private-desk.md` 把 `cake-order-desk` 复制成本店私有技能并绑定；复制失败才直接绑公开的 `cake-order-desk` 最新版本，交付时写明。
 
 ## 4. 定时巡查
@@ -47,7 +47,7 @@
 
 - 两个专员的 Role 和模板只差店名和表格 ID，字数不超过 2048。
 - 顾客专员：`api-google-workspace` 访客级别 `all`，没有绑技能。
-- 订单管家：`api-google-workspace` 和 `ornn-api` 都在，`ornn-api` 只有只读接口；技能只有本店私有的订单管家技能。
+- 订单管家：`api-google-workspace` 和 `ornn-api` 都在，`ornn-api` 放行了全部只读接口、没有写接口；技能只有本店私有的订单管家技能（`isPrivate` 为真）。私有技能没建好就不算完成，接着建；建不了才在交付里写明原因。
 - `nyxid__list_schedules`：巡查任务目标是订单管家，时间和时区对，送达方式对。
 - 让老板对订单管家说一句「今天有哪些订单」：能回答说明读得到技能和表。
 - 任何一项缺失，补上再交付。
