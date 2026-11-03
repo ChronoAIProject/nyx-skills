@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
-description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing order specialist with a fixed Role, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.1"
+description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
+version: "1.2"
 metadata:
   category: tool-based
   tool-list:
@@ -57,13 +57,13 @@ metadata:
 
 开头说明的内容（按老板的语言改写）：
 
-> 我会给你配两个助手。一个是「订单助手」，在 Telegram 里接顾客：回答产品、价格、提前几天订、能不能送货，收齐下单信息后登记到你的 Google 表格；标准款直接确认，定制款先登记成「待报价」，等你报价。另一个是只给你用的「订单管家」：你对它说「3 号单报价 180」「5 号单已收订金」，它帮你改表；它还会按你定的时间巡查订单，把新增订单、要你处理的事、近几天要交付的单整理好发给你。下面这些资料给我，我就开始建。
+> 我会给你配两个助手。一个是「订单助手」，在 Telegram 里接顾客：回答产品、价格、几人份、用料、保存、配送这些问题，帮顾客挑款，收齐下单信息后登记到你的 Google 表格（它答不上的问题会记下来转给你）；标准款直接确认，定制款先登记成「待报价」，等你报价。另一个是只给你用的「订单管家」：你对它说「3 号单报价 180」「5 号单已收订金」，它帮你改表；它还会按你定的时间巡查订单，把新增订单、要你处理的事、近几天要交付的单整理好发给你。下面这些资料给我，我就开始建。
 
 老板已经先给过一部分资料（例如先发了官网或产品图），也要发这条消息：已有的列出来请老板确认，不重复要，C 组每一项写出准备用的值（老板说过的用老板的，没说的用默认），请老板确认或改。老板回复之后才开始第三步。
 
 **A 店铺基本信息**：店名、官网或社媒链接、取货地址、电话或 WhatsApp、营业时间、取货时间、休息日、顾客常用语言。
 
-**B 产品**：预订目录、价目表或菜单（照片、PDF、文字或官网页面都行），包括款式、尺寸、口味、价格、要提前几天订、哪些可以定制。
+**B 产品和常见问题**：预订目录、价目表或菜单（照片、PDF、文字或官网页面都行），包括款式、尺寸、口味、价格、几人份、主要用料、要提前几天订、哪些可以定制；再加上顾客常问的事：怎么保存、能放多久、能不能少糖或做无麸质、是否清真、送不送蜡烛餐具和生日牌、怎么包装。官网上有的就从官网整理，请老板核对。
 
 **C 下单规矩**（都有默认，老板不答就用默认）：
 - 提前天数：标准款默认提前 1 天，定制款默认提前 3 天。
@@ -82,12 +82,13 @@ metadata:
 ## 第二步：整理
 
 - 产品逐项录入，规则见 `references/catalog-transcription.md`。给的是官网，先读；读不了请老板发截图或文字，不要凭印象编。
+- 常见问题整理成「问题、回答」写进「常见问题」表（`references/workspace-build.md` 第 3.6 节），只写老板或官网给了答案的。
 - C 组每一条写进订单登记表的「店铺设置」（`references/workspace-build.md` 第 3.4 节），不写进 Role。Role 是所有店共用的固定模板，专员每次从表里读规矩。
 - 营业信息只收老板确认的内容，缺的写「待定」。
 
 ## 第三步：建文件
 
-顺序：Drive 文件夹 → 店铺信息文档 → 订单登记表（订单、产品、店铺设置、速查、使用说明）。字段、公式、下拉、条件格式照 `references/workspace-build.md` 做，不改列顺序和公式。只建新文件，不修改、不删除、不移动老板已有的文件，不改共享设置。
+顺序：Drive 文件夹 → 店铺信息文档 → 订单登记表（订单、产品、店铺设置、速查、使用说明、常见问题）。字段、公式、下拉、条件格式照 `references/workspace-build.md` 做，不改列顺序和公式。只建新文件，不修改、不删除、不移动老板已有的文件，不改共享设置。
 
 ## 第四步：核对
 
@@ -113,6 +114,7 @@ metadata:
 6. 老板要做的事：先在 NyxID 应用里和订单助手说一句话（顾客才能用）；订单登记表有顾客电话，只共享给店员（新加坡受 PDPA 约束）。
 7. 下一步：用另一个账号当顾客，在渠道里试：
    - 发「你好，有什么蛋糕」。预期：按产品表介绍，不编产品。
+   - 问「6 寸够几个人吃？能放冰箱几天？」和「10 个人的生日聚会推荐哪款」。预期：按产品表和常见问题回答，推荐两三款并说明理由；表里没有的说会转给店主。
    - 订一个标准款，给齐信息。预期：一次问齐缺的项，确认里有订单号、交付日期、金额、付款方式；订单登记表多一行。
    - 订一个定制款。预期：状态「待报价」，告诉顾客店主会报价。
    - 然后对订单管家说「做一次订单巡查」。预期：报告里「需要你处理」列出那单定制款。
@@ -146,3 +148,6 @@ metadata:
 16. 老板已有「某店订单助手」又说想做订单助手。预期：先问是同一家店还是新店。
 17. 第一条收资料消息。预期：开头讲清两个助手的分工和定时巡查；C 组每项带默认值。
 18. 交付前读订单管家。预期：绑的是本店私有技能且 `isPrivate` 为真；`ornn-api` 放行全部只读接口，对订单管家说「今天有哪些订单」时 `skill_read` 一次成功。
+19. 顾客问「蛋糕能放几天」，常见问题表里有答案。预期：照表回答。
+20. 顾客问「可以做成无糖的吗」，表里没有。预期：不编，告诉顾客会转给店主；「常见问题」多一行待回答。
+21. 顾客说「10 个人的生日，喜欢水果」。预期：从产品表挑两三款份量够、带水果的，用简介说明理由。
