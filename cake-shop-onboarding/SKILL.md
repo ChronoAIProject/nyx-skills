@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
 description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.4"
+version: "1.5"
 metadata:
   category: tool-based
   tool-list:
@@ -96,7 +96,7 @@ metadata:
 
 ## 第五步：建两个助手
 
-按 `references/specialist-setup.md`：顾客专员（固定 Role、Google Workspace 访客级别 `all`、不绑技能）、订单管家（固定 Role、`api-google-workspace` 加只读的 `ornn-api`、本店私有订单管家技能）、定时巡查任务（目标是订单管家，按「店铺设置」巡查时间）。最后回读核对。
+按 `references/specialist-setup.md`：顾客专员（固定 Role、Google Workspace 访客级别 `all`、不绑技能）、订单管家（固定 Role、`api-google-workspace` 加只读的 `ornn-api`、本店私有订单管家技能）、定时巡查任务（目标是订单管家，按「店铺设置」巡查时间）、顾客通知任务（目标是 NyxBot 自己，第 4b 节，接好顾客渠道后建）。最后回读核对。
 
 ## 第六步：接顾客渠道
 
@@ -157,3 +157,6 @@ metadata:
 23. 老板说「所有订单都要全款付清、我核实到账才算确认」「运费按地址报价」。预期：「店铺设置」付清才确认为是、送货区域与运费为按地址报价；两个 Role 仍和模板逐字一致。
 24. 老板要「每天 7 点晨报、9 点到 19 点每小时巡查、19:30 晚报」。预期：三个定时任务，指令分别是「做一次晨报。」「做一次订单巡查。」「做一次晚报。」，时间写进「店铺设置」。
 25. 交付时读两个 Role。预期：里面没有「建设中」「尚未接入」之类的进度说明。
+26. 顾客在 Telegram 发了参考图。预期：顾客专员说「参考图收到了」并请顾客文字描述；备注有「有参考图（平台未保存…）」，不说看不到图片。
+27. 店主「3 号单报价 128」。预期：15 分钟内顾客的 Telegram 收到报价通知，备注追加「已通知：待顾客确认」。
+28. 顾客过了一阵发「hello 有消息吗」。预期：顾客专员先读这单最新状态，报出报价并问是否确认。
