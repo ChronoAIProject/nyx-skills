@@ -1,7 +1,7 @@
 ---
 name: cake-order-desk
 description: "蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns."
-version: "1.6"
+version: "1.7"
 metadata:
   category: tool-based
   tool-list:
@@ -99,6 +99,7 @@ metadata:
 3. 分类（已取消的单只在「新增」里出现时标出来，其他部分忽略）：
    - 判断一单要不要处理，只看 T 状态、S 订金状态、交付日期，以及备注里「顾客要求：」后面有没有「已处理」。备注里其他文字（下单时写的「档期待确认」之类说明）是历史记录，不算待办。
    - **需要你处理**，按紧急程度排序：
+     0. 备注里有「顾客称已付款」、订金状态还是未收的：写「顾客说已付款（时间），请核实 S$金额 到账」，店主回「到账了」后才算处理完；
      1. 状态待报价（定制款等报价）；
      2. 状态待确认（属于待确认类别）；状态待付款且交付在 3 天内的；
      3. 备注里有「顾客要求」而后面没有「已处理」的；备注里有「有参考图（平台未保存」且还是待报价的（提醒店主用订单里的电话向顾客要原图）；备注里有「未能通知」的；
@@ -145,7 +146,8 @@ metadata:
 
 - 行格式：`#订单号 产品 规格 · 交付日期 时间 方式（送货写区域）· 金额 · 状态或要做的事`。定制单在产品前写「定制」。
 - 第二行是一句话总览，没有的项不写。
-- 什么都没有时只发一行：「✅ 11/4 14:00 巡查：没有新订单，也没有要你处理的事。」（每小时巡查时尤其要短，不重复列已经报过、店主还没处理的旧事项，只在它变得更急时——例如交付到了今天——再列）
+- 什么都没有时只发一行：「✅ 11/4 14:00 巡查：没有新订单，也没有要你处理的事。」
+- 每小时巡查时：上次巡查之后有新进展的单（新订单、状态变了、备注里新加了「顾客称已付款」「顾客要求」「未能通知」等带时间的记录）一定列出；顾客称已付款、等你核实的单每次都列，直到店主说到账；其他已经报过、没有新进展的旧事项不重复列，只在变急时（例如交付到了今天）再列。
 - 不写顾客电话和地址全文（送货只写区域）；店主要看详情会问。
 - 报告到「顾客问题待回答」那一块就结束（没有待回答的问题就到产能为止）：不写「来源：…」、不写「已更新上次巡查时间」、不写「没有产能提醒」这类过程或空结论。
 - 「需要你处理」每行只写一件要店主做的事，不超过一行半；过敏、送达时间等细节放在店主追问时再说。
@@ -198,6 +200,7 @@ metadata:
 18. 「做一次晚报」，今天完成 1 单、明天 3 单交付。预期：标题🌙，今天完成 1 行，明天交付 3 行。
 19. 每小时巡查，上次巡查后没有新订单，旧的待报价单店主还没处理。预期：只发一行，不重复列旧事项。
 20. 「12 号单到账了」，#12 状态待付款。预期：S 已收，T 已确认。
+24. 每小时巡查，#3 状态一直是待付款，上次巡查后备注新加了「顾客称已付款（15:48）」。预期：「需要你处理」第一行写「#3 顾客说已付款（15:48），请核实 S$128 到账」。
 21. 「12 号单报价 168」，#12 是送货单，店铺设置运费为「全岛 S$20」。预期：Q 188，回复写「蛋糕 S$168 + 运费 S$20 = S$188」。
 22. 巡查时 #12 已确认，但备注里有下单时写的「档期待确认」。预期：不列入「需要你处理」。
 23. 「回答问题：可以做低糖」。预期：最早的待回答问题写入回答并改为已答（要调用工具写表，不能只复述答案）。
