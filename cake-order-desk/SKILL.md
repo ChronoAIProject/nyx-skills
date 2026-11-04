@@ -1,7 +1,7 @@
 ---
 name: cake-order-desk
 description: "蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns."
-version: "1.4"
+version: "1.5"
 metadata:
   category: tool-based
   tool-list:
@@ -63,7 +63,7 @@ metadata:
 
 ## 操作
 
-**报价**：「12 号单报价 180」「#12 180 元，订金 90」。Q 写金额；R 写订金（店主没说就按「店铺设置」订金规则算；付清才确认为是时 R 写全款；不收订金写 0 并把 S 写免收）；T 从待报价改为待顾客确认。报的是运费（「运费 15」「12 号单运费 S$15」）：Q 加上运费，V 追加「运费 S$15」，其余同上。报蛋糕价的单子是送货、而「店铺设置」送货区域与运费是固定运费（例如「全岛 S$20」，满额免运费的按规则算）：Q 写蛋糕价加运费，V 追加「含运费 S$20」，回复和转发话术里写明「蛋糕 S$168 + 运费 S$20 = S$188」；运费是按地址报价的，提醒店主一起报运费。回：`#12 已报价 S$180（订金 S$90），等顾客确认`，附一句转发给顾客的话：订单号、金额、订金、付款方式（取自设置）、请顾客回复确认。
+**报价**：「12 号单报价 180」「#12 180 元，订金 90」。Q 写金额；R 写订金（店主没说就按「店铺设置」订金规则算；付清才确认为是时 R 写全款；不收订金写 0 并把 S 写免收）；T 从待报价改为待顾客确认。报的是运费（「运费 15」「12 号单运费 S$15」）：Q 加上运费，V 追加「运费 S$15」，其余同上。报蛋糕价的单子是送货、而「店铺设置」送货区域与运费是固定运费（例如「全岛 S$20」，满额免运费的按规则算）：Q 写蛋糕价加运费，V 追加「含运费 S$20」，回复和转发话术里写明「蛋糕 S$168 + 运费 S$20 = S$188」；运费是按地址报价的，提醒店主一起报运费。回：`#12 已报价 S$180（订金 S$90），等顾客确认；顾客会自动收到通知`。报价、到账确认、取消这些状态变化由 NyxBot 的顾客通知任务发给顾客（备注里出现「已通知：…」），你不用让店主转发；备注里有「未能通知」时告诉店主要自己联系顾客（电话在订单里）。
 
 **确认**：「12 号单确认」。T 从待确认、待顾客确认或待付款（店主同时说了已收款）改为已确认，V 追加「店主确认」。
 
@@ -101,7 +101,7 @@ metadata:
    - **需要你处理**，按紧急程度排序：
      1. 状态待报价（定制款等报价）；
      2. 状态待确认（属于待确认类别）；状态待付款且交付在 3 天内的；
-     3. 备注里有「顾客要求」而后面没有「已处理」的；
+     3. 备注里有「顾客要求」而后面没有「已处理」的；备注里有「有参考图（平台未保存」且还是待报价的（提醒店主用订单里的电话向顾客要原图）；备注里有「未能通知」的；
      4. 交付在今天或明天、订金状态未收、订金大于 0 的；
      5. 交付在今天或明天、状态还是已确认（还没开始做）的；
      6. 状态待顾客确认超过 24 小时的。
