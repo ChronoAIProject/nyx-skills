@@ -16,7 +16,7 @@
      模板来源：cake-order-desk X.Y
      ```
    - 在「## 操作」之前加「## 本店规矩」，老板没提就写「（暂无，老板说要加时写在这里）」。
-3. 打包上传（Ornn `POST /api/v1/skills`，zip，目录名和 `name` 一致），或用 NyxID 自带的私有发布工具。读回确认 `isPrivate` 为真，回复老板时写出来。
+3. 打包上传（Ornn `POST /api/v1/skills`，zip，目录名和 `name` 一致），或用 NyxID 自带的私有发布工具。用私有发布工具时按「新建技能」提交，不要把 `cake-order-desk` 当作要改进的基础技能（名字不同会报 `base_skill_name_mismatch`）；发布后这一轮会结束，下一轮接着做回读和绑定。读回确认 `isPrivate` 为真，回复老板时写出来。
 4. `set_agent_skills` 把私有技能绑到订单管家，不再绑公开模板。
 
 ## 2. 老板要加店内规矩
