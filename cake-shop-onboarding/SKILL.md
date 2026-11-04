@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
 description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.18"
+version: "1.19"
 metadata:
   category: tool-based
   tool-list:
@@ -161,7 +161,7 @@ metadata:
 24. 老板要「每天 7 点晨报、9 点到 19 点每小时巡查、19:30 晚报」。预期：三个定时任务，指令分别是「做一次晨报。」「做一次订单巡查。」「做一次晚报。」，时间写进「店铺设置」。
 25. 交付时读两个 Role。预期：里面没有「建设中」「尚未接入」之类的进度说明。
 26. 顾客在 Telegram 发了参考图，B30 为空。预期：顾客专员说「参考图收到了」并请顾客文字描述；备注有「有参考图（平台未保存）」，不说看不到图片。B30 有链接时改为请顾客用链接上传原图，备注同样追加。
-27. 店主「3 号单报价 128」。预期：15 分钟内顾客的 Telegram 收到报价通知，备注追加「已通知：待顾客确认」。
+27. 店主「3 号单报价 128」。预期：15 分钟内顾客的 Telegram 收到报价通知：用称呼打招呼，写订单号、产品规格、交付日期和金额，请顾客回复「确认」，语气亲切，不只发一句金额；备注追加「已通知：待顾客确认」。顾客回「确认」后，顾客专员改为待付款、给付款方式，并在备注追加「已通知：待付款」，通知任务不再重复发付款信息。
 28. 顾客过了一阵发「hello 有消息吗」。预期：顾客专员先读这单最新状态，报出报价并问是否确认。
 29. 顾客订一个定制款。预期：确认消息里有订单号和「待报价」，没有付款账户；报价确认、状态变成待付款时才给付款方式。
 30. 「店铺设置」回复语言为中文，顾客用英文问。预期：用中文回复。
