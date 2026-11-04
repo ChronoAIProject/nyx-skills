@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
 description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.10"
+version: "1.11"
 metadata:
   category: tool-based
   tool-list:
@@ -65,6 +65,8 @@ metadata:
 
 **B 产品和常见问题**：预订目录、价目表或菜单（照片、PDF、文字或官网页面都行），包括款式、尺寸、口味、价格、几人份、主要用料、要提前几天订、哪些可以定制；再加上顾客常问的事：怎么保存、能放多久、能不能少糖或做无麸质、是否清真、送不送蜡烛餐具和生日牌、怎么包装。官网上有的就从官网整理，请老板核对。
 
+**参考图**：顾客在聊天里发的图片平台不保存，所以请老板按 `references/workspace-build.md` 第 3.8 节的步骤建一个「参考图上传」Google 表单（约 2 分钟），把链接发来；之后助手问预订信息时会附上这个链接，顾客直接在表单里传图，图片会进老板的 Drive 并挂到对应订单上。老板说先不建也可以。
+
 **C 下单规矩**（都有默认，老板不答就用默认）：
 - 提前天数：标准款默认提前 1 天，定制款默认提前 3 天。
 - 每天最多接几单：默认不限。
@@ -83,7 +85,7 @@ metadata:
 
 - 产品逐项录入，规则见 `references/catalog-transcription.md`。给的是官网，先读；读不了请老板发截图或文字，不要凭印象编。
 - 常见问题整理成「问题、回答」写进「常见问题」表（`references/workspace-build.md` 第 3.6 节），只写老板或官网给了答案的。
-- C 组每一条写进订单登记表的「店铺设置」（`references/workspace-build.md` 第 3.4 节）。模板没有对应项的店铺规矩（夹心和加价、保存、清真、必填信息、急单等），写在「店铺设置」第 30 行以后或「常见问题」里。**两个 Role 一个字都不改**：Role 是所有店共用的固定模板，专员每次从表里读规矩；把规矩写进 Role，以后改规矩就得改 Role，也会和模板升级冲突。
+- C 组每一条写进订单登记表的「店铺设置」（`references/workspace-build.md` 第 3.4 节）。模板没有对应项的店铺规矩（夹心和加价、保存、清真、必填信息、急单等），写在「店铺设置」第 33 行以后或「常见问题」里。**两个 Role 一个字都不改**：Role 是所有店共用的固定模板，专员每次从表里读规矩；把规矩写进 Role，以后改规矩就得改 Role，也会和模板升级冲突。
 - 营业信息只收老板确认的内容，缺的写「待定」。
 
 ## 第三步：建文件
@@ -163,3 +165,5 @@ metadata:
 29. 顾客订一个定制款。预期：确认消息里有订单号和「待报价」，没有付款账户；报价确认、状态变成待付款时才给付款方式。
 30. 「店铺设置」回复语言为中文，顾客用英文问。预期：用中文回复。
 31. 顾客说「想订蛋糕」。预期：一次问齐必填项，问口味那一项后面列出可选口味和加价，不只写「口味：」。
+32. 老板发来参考图表单链接。预期：找到回复表，「店铺设置」B30 是链接、B31 是回复表 ID。
+33. 顾客说「想订蛋糕」，B30 有链接。预期：问预订信息的同一条消息里附上上传链接。
