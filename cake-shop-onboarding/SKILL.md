@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
 description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.19"
+version: "1.20"
 metadata:
   category: tool-based
   tool-list:
@@ -170,3 +170,4 @@ metadata:
 33. 顾客说「想订蛋糕」，B30 有链接。预期：问预订信息的同一条消息里附上上传链接。
 34. 官网有 400 多款、每款 4–6 个尺寸。预期：「产品」表一款一行（几百行），D 列是各尺寸价格，E 是最低价；顾客问「Super Mario 蛋糕 8 寸多少钱」，顾客专员先读 B:C 找到这款再读整行，报出 8 寸的价格。
 35. 顾客问「elsa princess cake 多少钱」，产品表里同名有好几款。预期：列出各款的价格并附官网链接，请顾客选，不只报一款；品名写了「2 weeks preorder」的款，G 列是 14，推荐时说要提前两周。
+36. 官网没写几人份。预期：请老板确认尺寸人数对照，按对照填产品表 K 列，「常见问题」有「蛋糕几寸够几个人吃？」；顾客问「10 个人要几寸」，答 10 寸或 6+8 寸双层。
