@@ -1,7 +1,7 @@
 ---
 name: cake-order-desk
-description: "蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns."
-version: "1.2"
+description: "蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns."
+version: "1.3"
 metadata:
   category: tool-based
   tool-list:
@@ -42,7 +42,9 @@ metadata:
 | J | 产品 | U | 来源 |
 | K | 规格 | V | 备注 |
 
-状态：待报价、待顾客确认、待确认、已确认、制作中、待取货、已送出、已完成、已取消。正常流转：待报价 → 待顾客确认 → 已确认 → 制作中 → 待取货（自提）或已送出（送货）→ 已完成。
+状态：待报价、待顾客确认、待确认、待付款、已确认、制作中、待取货、已送出、已完成、已取消。正常流转：待报价 → 待顾客确认 →（「付清才确认」为是时）待付款 → 已确认 → 制作中 → 待取货（自提）或已送出（送货）→ 已完成。
+
+「店铺设置」第 30 行以后是这家店特有的规矩（夹心加价、保存、必填信息等），操作和报告时照做。
 
 其他工作表：
 - `产品`：A 编号、B 分类、C 品名、D 规格、E 价格、F 类型、G 提前天数、H 口味选项、I 备注、J 简介、K 份量。
@@ -61,11 +63,11 @@ metadata:
 
 ## 操作
 
-**报价**：「12 号单报价 180」「#12 180 元，订金 90」。Q 写金额；R 写订金（店主没说就按「店铺设置」订金规则算，不收订金写 0 并把 S 写免收）；T 从待报价改为待顾客确认。回：`#12 已报价 S$180（订金 S$90），等顾客确认`，附一句转发给顾客的话：订单号、金额、订金、付款方式（取自设置）、请顾客回复确认。
+**报价**：「12 号单报价 180」「#12 180 元，订金 90」。Q 写金额；R 写订金（店主没说就按「店铺设置」订金规则算；付清才确认为是时 R 写全款；不收订金写 0 并把 S 写免收）；T 从待报价改为待顾客确认。报的是运费（「运费 15」「12 号单运费 S$15」）：Q 加上运费，V 追加「运费 S$15」，其余同上。回：`#12 已报价 S$180（订金 S$90），等顾客确认`，附一句转发给顾客的话：订单号、金额、订金、付款方式（取自设置）、请顾客回复确认。
 
 **确认**：「12 号单确认」。T 从待确认或待顾客确认改为已确认。
 
-**收订金或全款**：「12 号单收了订金」「收了全款」。S 写已收；全款时 V 追加「已收全款」。
+**收订金或全款**：「12 号单收了订金」「收了全款」「12 号单到账了」。S 写已收；全款时 V 追加「已收全款」；状态是待付款的改为已确认。顾客发截图不算到账，只有店主说了才写。
 
 **开始做**：「12 号单开始做了」。T 写制作中。
 
@@ -90,14 +92,14 @@ metadata:
 
 ## 订单巡查
 
-定时任务说「做一次订单巡查」，或店主说「巡查一下」时：
+定时任务说「做一次订单巡查」，或店主说「巡查一下」时（晨报、晚报见下一节）：
 
 1. 并行读 `'速查'!A1:E9`（设置和今天起 7 天的接单数）、`'常见问题'!A1:E200` 和订单：先读 `'订单'!A:A` 得到最后一行 n，再读 `A{max(2,n-299)}:V{n}`。
 2. 从设置里取「上次巡查时间」（空就当作 24 小时前）、提前天数、每日最多接单。
 3. 分类（已取消的单只在「新增」里出现时标出来，其他部分忽略）：
    - **需要你处理**，按紧急程度排序：
      1. 状态待报价（定制款等报价）；
-     2. 状态待确认（属于待确认类别）；
+     2. 状态待确认（属于待确认类别）；状态待付款且交付在 3 天内的；
      3. 备注里有「顾客要求」而后面没有「已处理」的；
      4. 交付在今天或明天、订金状态未收、订金大于 0 的；
      5. 交付在今天或明天、状态还是已确认（还没开始做）的；
@@ -142,11 +144,32 @@ metadata:
 
 - 行格式：`#订单号 产品 规格 · 交付日期 时间 方式（送货写区域）· 金额 · 状态或要做的事`。定制单在产品前写「定制」。
 - 第二行是一句话总览，没有的项不写。
-- 什么都没有时只发两行：标题行，加「✅ 自上次巡查（时间）以来没有新订单，也没有要你处理的事。」
+- 什么都没有时只发一行：「✅ 11/4 14:00 巡查：没有新订单，也没有要你处理的事。」（每小时巡查时尤其要短，不重复列已经报过、店主还没处理的旧事项，只在它变得更急时——例如交付到了今天——再列）
 - 不写顾客电话和地址全文（送货只写区域）；店主要看详情会问。
 - 报告到「顾客问题待回答」那一块就结束（没有待回答的问题就到产能为止）：不写「来源：…」、不写「已更新上次巡查时间」、不写「没有产能提醒」这类过程或空结论。
 - 「需要你处理」每行只写一件要店主做的事，不超过一行半；过敏、送达时间等细节放在店主追问时再说。
 - 不超过 30 行；新增超过 10 单时只列前 10 单，末尾写「另有 N 单，说『列出全部新增』查看」。
+
+## 晨报和晚报
+
+定时任务说「做一次晨报」或「做一次晚报」时，读的东西和巡查一样（订单、速查、常见问题），最后同样写回上次巡查时间。格式和巡查一样分块、每单一行、空块不写、不写来源和过程。
+
+**晨报**（标题 `☀️ 今日安排｜11月5日（周四）`）：
+1. 第二行总览：今天交付几单（自提几、送货几）· 需要你处理几件。
+2. 📦 今天交付：按交付时间排，每单一行，送货写区域，状态不是制作中的写「还没开始做」。
+3. ⚠️ 今天要处理：待报价、待确认、待付款、顾客要求、明天交付但没开始做或没付款的。
+4. ❓ 顾客问题待回答（有就列）。
+没有交付也没有要处理的：一行「☀️ 11/5 今天没有交付，也没有要你处理的事。」
+
+**晚报**（标题 `🌙 今日小结｜11月5日（周四）`）：
+1. 第二行总览：今天新增几单 · 完成几单 · 还有几单没完成。
+2. ✅ 今天完成：状态已完成且交付日期是今天的，每单一行。
+3. ❗ 今天没完成：交付日期是今天、还没到已完成或已取消的。
+4. 📅 明天交付：按时间排，每单一行，没开始做或没付款的标出来。
+5. ⚠️ 明天之前要处理：待报价、待确认、待付款、顾客要求、待回答的顾客问题。
+今天和明天都没有订单：一行「🌙 11/5 今天没有订单，明天也没有交付。」
+
+金额只按表里写的统计；没有收款记录就不说「收入」。
 
 ## 输出
 
@@ -170,3 +193,7 @@ metadata:
 14. 巡查时今天和后天都没有交付。预期：「近 3 天交付」只写明天那一行；报告末尾没有来源行和过程说明。
 15. 巡查时「常见问题」有 2 条待回答。预期：报告最后一块列出这 2 个问题和提问时间。
 16. 「回答问题：无糖做不了，可以少糖」。预期：最早那条待回答写入回答，状态已答，附转发话术。
+17. 「做一次晨报」，今天 2 单交付、其中 1 单还是已确认。预期：标题☀️，今天交付 2 行，那单标「还没开始做」。
+18. 「做一次晚报」，今天完成 1 单、明天 3 单交付。预期：标题🌙，今天完成 1 行，明天交付 3 行。
+19. 每小时巡查，上次巡查后没有新订单，旧的待报价单店主还没处理。预期：只发一行，不重复列旧事项。
+20. 「12 号单到账了」，#12 状态待付款。预期：S 已收，T 已确认。

@@ -1,6 +1,6 @@
 # cake-order-desk
 
-> 蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns.
+> 蛋糕店 甜品店 订单 报价 订金 制作 取货 送货 取消 改期 巡查 报告 待处理 cake shop bakery order desk patrol report. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the order sheet and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns.
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `1.2`
-- Last synced: `2026-11-04T05:00:02.584Z`
+- Latest version: `1.3`
+- Last synced: `2026-11-04T05:50:30.057Z`
 
 ## Install
 
