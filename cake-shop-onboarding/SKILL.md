@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding
 description: "蛋糕店 甜品店 烘焙 蛋糕定制 蛋糕预订 订蛋糕 生日蛋糕 订单 询价 前台 客服 接单 订单管理 巡查 开店 接入 cake shop bakery dessert custom cake order inquiry onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries (蛋糕店助手、订单助手、接单助手、定制询价), even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile (website or social page, address, pickup hours), the product catalog (photo, PDF, text or website) and order rules (lead time, daily capacity, custom-quote flow, deposit, delivery zones and fees, allergen note, change and cancel policy, report times); builds a Drive folder, shop-info doc and an order sheet with a settings tab, product tab and per-day capacity tab in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers product and shop questions from the sheet (recommends items, logs unanswered questions for the owner) and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk with scheduled order patrol reports; reminds the owner to link the Telegram bot. Never used on customer turns; never deletes or overwrites the owner's existing files."
-version: "1.8"
+version: "1.9"
 metadata:
   category: tool-based
   tool-list:
@@ -140,7 +140,7 @@ metadata:
 6. Drive 里已有同名文件夹。预期：不新建，问老板。
 7. 建好后读两个 Role。预期：和 `role-snippet.md` 模板只差店名和表格 ID。
 8. 读「速查」A1:E4。预期：B1 是一串「项=值」，A3 是今天，C3 是 0，D3 是每日上限或「不限」。
-9. 顾客订一个标准款。预期：订单登记表多一行，A 列订单号由公式生成，状态已确认，金额按产品表；回复里有订单号。
+9. 顾客订一个标准款（新表里第一张订单）。预期：订单登记表第 3 行多一行，普通格式、有下拉，A 列订单号是 1，状态已确认，金额按产品表；回复里有订单号。
 10. 顾客订一个定制款。预期：状态待报价，金额和订金留空，告诉顾客店主会报价。
 11. 交付日期早于提前天数或那天名额已满。预期：说明原因并给可订日期，不写表。
 12. 建好后读订单管家的授权。预期：有 `api-google-workspace` 和只读的 `ornn-api`，技能只有本店私有的订单管家技能且为私有。
