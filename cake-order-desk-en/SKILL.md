@@ -1,7 +1,7 @@
 ---
 name: cake-order-desk-en
 description: "Cake shop, bakery, dessert shop order desk: orders, quote, deposit, production, pickup, delivery, cancel, reschedule, patrol, morning report, evening report, needs you. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding-en. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the Order Book and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns."
-version: "1.0"
+version: "1.1"
 metadata:
   category: tool-based
   tool-list:
@@ -57,7 +57,8 @@ Other tabs:
 ## General rules
 
 - Use the time zone in Settings. In the Orders tab, write dates as `2026-11-05`, times as `18:05`, and Ordered at as `2026-11-03 18:05`, with `USER_ENTERED`. Write values in Settings (including Last patrol) with `RAW` so they stay text. Otherwise they become date serial numbers and show up in Lookup B1 as a string of digits.
-- Order # is the row number minus 2: #12 is in row 14 (row 2 is the sample row). Read that row, `'Orders'!A14:V14`, and check the order # and name before writing. If they do not match, ask the owner and do not write.
+- Order # is the row number minus 2: #12 is in row 14 (row 2 is the sample row). Read that row, `'Orders'!A14:V14`, and check the order # and name before writing. If they do not match, ask the owner and do not write. If column A is empty (the order # formula is broken) but B Ordered at has a value, the row is still an order: use row − 2 as the order #, handle it as usual, and remind the owner `Order # formula is broken, ask NyxBot to fix it`.
+- To decide whether there are orders and where the last row is, always look at column B Ordered at, never column A. If an order # finds nothing, search by name, phone and due date. Only say there is no such order when those find nothing too.
 - If the owner gives no order #, find it by name, phone or due date. If several orders match, list them and ask.
 - Write only the cells that need to change. Column A is a formula. No write ever touches column A. Never delete, clear or reorder rows.
 - Notes column V is append-only, in the format `(MM-DD HH:mm) content`. Never overwrite what is there. Before writing a time, use the time tool to get the current time in the Settings time zone. Never write "time not available" or "exact time unknown". The patrol relies on these times to spot new progress.
@@ -86,7 +87,7 @@ Other tabs:
 **Answer a customer question**: "Answer question: we can't do sugar-free, but we can do less sugar", "Answer question 5: it keeps in the fridge for 3 days". Find the Unanswered question in FAQ. (If the owner did not say which, take the earliest Unanswered one. If several could match, list them and ask.) Write the answer in B, change C to `Owner` and E to `Answered`. Reply: `Noted. I'll use this answer when customers ask.` Then add one line the owner can forward to the customer who asked. (The customer specialist does not go back and tell the customer on its own.)
 
 **Queries**:
-- "What orders today / tomorrow", "Orders on 8 November": list the orders with that due date whose status is not Cancelled, sorted by due time.
+- "What orders today / tomorrow", "Orders on 8 November": find all order rows by column B, then list the orders with that due date whose status is not Cancelled, sorted by due time. List rows with an empty order # too, and flag the broken order #.
 - "What needs me?": list them by the "Needs you" rules of the patrol below.
 - "What's happening with #12?": list that order's key fields.
 
@@ -96,12 +97,13 @@ Query replies use the same line format as the patrol report.
 
 When a schedule says `Do an order patrol.` or the owner says "do a patrol" (for morning and evening reports, see the next section):
 
-1. In parallel, read `'Lookup'!A1:E9` (settings, and bookings for 7 days from today), `'FAQ'!A1:E200`, and the orders: read `'Orders'!A:A` first to get the last row n, then read `A{max(3,n-299)}:V{n}` (do not read the sample row 2).
+1. In parallel, read `'Lookup'!A1:E9` (settings, and bookings for 7 days from today), `'FAQ'!A1:E200`, and the orders: read `'Orders'!B:B` (Ordered at) first to get the last row n that has a value, then read `A{max(3,n-299)}:V{n}` (do not read the sample row 2). Do not use column A to find the last row: when the order # formula is broken, column A is empty.
 2. From the settings, take Last patrol (if empty, treat it as 24 hours ago), the lead days, Daily order limit and Reference image sheet ID.
 3. When Reference image sheet ID is not empty, this step cannot be skipped. Use that ID to read the response sheet `A1:F500` (no tab name; read the first tab). Row 1 is the header. Find the columns by header: `Timestamp`, `Name`, `Phone`, `Pickup or delivery date`, `Reference image`, `Design notes`. The ID is not known until the previous step, so do not run this in parallel with step 1.
 4. Sort the orders into groups. (Cancelled orders are flagged only when they appear under New orders; ignore them everywhere else.)
    - To decide whether an order needs handling, look only at T Status, S Deposit status, the due date, and whether `Customer request:` in Notes is followed by `Handled`. Any other text in Notes (for example "Date to be confirmed" written at order time) is history, not a to-do.
    - **Needs you**, sorted by urgency:
+     - First of all, data anomalies, listed every time until fixed: B has a value but A is empty or not equal to row − 2 (`Row N order # is broken, ask NyxBot to fix the order # formula`); Source is not one of Telegram, WhatsApp, NyxID, Phone, Walk-in; Source is Telegram but Notes does not start with `TG: ` or `TEST ORDER; TG: ` (`#N cannot be notified: no TG name in Notes`); Setup status is Building but new orders have appeared.
      0. Notes has `Customer says paid` and Deposit status is still Unpaid: write "Customer says paid (time), please check S$amount arrived". It counts as handled only after the owner replies "paid".
      1. Status Awaiting quote (a custom order waiting for a quote).
      2. Status Pending review (the Needs review category); status Awaiting payment with the due date within 3 days.
@@ -151,7 +153,7 @@ The report is your reply. It goes to the owner's phone. Lead with the conclusion
 Reply "Answer question: …" and I'll add it to the FAQ tab
 ```
 
-- Line format: `#Order# Product Size · Due date time Method (area for delivery) · Amount · Status or what to do`. For custom orders, put `Custom` before the product.
+- Line format: `#Order# Product Size · Due date time Method (area for delivery) · Amount · Status or what to do`. For custom orders, put `Custom` before the product. For test orders, end the line with `(test order)`.
 - The second line is a one-line summary. Leave out items with nothing.
 - When there is nothing at all, send only one line: `✅ Nov 4 14:00 patrol: no new orders, nothing needs you.`
 - On hourly patrols: always list orders with new progress since Last patrol (new orders, customer cancellations or changes, new timed records in Notes such as `Customer says paid`, `Customer request`, `Could not notify`). Changes the owner made through the order manager (quote, payment confirmed, production started, cancel, reschedule and so on) and the `Notified` records written by the notifications task are not new progress. Do not report them back to the owner. Orders waiting on the owner while the customer waits are listed every time: Customer says paid waiting for the owner to check (until the owner says paid), status Awaiting quote, status Pending review. One order per line. Do not drop them because they were reported before. Do not repeat other old items already reported with no new progress. List them again only when they become urgent (for example, the due date is now today).
@@ -218,3 +220,6 @@ In the owner's language. Operation replies are one to three lines. Patrols follo
 29. `Do a morning report.`, then the 09:00 patrol runs, and 1 new order came in at 22:00 last night. Expected: the morning report does not write Last patrol; the 09:00 patrol lists that order under "New orders".
 30. Instruction `Do an order patrol. (Test run: do not write Last patrol.)`. Expected: the report is as usual, B23 is unchanged.
 31. The patrol writes back Last patrol. Expected: B23 is the text `2026-11-04 17:00`, and Lookup B1 contains `Last patrol=2026-11-04 17:00`, not a string of digits.
+32. Column A's formula in Orders is broken: row 3 has Ordered at in B but A is empty. The owner asks "What orders today". Expected: the order is found by column B and listed, with the reminder `Row 3 order # is broken, ask NyxBot to fix the order # formula`; the reply is not "no orders".
+33. On patrol, a Telegram order has a web address in Source and Notes starting with "TG display name: …". Expected: "Needs you" lists the data anomalies: wrong source, and the customer cannot be notified.
+34. Orders has a row whose Notes start with `TEST ORDER; TG: …`. Expected: that line in the report ends with `(test order)`.
