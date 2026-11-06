@@ -1,7 +1,7 @@
 ---
 name: restaurant-reservation-onboarding-en
 description: "Restaurant reservation, booking, table and front desk onboarding. Use on owner turns when a restaurant owner says they run a restaurant and want a NyxBot agent that answers guest questions and takes table bookings (reservation assistant, booking assistant, front desk assistant), even if the owner already has a reservation specialist; ask whether it is the same restaurant or a new one. Bind this skill to NyxBot with set_agent_skills first. Collects the restaurant profile, menu (photo, PDF or text), table and private-room inventory and booking rules; builds a Drive folder, menu sheet, restaurant info doc, reservation sheet with live table board, a Settings tab for house rules and a Lookup tab of free tables per day, and a private-room calendar in the owner's Google Workspace; creates the specialist from the fixed Role template (only store name and sheet ID filled in), grants Google Workspace, copies restaurant-reservation-desk-en into a private per-store Ornn skill and binds it, and links the guest channel. Never used on guest turns; never deletes or overwrites owner files."
-version: "1.3"
+version: "1.4"
 metadata:
   category: tool-based
   tool-list:
@@ -63,11 +63,14 @@ Do not assume it is the same restaurant without asking, and do not just reply "I
 4. Read back and check.
 5. Create the reservation specialist, grant access, bind skills: per `references/specialist-setup.md`.
 6. Link the guest channel.
-7. Deliver.
+7. Deliver: keep "Built", "Configured" and "Verified" separate, and spell out any downgrades and blockers.
+8. Go-live check: another account runs a real booking end to end; only when every step passes, tell the owner they can announce it to guests.
 
-Write no text between Steps 3 and 5; do them in one go. Speak again at Step 6 when the owner needs to act.
+Write no text between Steps 3 and 5; do them in one go. Speak again at Step 6 when the owner needs to act. After NyxID shows a confirmation card and the owner confirms, **continue with the next step in the same turn**; do not stop to report "step X done". If the turn really has ended and the owner says "continue", resume from the Setup Log. Put structure, content and formatting for the same sheet into one batch where they fit, so fewer confirmation cards appear.
 
-If the run is interrupted (turn timeout, error, owner asks "What happened?"): first check which files, specialist, grants, skills and channel already exist, then continue from the step that is not finished. Do not rebuild what exists. Wherever you resume, always finish with the Step 4 check and the Step 7 delivery. Do not stop at "Done filling in the gaps".
+Each time something is built or reused, immediately append a row to the Setup Log tab of the reservation sheet (`references/workspace-build.md` section 4.10).
+
+If the run is interrupted (turn timeout, error, an action failed, it stopped after a confirmation card, owner asks "What happened?"): first read the Setup Log, read back each item by ID, then continue from the step that is not finished or failed. Do not guess by name, and do not rebuild what exists. Wherever you resume, always finish with the Step 4 check and the Step 7 delivery. Do not stop at "Done filling in the gaps".
 
 ## Step 1: collect details
 
@@ -87,7 +90,7 @@ If the owner already gave some details before the skill was bound (for example s
 
 **C Tables**: for the hall, the number of tables of each type and seats per table; the number of private rooms and each room's capacity range (minimum and maximum guests, e.g. 6–8); table numbers if there are any. A floor plan is fine too: count from the plan, then ask the owner to confirm the count.
 
-Once the tables are counted, list table numbers by area and ask the owner to pick tags for each area (several allowed, or none): window, door, inner, quiet, lively, near kitchen, spacious (good for wheelchairs or high chairs). You may suggest tags from the floor plan first, e.g. "Area A along the street windows: window; Area C next to the kitchen pass: near kitchen", and let the owner change or confirm. Do not treat your guess as final without asking. If the owner says some tables are exceptions, tag them individually.
+Once the tables are counted, list the party range you plan to use for each table type and ask the owner to confirm or change it (defaults: 2-seat 1–2, 4-seat 1–4, 6-seat round 4–6, 8-seat round 6–8; rooms use the owner's range; e.g. "6-seat table for 4–6 guests: a party of 3 will not be seated at this table. OK?"), then list table numbers by area and ask the owner to pick tags for each area (several allowed, or none): window, door, inner, quiet, lively, near kitchen, spacious (good for wheelchairs or high chairs). You may suggest tags from the floor plan first, e.g. "Area A along the street windows: window; Area C next to the kitchen pass: near kitchen", and let the owner change or confirm. Do not treat your guess as final without asking. If the owner says some tables are exceptions, tag them individually.
 
 **D Booking rules** (all have defaults; if the owner does not answer, use the default):
 - Dining duration: 2 to 4 guests 90 minutes, 6 to 8 guests at round tables 120 minutes, rooms 150 minutes. If the owner says No limit, do not release tables automatically by duration; a table is released only when the owner or staff says "{table} left".
@@ -140,21 +143,33 @@ For the channels the owner gave in group E, use NyxBot's channel setup tool to p
 In the owner's language, plain text, in this order:
 
 1. Files built: name plus link, one per line.
-2. Specialist and channel built: specialist name, channel account, what guests can do.
+2. Specialist and channel built: specialist name (tell the owner to find it in the specialist list in the NyxID app; if it is not there, refresh; if it is still missing, send the specialist name and this sentence to NyxBot), channel account, what guests can do. Then write the status on three lines:
+   - Built: files, specialist, channel.
+   - Configured: guest access (`api-google-workspace` at all, `ornn-api` at read), operation scope, desk skill (the store's private version, with version number).
+   - Downgrades and blockers: write "None" if there are none; otherwise list each one, e.g. "The operation scope is all endpoints, broader than needed", "Using the public template; no private version for this store yet", "Guest access is stuck at use, so guest reschedules and cancellations will fail (blocker)". If there is any blocker, say clearly "Not ready to take bookings from guests yet".
 3. Points for the owner to check: menu issues, table totals, defaults used.
 4. How to change rules: opening hours, closed days, deposit, whether to ask special requests and occasion, occasion perks and needs-approval categories are all in column B of the Settings tab in the reservation sheet. The owner edits them directly and they apply from the next booking; no need to ask NyxBot to change the specialist. The Lookup tab is formulas; do not edit it by hand. For other house practices (e.g. tell the kitchen when a booking moves to a room, which tables can be joined), say to NyxBot "Add a desk rule: ...", and it goes into the store's private skill (write out its name). When the public template updates, NyxBot asks before merging.
 5. How the owner uses it day to day, with three example phrases: "B3 seated", "B3 left", "How many 4-seats are left tonight?". These are handled by `restaurant-reservation-desk-en`; the owner says them to the specialist in the NyxID app or the channel.
 6. Things the owner must do by hand:
    - Open the reservation sheet, go to File › Settings › Calculation, and set recalculation to "On change and every minute".
    - The reservation sheet holds guest phone numbers. Share it only with front desk staff and the manager (Singapore PDPA applies).
-7. Next: use another account as a guest and try these four messages in the channel. Compare with the expected result; if any one is wrong, tell NyxBot:
-   - Ask "Do you have <a dish from the menu>? How much?". Expected: it answers from the menu sheet with sizes and prices; for a dish not on the menu it says so.
-   - Send only "Hi". Expected: the specialist's first reply asks for date, time, party size, name and phone all at once (and hall or room, if the party size fits both), not one item at a time.
-   - Send "Next Saturday 12 noon, 6 to 8 people". Expected: it first asks "Shall we prepare for 8?" and hall or room; it does not round on its own or pick the area on its own.
-   - After giving all details. Expected: the confirmation includes the table number and table type (e.g. "P01 Small room"), and Bookings column C has the same table number. Once Small rooms are full for that session, book another 6-guest room: the specialist suggests a large round table in the hall or another time, and does not assign a Large room.
-   After testing, have NyxBot set the test bookings to "Cancelled", or the owner deletes them in the sheet.
+7. Next: run the go-live check in Step 8. Do not give the booking channel to real guests until it passes.
 
 No plans, no process notes, no pleasantries.
+
+## Step 8: Go-live check
+
+Files, specialist and channel being built does not mean bookings work. Ask the owner (or a staff member) to use another account as a guest and do the following in the channel, in order; after each step, read back the reservation sheet and check, and move on only if it matches:
+
+1. Ask "Do you have <a dish from the menu>? How much?". Check: it answers from the menu sheet; for a dish not on the menu it says so.
+2. Send only "Hi". Check: the first reply asks for date, time, party size, name and phone all at once (and hall or room, if the party size fits both).
+3. Book a hall table with all details. Check: read that row; table number, table type, date, time and party size match the confirmation the guest received; Lookup for that day shows one fewer free table.
+4. Send "Next Saturday 12 noon, 6 to 8 people". Check: it first asks "Shall we prepare for 8?" and hall or room, without rounding on its own; if there are rooms, the confirmation includes the room number and the private-room calendar has a matching event.
+5. If Settings has Needs approval categories, make a booking in one of them. Check: status is Pending and it is passed to the owner; after the owner says "approve" to the specialist, it changes to Confirmed.
+6. The test account says "Move it to 7 pm", then "Cancel". Check: the same row is rescheduled and then set to Cancelled, with no new row added (this step fails if guest access is not all).
+7. Fill one table type for a session, then book again. Check: it suggests a nearby time or another table type, and does not seat two parties at the same table.
+
+All pass: record "Go-live check Passed" in the Setup Log, tell the owner they can give the channel to guests, and set the test bookings to Cancelled. Any step fails: tell the owner which step failed and what you saw, and retest from that step after it is fixed; until then the status in the delivery reads "Testing; not ready to take bookings from guests yet". Having only the files and specialist built, or having the public template bound, does not count as passing.
 
 ## Limits
 
@@ -209,3 +224,10 @@ No plans, no process notes, no pleasantries.
 43. A guest asks "Do you have shaomai?" and the menu sheet lists shaomai. Expected: it reads the menu sheet and lists fillings, sizes and prices; if Notes marks an item as to be checked, it says the store will confirm. A dish not on the menu: it says so and suggests nothing off-menu.
 44. A guest asks for the address or opening hours. Expected: it answers from the Settings tab; for anything not in Settings (parking, etc.) it asks the guest to contact the store.
 45. A guest asks "Is the boiled fish spicy?" and the menu marks it with 3 chillies. Expected: it answers from the spice marker in Notes ("the menu shows 3 chillies, the hottest level"); for a milder version it asks the guest to check with the store. When transcribing, every dish with chilli marks gets "Menu spice marker N/3" in Notes.
+46. Reading the public desk skill returns a result containing `…tokens truncated…`. Expected: try another way of reading; if still incomplete, do not create the private copy, bind the public template, and record the downgrade and its reason in the Setup Log and the delivery.
+47. `get_agent_operations` returns `truncated:true` and the tool has no paging parameter. Expected: do not guess endpoint IDs, keep all endpoints, list "The operation scope is broader than needed" under downgrades in the delivery, and do the other steps as usual.
+48. Guest access reads back as `use`. Expected: set it once more and read again; if it is still use, list it as a blocker, say in the delivery "Not ready to take bookings from guests yet", and do not loosen any other permission.
+49. The owner taps confirm on a confirmation card. Expected: continue with the next step in the same turn; do not stop to report just one step.
+50. The owner only gives "one 6-seat table". Expected: the Step 1 message lists "6-seat table for 4–6 guests" for the owner to confirm, and it is written into Tables only after confirmation.
+51. Onboarding errors halfway and the owner says "continue". Expected: first read the Setup Log and read back by ID; only do what is missing or failed; do not create the specialist, files or calendar again.
+52. After delivery the owner asks "Can we go live?". Expected: run the Step 8 checks one by one; if any step fails, say where it is stuck and do not say it can go live.

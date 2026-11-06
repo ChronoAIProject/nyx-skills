@@ -38,7 +38,7 @@ After the service is granted, which endpoints the specialist can call on owner t
 
 Do not open deleting sheets, clearing, creating or deleting calendars, or Drive file operations. After setting, read it again and confirm all these endpoints are there.
 
-If it already reads back as "all endpoints" (`all_operations` is true), every endpoint needed is there and it works. If you want to narrow it to the table above but cannot get exact endpoint IDs (list truncated, no paging), keep all endpoints. Do not stop or skip other steps for this; in delivery point 2 write one line: "The operation scope is currently all endpoints, broader than needed."
+If it already reads back as "all endpoints" (`all_operations` is true), every endpoint needed is there and it works. If you want to narrow it to the table above but cannot get exact endpoint IDs (`get_agent_operations` returns `truncated:true` or asks you to narrow the query, but the tool has no paging or filter parameter), **do not guess endpoint IDs**; keep all endpoints. Do not stop or skip other steps for this; record "Operation scope Downgraded: all endpoints (list truncated)" in the Setup Log, and under "Downgrades and blockers" in delivery point 2 write "The operation scope is currently all endpoints, broader than needed."
 
 In the delivery, mention once: guest turns can write to sheets in this Google account, and for long-term use the restaurant should switch to a dedicated restaurant account. This is only a reminder, not a reason to downgrade; do not switch to passing bookings to the owner because of it.
 
@@ -64,7 +64,7 @@ Bind channels to the reservation specialist; see SKILL.md Step 6.
 ## 6. Read back
 
 - List the specialist: name; Role differs from the template only in store name and sheet ID; total characters (no more than 2048); grants include `api-google-workspace`; skills contain only the store's private desk skill (`isPrivate` true), or, if the copy failed, the latest version of `restaurant-reservation-desk-en`.
-- Read guest access: the level on `api-google-workspace` matches the table in section 3.
+- Read guest access: the level on `api-google-workspace` must be `all`, and on `ornn-api` `read`. If it reads `use` or any other value, set it again and read again; if it is wrong both times, it is a **blocker**: guest reschedules and cancellations will fail. Say so in the delivery, do not say the setup is complete, and do not loosen any other permission to work around it.
 - Read the operation scope (once for owner turns and once for guest turns): read only the `api-google-workspace` service and check it against the "Operation scope" table in section 3 one by one; the sheet read/write and calendar event endpoints must all be there. For `ornn-api`, do not expand the whole operation list (it has more than 70 entries and the result gets truncated); just check that it does not open all operations and has more than 0 entries.
 - Have the owner say to the specialist "What bookings do we have today?": a normal answer means the specialist can read the desk skill; if it answers "missing Ornn access", go back to section 4 and add the grant.
-- If anything is missing, add it before delivering.
+- Record each item's result in the Setup Log (Passed, Downgraded, Blocked). If anything is missing, add it before delivering; whatever cannot be added goes into the delivery as a downgrade or blocker.

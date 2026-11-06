@@ -5,6 +5,7 @@ The public `restaurant-reservation-desk-en` is a template shared by all stores. 
 ## 1. Create the copy (done in Step 5, instead of binding the public template directly)
 
 1. Use `search_agent_skills` to find `restaurant-reservation-desk-en`, note the latest version X.Y, and read its full SKILL.md with Ornn's read-skill tool (e.g. `ornn-api__getskilljson`).
+   **First confirm you read all of it**: if the result contains `truncated` or `…tokens truncated…`, or the text does not end with the numbered list of the "## Regression checks" section, it is incomplete. Try another way of reading once (`nyxid__skill_read`, `preview_agent_skill`, or reading in parts). If it is still incomplete, **do not build the copy from the partial text**; handle it as "If creating the copy fails" at the end of this section, with the reason "skill text read was truncated".
 2. In the full text, change only these places:
    - `name`: the store name in pinyin or English + `-reservation-desk`, e.g. `xibei-reservation-desk`, `laosuiyuan-reservation-desk`. All lowercase, words joined by hyphens.
    - `description`: add at the start "For {Store} only (based on public template restaurant-reservation-desk-en X.Y, plus house rules).", then copy the rest as is. NyxBot's create-skill tool may limit the description to 400 characters: if it is over, keep only that opening sentence and the English keywords (seated left move walk-in reschedule cancel pending tables capacity room calendar); do not add an appendix.
@@ -19,7 +20,7 @@ The public `restaurant-reservation-desk-en` is a template shared by all stores. 
 3. Zip it (the folder name matches `name`, containing only SKILL.md) and upload it with Ornn's create-skill endpoint (`POST /api/v1/skills`, `application/zip`). New skills are private by default. After uploading, read it once, confirm `isPrivate` is true, and say so in the reply to the owner; if not, make it private with the permissions endpoint (`PUT /api/v1/skills/{id}/permissions`, `{"isPrivate":true,"grants":[]}`).
 4. Use `set_agent_skills` to bind this private skill to the reservation specialist. Do not also bind the public `restaurant-reservation-desk-en`; binding both causes conflicts.
 
-If creating the copy fails (the owner has no Ornn access, upload error): tell the owner why, bind the latest version of the public `restaurant-reservation-desk-en` directly instead, and write in the delivery "Currently using the public template; no private version for this store yet."
+If creating the copy fails (the owner has no Ornn access, upload error, skill text read was truncated): tell the owner why, and bind the latest version of the public `restaurant-reservation-desk-en` directly instead. This is a **downgrade**: record a row in the Setup Log "Private skill Downgraded: public template (reason)", and under "Downgrades and blockers" in delivery point 2 write "Currently using the public template; no private version for this store yet. Build the private version before adding house rules."
 
 ## 2. The owner adds a house rule
 

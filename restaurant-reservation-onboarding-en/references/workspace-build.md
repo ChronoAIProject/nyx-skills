@@ -51,6 +51,7 @@ Create: `drive_create_file`, `name` `{Store} Reservations`, `mimeType` spreadshe
 - `addSheet`: sheetId 4, `Guide`.
 - `addSheet`: sheetId 5, `Settings`, freeze 1 row.
 - `addSheet`: sheetId 6, `Lookup`, freeze 2 rows.
+- `addSheet`: sheetId 7, `Setup Log`, freeze 1 row (see 4.10).
 - `updateSpreadsheetProperties`: time zone and locale, same as the menu sheet.
 
 ### 4.2 Tables (sheetId 1)
@@ -132,7 +133,7 @@ It lists the tables of this type that are not yet taken in that session on the B
 
 ### 4.6 Guide (sheetId 4)
 
-One column of text, one item per row. Content follows the Step 1 group D rules in SKILL.md, plus: what each of the six tabs is for (Bookings, Tables, Today, Capacity, Settings, Lookup); to change a rule, edit only column B of Settings (it takes effect from the next booking, no need to ask the specialist); Lookup is all formulas, do not edit it by hand; how to fill each Bookings column; the statuses (Pending, Confirmed, Arrived, Dining, Completed, No-show, Cancelled); what the red double-booking highlight means; the Today colors; how to change the Tags in Tables; room bookings sync to the room booking calendar; the few phrases the owner uses with the specialist day to day; check table turnover and average dining time each week. Column A width 900, wrap text.
+One column of text, one item per row. Content follows the Step 1 group D rules in SKILL.md, plus: what each tab is for (Bookings, Tables, Today, Capacity, Settings, Lookup; Setup Log is NyxBot's build record from onboarding and can be ignored); to change a rule, edit only column B of Settings (it takes effect from the next booking, no need to ask the specialist); Lookup is all formulas, do not edit it by hand; how to fill each Bookings column; the statuses (Pending, Confirmed, Arrived, Dining, Completed, No-show, Cancelled); what the red double-booking highlight means; the Today colors; how to change the Tags in Tables; room bookings sync to the room booking calendar; the few phrases the owner uses with the specialist day to day; check table turnover and average dining time each week. Column A width 900, wrap text.
 
 ### 4.7 Formatting, dropdowns, conditional formatting (one batch)
 
@@ -202,9 +203,18 @@ C3 (Lunch):
 
 In D3, replace `"Lunch"` with `"Dinner"`. Both sides of the date comparison use `TEXT(…,"yyyy-mm-dd")` because the specialist sometimes writes a date into Bookings as text (RAW write). A plain `=` comparison would then miss it, the table would keep showing as free, and the result is a double booking. Write `=A3+1` in A4. Then one batch with two `copyPaste` requests (`PASTE_FORMULA`): A4 to A5:A62 (`source` `{"sheetId":6,"startRowIndex":3,"endRowIndex":4,"startColumnIndex":0,"endColumnIndex":1}`, `destination` with `startRowIndex` 4 and `endRowIndex` 62); B3:D3 to B4:D62 (`source` rows 2 to 3, columns 1 to 4; `destination` rows 3 to 62, columns 1 to 4).
 
-A resulting cell looks like this: `2-seat (1–2 guests): A01[window], A02; 4-seat (3–4 guests): B01, B02[quiet]; Small room (6–8 guests): Full`. Table types come from column A of Capacity, smallest to largest, rooms last. Party ranges come from columns H and C of Tables. For restaurants with two dinner seatings, column D becomes "Dinner 1", add "Dinner 2" in column E, change the session text in the formulas to match, and change the read range in the Role to `A{n}:E{n}`.
+A resulting cell looks like this: `2-seat (1–2 guests): A01[window], A02; 4-seat (1–4 guests): B01, B02[quiet]; Small room (6–8 guests): Full`. Table types come from column A of Capacity, smallest to largest, rooms last. Party ranges come from columns H and C of Tables. For restaurants with two dinner seatings, column D becomes "Dinner 1", add "Dinner 2" in column E, change the session text in the formulas to match, and change the read range in the Role to `A{n}:E{n}`.
 
 Formatting: column A `DATE` `yyyy-mm-dd`; header row 2 in dark blue, white bold text; column A width 100, B 80, C and D 600 with text wrap; B1 in gray font, no wrap.
+
+### 4.10 Setup Log (sheetId 7)
+
+NyxBot's build record from onboarding; the owner can ignore it. Header A to G: `Time, Step, Type, Name, ID, Result, Checked`.
+
+- Each time something is built or reused (folder, menu sheet, doc, reservation sheet, calendar, specialist, grants, operation scope, private skill, channel), append a row: type, name, ID (Drive file ID, calendar ID, specialist ID, skill guid, channel ID), result (Created, Reused, Failed, Downgraded; give the reason for the last two).
+- After the read-back check, write Passed, Downgraded or Blocked in Checked.
+- The folder, menu sheet and doc built before the reservation sheet exists are logged as soon as the sheet is built.
+- If the run is interrupted, read this tab first and read back each item by ID: if it exists, skip it; if it is missing or failed, redo from that step. Do not guess by name, and do not build anything twice.
 
 ## 5. Room booking calendar
 
@@ -220,6 +230,7 @@ Create it only if the restaurant has private rooms. `calendar_create_calendar`: 
 - Read `'Lookup'!A1:D4`: B1 is a string of "Key=Value" items separated by "; ", and empty settings show the column C default. A3 is today and A4 is tomorrow. C3 and D3 show a party range and every table for each table type, with tags in square brackets, and no "#NAME?" or "#ERROR!". Then read `A62`: it is today plus 59 days.
 - `docs_get_document` (`fields` `body.content.paragraph.paragraphStyle.namedStyleType,body.content.paragraph.elements.textRun.content`): one TITLE and three HEADING_1.
 - `calendar_list_calendars`: the new calendar is in the list.
+- Read `'Setup Log'!A1:G`: every item built has a row with its ID; downgrades and blockers have a reason.
 
 ## 7. Common failures
 
