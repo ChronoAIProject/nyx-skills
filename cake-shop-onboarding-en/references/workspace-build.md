@@ -11,6 +11,7 @@ First look for a folder with the same name (`name = '{Shop} Shop Management' and
 Use `drive_create_file` to create `{Shop} Shop Info` (`application/vnd.google-apps.document`, `parents` set to the folder ID). Then write it with `docs_batch_update_document`. Structure:
 
 - TITLE: `{Shop} Shop Info`
+- First paragraph under the title: "Note: the two assistants do not read this document. They read only the order book. To change hours, address, rules or products, change the order book (or tell NyxBot); it takes effect at once. This document is a human-readable record."
 - HEADING_1 "Basics": shop name, address, phone or WhatsApp, website or social media, opening hours, pickup hours, closed days, date last updated.
 - HEADING_1 "Order rules": lead days, daily order limit, custom order process, deposit and payment method, delivery areas and fees, allergen note, change and cancel policy. Write only what the owner has confirmed.
 - HEADING_1 "Linked files": the order book (with a link) and the folder name.
@@ -27,6 +28,7 @@ Use `drive_create_file` to create `{Shop} Order Book` (spreadsheet, `parents` se
 - `addSheet`: sheetId 3 `Lookup`, freeze 2 rows.
 - `addSheet`: sheetId 4 `Guide`.
 - `addSheet`: sheetId 5 `FAQ`, freeze 1 row.
+- `addSheet`: sheetId 6 `Setup Log`, freeze 1 row.
 - `updateSpreadsheetProperties`: `timeZone` set to the owner's time zone (Singapore is `Asia/Singapore`), `locale` set to `en_US`, `fields` set to `timeZone,locale`.
 
 ### 3.2 Orders (sheetId 0)
@@ -50,8 +52,8 @@ Column values:
 | Q Amount, R Deposit | Numbers; leave empty for custom orders before the quote |
 | S Deposit status | `Unpaid`, `Paid`, `Waived` |
 | T Status | `Awaiting quote`, `Awaiting customer`, `Pending review`, `Awaiting payment`, `Confirmed`, `In production`, `Ready for pickup`, `Out for delivery`, `Completed`, `Cancelled` |
-| U Source | The actual channel (`Telegram`, `WhatsApp`, `NyxID`, `Phone`, `Walk-in`) |
-| V Notes | Customer requests, reschedule records, cancel reasons and so on. Append; never overwrite |
+| U Source | Only a value from the dropdown: `Telegram`, `WhatsApp`, `NyxID`, `Phone`, `Walk-in`. Never a web address or other text |
+| V Notes | Telegram orders always start with `TG: <customer display name>` (test orders: `TEST ORDER; TG: …`); the notifications task uses it to find the customer. Later customer requests, reschedules, notification records and so on are appended; never overwrite |
 
 Formatting (one batch): only row 1 gets the header format (dark blue background (0.122, 0.22, 0.392), white bold text, wrap). Row 2 (the sample row) and below stay in plain format, row height 24. Column B `DATE_TIME` `yyyy-mm-dd HH:mm`, column C `DATE` `yyyy-mm-dd`, column D `TIME` `HH:mm`, column H `TEXT`, columns Q and R `$#,##0.00` (range rows 2 to 3000, including the sample row). `setDataValidation` (rows 2 to 3000, including the sample row, `showCustomUi: true`): dropdowns for E, I, S, T and U as in the table above. The T list must include `Awaiting payment`. Conditional formatting (rows 3 to 3000): when T is `Awaiting quote`, `Awaiting customer`, `Pending review` or `Awaiting payment`, the whole row gets a light yellow background (1, 0.95, 0.75); when T is `Cancelled`, the whole row gets gray text (0.6, 0.6, 0.6). Column width 100 by default; Product 160; Custom notes and Notes 260.
 
@@ -91,7 +93,7 @@ Shop facts and rules all live here. Later, the owner changes rules only in colum
 | 25 | Full payment to confirm | {Yes/No} | No | Yes: an order is confirmed only after the owner records full payment received; until then its status is Awaiting payment. A customer's payment screenshot does not count as received |
 | 26 | Morning report time | {e.g. 07:00; do not write "None"} | None | The order manager sends a morning report every day: orders to make and hand over today, and things to handle today |
 | 27 | Evening report time | {e.g. 19:30; do not write "None"} | None | The order manager sends an evening report every day: how today went and tomorrow's plan |
-| 28 | Setup status | {Building/Live} | Live | Building: the customer specialist only takes enquiries and confirms no orders. Change to Live at handover |
+| 28 | Setup status | {Building/Testing/Live} | Building | Building: the customer specialist only answers enquiries and records no orders; Testing: orders are recorded as usual, with Notes marked `TEST ORDER`, for the go-live check; Live: real orders. Change to Live only after every Step 8 go-live check passes |
 | 29 | Reply language | {Follow customer / English / Chinese} | Follow customer | Language used by the customer specialist and customer notifications |
 | 30 | Reference image link | {Google Form link; leave empty if none} | | The customer specialist attaches it when asking for order details; see section 3.8 |
 | 31 | Reference image sheet ID | {ID of the form's response sheet; leave empty if none} | | During patrols the order manager matches by phone and writes the image links into the order's Custom notes |
@@ -148,18 +150,29 @@ After the owner sends the link: use `drive_list_files` to find a spreadsheet who
 
 Customers must sign in to a Google account to upload (a requirement of file upload questions). Tell the owner this at handover.
 
+### 3.9 Setup Log (sheetId 6)
+
+During onboarding, append a row each time you create or reuse something; if the run is interrupted, use it to continue. Header A to G: `Time, Step, Type, Name, ID, Result, Checked`.
+
+- Type: folder, doc, spreadsheet, tab, customer specialist, order manager, grant, private skill, schedule, channel, form.
+- ID: Drive file ID, specialist ID, skill guid, schedule ID, channel or chat ID.
+- Result: `Created`, `Reused`, `Failed (reason)`. Checked: write `Passed` when the readback passes; leave it empty if not checked.
+- When resuming, read this tab first and read back each item by its ID: skip it if it exists; redo from that step if it is missing or failed. Do not guess by name, and do not create anything twice.
+- The spreadsheet itself is the first item: after building the Order Book and adding the tabs, add the folder, doc and spreadsheet rows.
+
 ### 3.7 Guide (sheetId 4)
 
-One column of text, one item per row: what each of the six tabs is for; the customer specialist repeats the answers in FAQ, and the owner can add or edit them directly; to change a rule, change only Settings column B, and it applies from the next order; Lookup and the order # are formulas, do not edit them by hand; what the order statuses mean and how they flow (Awaiting quote → Awaiting customer → Confirmed → In production → Ready for pickup or Out for delivery → Completed); the phrases the owner can say to the order manager; when patrol reports arrive; quotes, confirmations and cancellations are sent to Telegram customers automatically; the reference image link is in the order's Custom notes, tap it to view. Column A width 900, wrap.
+One column of text, one item per row: what each tab is for (Setup Log is NyxBot's build record during onboarding; the owner can ignore it); the customer specialist repeats the answers in FAQ, and the owner can add or edit them directly; to change a rule, change only Settings column B, and it applies from the next order; Lookup and the order # are formulas, do not edit them by hand; what the order statuses mean and how they flow (Awaiting quote → Awaiting customer → Confirmed → In production → Ready for pickup or Out for delivery → Completed); the phrases the owner can say to the order manager; when patrol reports arrive; quotes, confirmations and cancellations are sent to Telegram customers automatically; the reference image link is in the order's Custom notes, tap it to view. Column A width 900, wrap.
 
 ## 4. Checklist
 
-- Read `'Orders'!A1:V2`: the header has 22 columns, A1 is the order # formula (shows "Order #"), A2 shows "Sample", B2 is the sample-row text.
+- Read `'Orders'!A1:V2`: the header has 22 columns, A1 shows "Order #", A2 shows "Sample", B2 is the sample-row text. Then read `'Orders'!A1` with `valueRenderOption=FORMULA`. It must match the formula in 3.2 character for character (`B3:B` and `ROW(B3:B)-2`, not B4 or anything else). If it does not match, rewrite A1, clear A2:A3000, and read it again.
 - Read the first and last three rows of `'Products'!A1:K`. The row count matches the transcription (one row per product, not split by size).
 - Read `'FAQ'!A1:E`: every Q&A collected at setup is there, with status `Answered`.
 - Read `'Settings'!A1:D40`: rows 2 to 31 are all there (B30 and B31 only have values after the owner builds the reference image form), and column B matches the owner's answers. Shop-specific rules are from row 33 on.
 - Read `'Lookup'!A1:E4`: B1 is a string of "key=value" items, A3 is today, C3 is 0, D3 is the daily limit or "Unlimited", and there is no `#NAME?` or `#ERROR!`.
-- `docs_get_document`: one TITLE and three HEADING_1.
+- `docs_get_document`: one TITLE, the opening note that the two assistants do not read this document, and three HEADING_1.
+- Read `'Setup Log'!A1:G`: everything built has a row with an ID.
 
 ## 5. Common failures
 
@@ -168,5 +181,5 @@ One column of text, one item per row: what each of the six tabs is for; the cust
 | `Unable to parse range` | Wrong tab name, or the tab is not built yet | Run 3.1 first |
 | "11:00–19:00" in Settings turned into a decimal | `USER_ENTERED` was used | Use `RAW` in 3.4 |
 | Wrong booked count for a day in Lookup | An order status is misspelled, or the due date was written in another format | Use the status dropdown; write dates as `yyyy-mm-dd` |
-| Order # is empty, or A1 shows `#REF!` | The formula was pushed away, or an empty string written lower in column A blocks the formula from expanding | Rewrite A1 as the header formula, clear A2:A3000 (`updateCells` clearing only `userEnteredValue`), pass `null` for column A when appending |
+| Order # is empty, does not match what the customer received, or A1 shows `#REF!` | The formula was pushed away, or an empty string written lower in column A blocks the formula from expanding | Rewrite A1 as the header formula, clear A2:A3000 (`updateCells` clearing only `userEnteredValue`), pass `null` for column A when appending |
 | The first order has a dark blue background and white text, and no dropdowns | There is no sample row, so the order landed on row 2 | Insert the sample row at row 2, and reset plain format, dropdowns and conditional formatting from row 2 down (see above) |

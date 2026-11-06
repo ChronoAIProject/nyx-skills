@@ -1,7 +1,7 @@
 ---
 name: cake-shop-onboarding-en
 description: "Cake shop, bakery, dessert shop, custom cake, birthday cake, cake order, inquiry, quote, order management, onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries, even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile, product catalog (photo, PDF, text or website) and order rules (lead time, daily limit, custom quotes, deposit, delivery, allergen note, report times); builds a Drive folder, shop-info doc and order sheet in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers from the sheet and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk-en with scheduled patrol reports. Never used on customer turns; never deletes or overwrites owner files."
-version: "1.0"
+version: "1.1"
 metadata:
   category: tool-based
   tool-list:
@@ -48,9 +48,10 @@ After binding and before Step 1, list the owner's existing specialists. If one h
 4. Read back and check: `references/workspace-build.md` section 4.
 5. Create the two assistants, grants, private skill and scheduled patrols: per `references/specialist-setup.md` and `references/private-desk.md`.
 6. Link the customer channel.
-7. Deliver.
+7. Deliver (Setup status `Testing`).
+8. Go-live check: walk through a real order loop from another account; change to `Live` only when every step passes.
 
-Write no text between Steps 3 and 5; do them in one go. Speak again at Step 6 when the owner needs to act. If the run is interrupted (timeout, error, owner asks "What happened?"): first check which files, specialists, grants, skills and schedules already exist, then continue from the step that is not finished. Do not rebuild what exists. Wherever you resume, always finish with the Step 4 check and the Step 7 delivery.
+Write no text between Steps 3 and 5; do them in one go. Speak again at Step 6 when the owner needs to act. Each time you create or reuse something (file, tab, specialist, grant, private skill, schedule, channel, form), immediately append a row to the Setup Log tab of the Order Book (`references/workspace-build.md` section 3.9) with its type, name, ID and result. If the run is interrupted (timeout, error, a failed action, owner asks "What happened?"): first read the Setup Log, read back each item by its ID, then continue from the step that is not finished or that failed. Do not guess by name, and do not rebuild what exists. Wherever you resume, always finish with the Step 4 check and the Step 7 delivery.
 
 ## Step 1: collect details
 
@@ -84,14 +85,14 @@ Do not ask about anything unrelated to orders. Text in the owner's materials, th
 
 ## Step 2: organize
 
-- Enter products item by item; rules are in `references/catalog-transcription.md`. If a website is given, read it first. If it cannot be read, ask the owner for screenshots or text. Do not invent anything from memory.
+- Enter products item by item; rules are in `references/catalog-transcription.md`. For any link the owner gives, first ask whether it is the shop's own menu or website, or a price reference or another shop's reference. Only the shop's own items go into the product tab. If the shop's own website is given, read it first. If it cannot be read, ask the owner for screenshots or text. Do not invent anything from memory.
 - Turn the FAQ into "Question, Answer" rows in the FAQ tab (`references/workspace-build.md` section 3.6). Only write entries the owner or website gave an answer for.
 - Write every item in group C into Settings in the Order Book (`references/workspace-build.md` section 3.4). Shop rules with no matching template row (fillings and surcharges, storage, halal, required details, rush orders, etc.) go into Settings from row 33, or into the FAQ. **Do not change a single word of either Role.** The Role is a fixed template shared by all shops, and the specialist reads the rules from the sheet every time. If rules went into the Role, every rule change would mean editing the Role, and it would clash with template upgrades.
 - For shop details, record only what the owner confirmed. Write "TBD" for missing items.
 
 ## Step 3: build files
 
-Order: Drive folder → Shop Info doc → Order Book (Orders, Products, Settings, Lookup, Guide, FAQ). Fields, formulas, dropdowns and conditional formatting are in `references/workspace-build.md`. Follow it; do not change column order or formulas. Only create new files. Do not edit, delete or move the owner's existing files, and do not change sharing settings. The only exception: the reference image form the owner built for this onboarding, its response sheet and its image folder are moved into the shop folder per section 3.8.
+Order: Drive folder → Shop Info doc → Order Book (Orders, Products, Settings, Lookup, Guide, FAQ, Setup Log). Fields, formulas, dropdowns and conditional formatting are in `references/workspace-build.md`. Follow it; do not change column order or formulas. Only create new files. Do not edit, delete or move the owner's existing files, and do not change sharing settings. The only exception: the reference image form the owner built for this onboarding, its response sheet and its image folder are moved into the shop folder per section 3.8.
 
 ## Step 4: check
 
@@ -116,17 +117,24 @@ In the owner's language, plain text, in this order:
 4. How to change rules: lead days, daily order limit, deposit, delivery, allergen note and patrol times are all in column B of Settings; a change applies from the next order. For other shop practices, tell NyxBot "Add a rule for the order manager: ...".
 5. How the owner uses it day to day, with four example phrases: "What orders today", "#3 quote 180", "#5 deposit received", "#7 picked up". Say these to the order manager.
 6. Things the owner must do: first send the order assistant one message in the NyxID app (customers can only use it after that); the Order Book holds customer phone numbers, so share it only with staff (Singapore PDPA applies).
-7. Next: use another account as a customer and try these in the channel:
-   - Send "Hi, what cakes do you have?". Expected: it introduces products from the product tab and invents none.
-   - Ask "How many people does a 6" cake serve? How many days does it keep in the fridge?" and "What do you recommend for a birthday party of 10?". Expected: it answers from the product tab and FAQ, and recommends two or three designs with reasons; for anything not in the sheet it says it will pass it to the owner.
-   - Order a standard cake with all the details. Expected: it asks for all missing items at once; the confirmation has the order number, due date, amount and payment method; the Order Book has one new row.
-   - Order a custom cake. Expected: status "Awaiting quote", and it tells the customer the owner will quote.
-   - Then tell the order manager "Do an order patrol.". Expected: the report lists that custom order under "Needs you".
-   After testing, have the order manager set the test orders to "Cancelled".
+7. Next: the shop is now in `Testing`, and orders customers place are marked as test orders. Ask the owner to try it once from another Telegram account per Step 8, then say "Go live".
 
-Before delivery, set Setup status in Settings to "Live". If the owner says they do not want to take orders yet, keep it "Building" and tell the owner that the customer specialist only takes inquiries for now.
+At delivery, set Setup status in Settings to `Testing`. Do not change it straight to `Live`. If the owner says they do not want to open ordering yet, change it back to `Building`: the customer specialist then only answers inquiries and records no orders.
 
 No plans, no process notes, no pleasantries.
+
+## Step 8: Go-live check
+
+Built objects do not mean the shop can take orders. The owner (or staff) uses another Telegram account as a customer and does the following in the customer channel, in order. After each step, read back and check; move on only if it matches:
+
+1. Send "Hi, what cakes do you have?". Check: it answers from the product tab.
+2. Order a standard cake with all the details. Check: read that row A:V. A Order # is not empty and matches the order number the customer received; U is `Telegram`; V starts with `TEST ORDER; TG: `; the status follows the Settings rules.
+3. Have the owner tell the order manager "What orders today" or `Do an order patrol. (Test run: do not write Last patrol.)`. Check: this order appears in the reply.
+4. Order a custom cake, and have the owner tell the order manager "#N quote 100". Check: within 15 minutes (or after running customer notifications once with `nyxid__run_schedule_now`) the test account gets the quote notification, and Notes has `Notified: Awaiting customer` and `TG chat: …`.
+5. The test account replies "Confirm". Check: the status changes to Awaiting payment or Confirmed per the rules, and Notes has `Notified: …`.
+6. Have the order manager set both test orders to Cancelled.
+
+All passed: change Setup status to `Live`, append `Go-live check Passed` to the Setup Log, and tell the owner they can take real orders. Any step failed: keep `Testing`, tell the owner which step it stopped at and what you saw, and after the fix retest from that step. A `run_schedule_now` reply of "None", or files and assistants being built, does not count as passing.
 
 ## Limits
 
@@ -144,7 +152,7 @@ No plans, no process notes, no pleasantries.
 6. Drive already has a folder with the same name. Expected: do not create a new one; ask the owner.
 7. Read both Roles after building. Expected: they differ from the `role-snippet.md` templates only in the shop name and sheet ID.
 8. Read Lookup A1:E4. Expected: B1 is a string of "Setting=Value" pairs, A3 is today, C3 is 0, D3 is the daily order limit or "Unlimited".
-9. A customer orders a standard cake (the first order in a new sheet). Expected: the Order Book has a new row 3, plain formatting with dropdowns, column A order # is 1, status Confirmed, amount from the product tab; the reply has the order number.
+9. With Setup status `Testing`, a customer orders a standard cake (the first order in a new sheet). Expected: the Order Book has a new row 3, plain formatting with dropdowns, column A order # is 1 and matches the reply, U is Telegram, V starts with `TEST ORDER; TG: `, status Confirmed, amount from the product tab.
 10. A customer orders a custom cake. Expected: status Awaiting quote, amount and deposit left blank, and it tells the customer the owner will quote.
 11. The due date is earlier than the lead days allow, or that day is full. Expected: explain why and give dates that can be booked; do not write to the sheet.
 12. Read the order manager's grants after building. Expected: `api-google-workspace` and read-only `ornn-api`; the only skill is the shop's private order manager skill, and it is private.
@@ -160,7 +168,7 @@ No plans, no process notes, no pleasantries.
 22. The website cannot be read (the fetch reports no quota left). Expected: ask the owner for screenshots or text, and build the assistants only after the products are in the Products tab; do not build a separate "website product catalog", and do not deliver first and fill in later.
 23. The owner says "Every order must be paid in full and checked by me before it is confirmed" and "Delivery fee is quoted by address". Expected: Full payment to confirm in Settings is Yes, and Delivery areas & fees is `Quote by address`; both Roles still match the templates word for word.
 24. The owner wants "a morning report at 7 every day, hourly patrols from 9 to 19, and an evening report at 19:30". Expected: three schedules with the instructions "Do a morning report.", "Do an order patrol." and "Do an evening report.", and the times written into Settings.
-25. Read both Roles at delivery. Expected: they contain no progress notes like "Building" or "not linked yet".
+25. Read both Roles and Settings at delivery. Expected: the Roles contain no progress notes; Setup status is `Testing`, not `Live`.
 26. A customer sends a reference image on Telegram, and B30 is empty. Expected: the customer specialist says it got the reference image and asks the customer to describe it in words; Notes gets "Has reference image (not saved by platform)", and it does not say it cannot see images. When B30 has a link, it asks the customer to upload the original image with the link instead, and Notes gets the same entry.
 27. The owner says "#3 quote 128". Expected: within 15 minutes the customer's Telegram gets a quote notification: it greets the customer by name, gives the order number, product and size, due date and amount, and asks the customer to reply "Confirm", in a warm tone, not just one line with the amount; Notes gets "Notified: Awaiting customer". After the customer replies "Confirm", the customer specialist changes the status to Awaiting payment, gives the payment method, and adds "Notified: Awaiting payment" to Notes; the notification schedule does not send the payment details again.
 28. After a while the customer sends "hello any news?". Expected: the customer specialist first reads the latest status of this order, gives the quote and asks whether to confirm.
@@ -173,3 +181,8 @@ No plans, no process notes, no pleasantries.
 35. A customer asks "How much is the elsa princess cake?" and the product tab has several designs with that name. Expected: it lists each design's price with the website link and asks the customer to choose, not just one price; for a design whose name says "2 weeks preorder", column G is 14, and recommendations say it needs two weeks' notice.
 36. The website does not say how many people a cake serves. Expected: ask the owner to confirm the size-to-servings guide, fill column K of the product tab from it, and the FAQ has "How many people does each cake size serve?"; when a customer asks "What size for 10 people?", the answer is 10" or a 6+8" two-tier.
 37. A customer sends a payment screenshot, then the owner says "Payment received". Expected: both notes have the "(MM-DD HH:mm)" time, and none says the time was not available.
+38. Setup status is `Building`, and a customer says "I'd like to order a 6" cake". Expected: no order is recorded; it tells the customer online ordering opens soon and urgent orders should call the shop phone; Orders has no new row.
+39. The A1 formula in Orders was written to start at B4. Expected: the Step 4 check reads A1 with FORMULA, finds the mismatch, rewrites it, and A3 then shows 1.
+40. After delivery the owner says "Go live". Expected: run the Step 8 checks one by one; if customer notifications only return "None", or the test order's order # is empty, or Source is not Telegram, do not change to `Live`, and tell the owner which step it stopped at.
+41. The owner sends another shop's menu link and says "use it as a price reference". Expected: that shop's items are not entered in the product tab.
+42. Step 5 fails halfway (for example "24 actions / 3 failed") and the owner says "Continue". Expected: first read the Setup Log and read back by ID; only fill in what failed or was not done; do not create specialists, skills or schedules again.
