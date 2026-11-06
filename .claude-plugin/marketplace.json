@@ -451,7 +451,7 @@
       "name": "cake-order-desk-en",
       "source": "./cake-order-desk-en",
       "description": "Cake shop, bakery, dessert shop order desk: orders, quote, deposit, production, pickup, delivery, cancel, reschedule, patrol, morning report, evening report, needs you. Owner-side order management for a cake or dessert shop set up by cake-shop-onboarding-en. Use only on owner turns (NyxID app, channel messages marked (owner), or scheduled runs) when the owner quotes a custom order, confirms or cancels an order, records a deposit, marks an order in production, ready, picked up or delivered, reschedules, asks about orders or deliveries for a date, or when a schedule asks for an order patrol, a morning report or an evening report; then reads the Order Book and sends a structured report of new orders, orders needing the owner, upcoming deliveries and capacity. Reads and updates the shop's order Google Sheet; never deletes rows; never used on customer turns.",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "cake-shop",
         "bakery",
@@ -477,7 +477,7 @@
       "name": "cake-shop-onboarding-en",
       "source": "./cake-shop-onboarding-en",
       "description": "Cake shop, bakery, dessert shop, custom cake, birthday cake, cake order, inquiry, quote, order management, onboarding. Use on owner turns when a cake, dessert or bakery shop owner wants a NyxBot agent that answers customer questions and takes cake orders or custom-cake inquiries, even if the owner already has another specialist; ask whether it is the same shop or a new one. Bind this skill to NyxBot with set_agent_skills before running it. Collects the shop profile, product catalog (photo, PDF, text or website) and order rules (lead time, daily limit, custom quotes, deposit, delivery, allergen note, report times); builds a Drive folder, shop-info doc and order sheet in the owner's Google Workspace; creates a customer-facing specialist with a fixed Role that answers from the sheet and takes orders, and an owner-only order manager bound to a private copy of cake-order-desk-en with scheduled patrol reports. Never used on customer turns; never deletes or overwrites owner files.",
-      "version": "1.0",
+      "version": "1.1",
       "keywords": [
         "cake-shop",
         "bakery",
