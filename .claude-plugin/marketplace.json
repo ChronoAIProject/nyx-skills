@@ -1314,6 +1314,17 @@
       ]
     },
     {
+      "name": "nyxbot",
+      "source": "./nyxbot",
+      "description": "Placeholder built-in skill for NyxBot and its specialists. How NyxBot works inside NyxID - who does what, how to delegate to specialists, grant services, set up chat channels and schedules, and hand the owner setup pages instead of asking for secrets. Read it when unsure which NyxID tool fits a request or how NyxBot and specialists cooperate. Guidance only; it grants no permissions.",
+      "version": "0.1",
+      "keywords": [
+        "nyxbot",
+        "nyxid",
+        "placeholder"
+      ]
+    },
+    {
       "name": "nyxid",
       "source": "./nyxid",
       "description": "Brokers credentials for downstream services (OpenAI, Anthropic, GitHub, Lark, custom APIs, SSH, MCP) so the agent never sees raw API keys or OAuth tokens. Use whenever the user asks to call, proxy, or authenticate against a third-party API/service, mentions NyxID, asks to \"connect\", \"add a service\", \"set up an API key\", manage credentials/nodes/MCP, send messages through bot platforms, or wire up SSH access. Operate exclusively through the `nyxid` CLI.",
