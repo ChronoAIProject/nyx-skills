@@ -1896,6 +1896,19 @@
         "acceptance",
         "aevatar"
       ]
+    },
+    {
+      "name": "zoho-lark-notice-assistant",
+      "source": "./zoho-lark-notice-assistant",
+      "description": "Read selected Zoho Mail messages or an email supplied in chat, show the original in a private Lark review conversation, draft employee announcements and useful reminders or a reply to the sender, and deliver only after the owner explicitly approves the exact content, recipients and time.",
+      "version": "1.0",
+      "keywords": [
+        "zoho-mail",
+        "lark",
+        "notice-assistant",
+        "email-drafting",
+        "human-approval"
+      ]
     }
   ]
 }
