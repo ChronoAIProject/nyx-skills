@@ -1,0 +1,5 @@
+{
+  "name": "nyxbot-ornn-skills",
+  "version": "0.1",
+  "description": "Placeholder built-in skill for NyxBot and specialists - how to find, attach, read and draft Ornn skills with NyxID's native skill tools (search, preview, pin, request, read, draft) instead of the Ornn CLI or raw Ornn APIs. Read it when the owner asks to find, add, improve or create a skill, or when you need a skill you do not have. Guidance only; it grants no permissions."
+}

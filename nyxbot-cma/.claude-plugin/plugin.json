@@ -1,0 +1,5 @@
+{
+  "name": "nyxbot-cma",
+  "version": "0.1",
+  "description": "Placeholder built-in skill for NyxBot and specialists - how to use ChronoAI Managed Agent (CMA) through the owner's connected cma service in NyxID, for hosted agents, sandboxes and running a command line when one is truly needed. Read it when work needs a hosted agent, a sandbox or a CLI. Guidance only; it grants no permissions."
+}
