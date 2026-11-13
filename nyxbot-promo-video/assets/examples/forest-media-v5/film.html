@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>Forest Media × NyxBot</title>
+<style>
+@font-face{font-family:"Noto Sans CJK SC";src:local("Noto Sans CJK SC"),url(../../fonts/NotoSansSC-Regular.otf);font-weight:100 449}
+@font-face{font-family:"Noto Sans CJK SC";src:local("Noto Sans CJK SC Medium"),url(../../fonts/NotoSansSC-Medium.otf);font-weight:450 599}
+@font-face{font-family:"Noto Sans CJK SC";src:local("Noto Sans CJK SC Bold"),url(../../fonts/NotoSansSC-Bold.otf);font-weight:600 749}
+@font-face{font-family:"Noto Sans CJK SC";src:local("Noto Sans CJK SC Black"),url(../../fonts/NotoSansSC-Black.otf);font-weight:750 1000}
+@font-face{font-family:"Mona Sans";src:url(../../fonts/MonaSans-Regular.ttf);font-weight:400}
+@font-face{font-family:"Mona Sans";src:url(../../fonts/MonaSans-Medium.ttf);font-weight:500}
+@font-face{font-family:"Mona Sans";src:url(../../fonts/MonaSans-SemiBold.ttf);font-weight:600}
+@font-face{font-family:"Mona Sans";src:url(../../fonts/MonaSans-Bold.ttf);font-weight:700}
+@font-face{font-family:"Mona Sans";src:url(../../fonts/MonaSans-ExtraBold.ttf);font-weight:800}
+@font-face{font-family:"JetBrains Mono";src:url(../../fonts/JetBrainsMono-Regular.ttf);font-weight:400}
+@font-face{font-family:"JetBrains Mono";src:url(../../fonts/JetBrainsMono-Medium.ttf);font-weight:500}
+:root{
+  --bg:#F4F4F5; --card:#FFFFFF; --card2:#FAFAFA; --line:#DCDCE1; --line2:#C4C4CA; --hair:rgba(0,0,0,.2);
+  --fg:#18181B; --mute:#3F3F46; --tert:#5B5B63;
+  --nyx:#5E00F5; --violet:#7C5CF0; --nyx-bg:rgba(94,0,245,.07); --nyx-bg2:rgba(94,0,245,.12);
+  --vivid:linear-gradient(180deg,#A672FB,#5E00F5);
+  --ok:#059669; --warn:#B45309; --err:#DC2626; --info:#2563EB;
+  --ok-bg:rgba(5,150,105,.1); --warn-bg:rgba(180,83,9,.1); --err-bg:rgba(220,38,38,.1);
+  --fm:#D7262E; --fm-bg:rgba(215,38,46,.08); --fm-ink:#1F2733;
+  --cust-bg:#E4F5D0; --boss-bg:#F0ECFF;
+  --f:"Mona Sans","Noto Sans CJK SC",sans-serif; --cn:"Noto Sans CJK SC","Mona Sans",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--cn)}
+.a{position:absolute}
+.scene{position:absolute;inset:0;display:none}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.en{font-family:var(--f)}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;box-shadow:0 2px 4px rgba(0,0,0,.04),0 18px 50px rgba(24,24,27,.06)}
+.over{font-family:var(--f);font-size:22px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--nyx)}
+.h2{font-size:64px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.vio{color:var(--nyx)}
+.grad{background:var(--vivid);-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge{display:inline-flex;align-items:center;gap:8px;font-size:22px;font-weight:500;padding:4px 14px;border-radius:9px;white-space:nowrap;line-height:1.4}
+.b-ok{color:#fff;background:var(--ok)} .b-warn{color:#fff;background:var(--warn)} .b-err{color:#fff;background:var(--err)} .b-info{color:#fff;background:var(--info)}
+.b-nyx{color:#fff;background:var(--nyx)} .b-fm{color:#fff;background:var(--fm)} .b-n{color:var(--mute);border:1.5px solid var(--mute)} .b-soft{color:var(--nyx);background:var(--nyx-bg2)}
+#glow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(124,92,240,.30),rgba(124,92,240,.10) 55%,rgba(124,92,240,0));pointer-events:none}
+#lines{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none}
+#tag{position:absolute;right:40px;bottom:30px;font-size:19px;color:var(--tert);display:flex;align-items:center;gap:8px}
+#tag i{width:9px;height:9px;border-radius:50%;background:var(--warn);display:block}
+.secpill{position:absolute;left:96px;top:72px;display:flex;align-items:center;gap:12px;font-family:var(--f);font-size:22px;font-weight:600;letter-spacing:.14em;color:var(--nyx)}
+.secpill .n{background:var(--nyx);color:#fff;border-radius:8px;padding:2px 10px;letter-spacing:0;font-family:var(--mono);font-size:20px}
+/* bubbles */
+.bub{border-radius:18px;padding:12px 16px;font-size:23px;line-height:1.42;border:1.5px solid transparent;max-width:88%;overflow:hidden}
+.bub.cu{align-self:flex-end;background:var(--cust-bg);border-bottom-right-radius:5px;font-family:var(--f)}
+.bub.ai{align-self:flex-start;background:#fff;border-color:var(--line);border-bottom-left-radius:5px;font-family:var(--f)}
+.bub.zh{font-family:var(--cn)}
+.bub.boss{align-self:flex-end;background:var(--boss-bg);border-bottom-right-radius:5px}
+.bub .gl{display:block;margin-top:7px;padding-top:7px;border-top:1.5px dashed var(--hair);font-size:19px;color:var(--tert);font-family:var(--cn)}
+.bub.sys{align-self:center;background:transparent;border:1.5px dashed rgba(0,0,0,.3);color:var(--tert);font-size:19px;padding:5px 12px}
+.wave{display:inline-flex;gap:4px;align-items:center;height:26px;margin-right:12px;vertical-align:-5px}
+.wave i{display:block;width:4px;border-radius:2px;background:var(--nyx);height:8px}
+/* phone */
+.phone{position:absolute;background:#fff;border:2px solid var(--line2);border-radius:44px;padding:18px 18px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 30px 80px rgba(24,24,27,.14);overflow:hidden}
+.phone .bar{display:flex;justify-content:space-between;font-size:17px;color:var(--tert);font-family:var(--mono);padding:0 10px}
+.phone .app{display:flex;align-items:center;gap:12px;padding:4px 8px 14px;border-bottom:1.5px solid var(--line);font-size:23px;font-weight:600}
+.phone .app .av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--fm-bg);color:var(--fm);font-size:18px;font-weight:800;font-family:var(--f)}
+.phone .app .av.nyx{background:var(--nyx-bg2);color:var(--nyx)}
+.phone .app small{display:block;font-weight:400;color:var(--tert);font-size:17px}
+.phone .app .st{margin-left:auto;font-size:16px;color:var(--ok);font-weight:500;font-family:var(--f)}
+.phone .chat{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;overflow:hidden;min-height:0}
+.phone .chat>*{flex-shrink:0}
+.phone .inp{display:flex;gap:10px;padding-top:12px;border-top:1.5px solid var(--line)}
+.phone .inp span{flex:1;height:48px;border:1.5px solid var(--hair);border-radius:999px;padding:0 18px;font-size:19px;color:var(--tert);display:flex;align-items:center}
+.phone .inp b{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--nyx-bg2);color:var(--nyx)}
+/* misc */
+.lrow{display:grid;grid-template-columns:16px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border-radius:10px;background:rgba(0,0,0,.035);font-size:20px}
+.lrow .k{width:10px;height:10px;border-radius:50%;background:var(--violet)} .lrow .k.ok{background:var(--ok)} .lrow .k.warn{background:var(--warn)}
+.lrow .t{font-family:var(--mono);font-size:16px;color:var(--tert)}
+.kin{position:absolute;left:0;width:1920px;text-align:center;font-weight:700}
+table{border-collapse:collapse;width:100%}
+.jobs th{font-family:var(--f);font-size:17px;font-weight:600;letter-spacing:.1em;color:var(--tert);text-align:left;padding:10px 16px;border-bottom:1.5px solid var(--line)}
+.jobs td{padding:8px 16px;border-bottom:1.5px solid var(--line);font-size:22px;vertical-align:middle}
+.jobs td small{display:block;font-size:17px;color:var(--tert)}
+.jobs td.me{color:var(--fm);font-weight:600}
+.sw{display:flex;align-items:center;gap:18px;padding:16px 20px;border:1.5px solid var(--line);border-radius:16px;background:#fff;font-size:28px}
+.sw .knob{width:66px;height:38px;border-radius:999px;background:rgba(0,0,0,.25);position:relative;flex:none}
+.sw .knob i{position:absolute;top:5px;left:5px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);display:block}
+.sw small{margin-left:auto;font-size:22px;color:var(--tert)}
+.qdoc{font-family:var(--f);color:#1F2733;background:#fff}
+.qdoc th{background:#1F2733;color:#fff;font-size:15px;letter-spacing:.12em;text-transform:uppercase;padding:12px 18px;text-align:left}
+.qdoc td{padding:16px 18px;border-bottom:1.5px solid #E4E4E7;font-size:19px;vertical-align:top}
+.c{visibility:hidden}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:22px;font-weight:600;padding:6px 16px;border-radius:999px;white-space:nowrap;font-family:var(--cn)}
+.pill.cu{background:var(--cust-bg);color:#2F6B1A}
+.pill.bot{background:var(--nyx);color:#fff}
+.tln{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:start}
+.tln .en{font-size:40px;line-height:1.3;font-weight:500;letter-spacing:-.005em}
+.tln .en .w{display:inline-block;margin-right:.26em;opacity:0}
+.tln .zh{font-size:25px;color:var(--tert);margin-top:6px}
+.wvb{display:block;width:9px;border-radius:5px;background:var(--line2)}
+.srow{display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:center;padding:16px 0;border-top:1.5px solid var(--line);font-size:32px}
+.srow .k{font-size:24px;color:var(--tert)}
+.ghost{position:absolute;font-family:var(--f);font-size:28px;padding:16px 22px;border-radius:24px 24px 24px 6px;background:#fff;border:1.5px solid var(--line);color:var(--mute);box-shadow:0 10px 30px rgba(24,24,27,.06)}
+.ghost.r{border-radius:24px 24px 6px 24px;background:var(--cust-bg);border-color:transparent}
+.ph{position:absolute;width:330px;border-radius:20px;overflow:hidden;background:#fff;border:1.5px solid var(--line);box-shadow:0 20px 50px rgba(24,24,27,.12)}
+.ph img{display:block;width:100%;height:290px;object-fit:cover}
+.ph b{display:block;padding:10px 16px 12px;font-size:24px;font-weight:600}
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;gap:14px;width:340px;text-align:center}
+.node .av{width:210px;height:210px;border-radius:50%;display:grid;place-items:center;background:#fff;border:2px solid var(--line);box-shadow:0 18px 44px rgba(24,24,27,.08);overflow:hidden}
+.node .av svg{width:190px;height:190px;margin-top:20px}
+.node b{font-size:40px}
+.node small{font-size:24px;color:var(--tert)}
+.coin{position:absolute;width:86px;height:86px;border-radius:50%;background:#F2B233;border:5px solid #D4931A;color:#7A4E06;display:grid;place-items:center;font-family:var(--f);font-size:40px;font-weight:800;box-shadow:0 8px 20px rgba(180,120,10,.3)}
+.sitetile{border:1.5px solid #E4E4E7;border-radius:10px;overflow:hidden;background:#fff}
+.sitetile img{display:block;width:100%;height:150px;object-fit:cover}
+.sitetile b{display:block;padding:7px 10px 1px;font-size:15px;font-weight:700}
+.sitetile small{display:block;padding:0 10px 8px;font-size:13px;color:#5B5B63}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="vivid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A672FB"/><stop offset="1" stop-color="#5E00F5"/></linearGradient>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 4v4M9 13v2M15 13v2M2 14h2M20 14h2"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9 4.5 4h15L21 9M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 13v8h14v-8M10 21v-5h4v5"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></symbol>
+<symbol id="i-sheet" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 15l2 2 4-4"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+<symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-sign" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="10" rx="2"/><path d="M12 15v6M8 21h8M7 10h10"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="tm" viewBox="0 0 40 40"><rect x="2" y="3" width="24" height="7" fill="#D7262E"/><rect x="2" y="3" width="7" height="22" fill="#D7262E"/><path d="M13 36V15l7.5 10L28 15v21h-4V24.5l-3.5 5-3.5-5V36z" fill="#1F2733"/></symbol>
+</defs></svg>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="p-boss" viewBox="0 0 100 100"><path d="M18 100V84c0-14 10-22 24-22h16c14 0 24 8 24 22v16z" fill="#D7262E"/><path d="M44 62l6 10 6-10z" fill="#F4F4F5"/><rect x="42" y="50" width="16" height="16" fill="#D59A72"/><circle cx="26" cy="36" r="5" fill="#D59A72"/><circle cx="74" cy="36" r="5" fill="#D59A72"/><ellipse cx="50" cy="34" rx="26" ry="28" fill="#E6B38E"/><path d="M28 22c6-14 38-14 44 0" fill="#D59A72" opacity=".35"/><path d="M38 28q6-4 10-1M62 28q-6-4-10-1" stroke="#2B2B2E" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="42" cy="36" r="2.6" fill="#2B2B2E"/><circle cx="58" cy="36" r="2.6" fill="#2B2B2E"/><path d="M42 48q8 7 16 0" stroke="#9B5E3E" stroke-width="2.5" stroke-linecap="round" fill="none"/></symbol>
+<symbol id="p-sales" viewBox="0 0 100 100"><path d="M18 100V84c0-14 10-22 24-22h16c14 0 24 8 24 22v16z" fill="#F4F4F5" stroke="#C4C4CA" stroke-width="2"/><path d="M44 62l6 12 6-12z" fill="#B45309"/><rect x="42" y="50" width="16" height="16" fill="#D59A72"/><circle cx="26" cy="38" r="5" fill="#D59A72"/><circle cx="74" cy="38" r="5" fill="#D59A72"/><ellipse cx="50" cy="36" rx="25" ry="26" fill="#E6B38E"/><path d="M25 30c2-16 46-18 50-2-8-6-20-8-25-2-5-4-18-4-25 4z" fill="#3B2A22"/><circle cx="42" cy="38" r="2.6" fill="#2B2B2E"/><circle cx="58" cy="38" r="2.6" fill="#2B2B2E"/><path d="M42 48q8 7 16 0" stroke="#9B5E3E" stroke-width="2.5" stroke-linecap="round" fill="none"/><rect x="70" y="66" width="16" height="26" rx="3" fill="#1F2733"/><rect x="73" y="70" width="10" height="16" fill="#F4F4F5"/></symbol>
+</defs></svg>
+<div id="stage">
+  <div id="glow"></div>
+  <svg id="lines" viewBox="0 0 1920 1080"><g id="lg" fill="none" stroke="rgba(94,0,245,.10)" stroke-width="1.6"><path vector-effect="non-scaling-stroke" d="M258.614 53.8457V205.377C258.614 234.778 234.78 258.612 205.38 258.612H131.074C130.268 258.612 129.613 257.957 129.613 257.15V117.358C129.613 115.867 127.645 115.332 126.891 116.619L44.0376 257.889C43.7745 258.337 43.2951 258.612 42.7777 258.612H2.073C1.26616 258.612 0.611328 257.957 0.611328 257.15V2.07323C0.611328 1.26639 1.26616 0.611557 2.073 0.611557H85.1516C85.9584 0.611557 86.6133 1.26639 86.6133 2.07323V141.865C86.6133 143.356 88.5807 143.891 89.3349 142.604L172.191 1.33362C172.454 0.886352 172.934 0.611557 173.451 0.611557H205.377C234.777 0.611557 258.611 24.4456 258.611 53.8457H258.614Z"/></g></svg>
+
+  <!-- ===== S0 his work (v5 opening) ===== -->
+  <div class="scene" id="s0">
+    <div id="phs"></div>
+    <div class="kin" id="k0" style="top:880px;font-size:92px;font-weight:800">这些招牌，都是您的<span style="color:var(--fm)">得意之作</span>。</div>
+  </div>
+
+  <!-- ===== S1 the detour, four beats ===== -->
+  <div class="scene" id="s1">
+    <div class="node" id="nC" style="left:170px;top:100px"><div class="av" style="background:var(--cust-bg);border-color:transparent"><svg class="i" style="width:110px;height:110px;margin:0;color:#2F6B1A;stroke-width:1.3"><use href="#i-phone"/></svg></div><b>英文客户</b><small>传单 · Carousell · Facebook</small></div>
+    <div class="node" id="nS" style="left:790px;top:100px"><div class="av" style="background:var(--warn-bg);border-color:rgba(180,83,9,.3)"><svg><use href="#p-sales"/></svg></div><b>业务员</b><small>会英文 · 兼职</small></div>
+    <div class="node" id="nB" style="left:1410px;top:100px"><div class="av" style="background:var(--fm-bg);border-color:rgba(215,38,46,.3)"><svg><use href="#p-boss"/></svg></div><b>白老板</b><small>做招牌</small></div>
+    <svg class="a" style="left:0;top:0" width="1920" height="1080"><path id="ar1" d="M560 205 H780" stroke="#C4C4CA" stroke-width="5" stroke-dasharray="10 12" fill="none"/><path id="ar2" d="M1180 205 H1400" stroke="#C4C4CA" stroke-width="5" stroke-dasharray="10 12" fill="none"/></svg>
+    <div class="a" id="arl1" style="left:600px;top:150px;font-size:26px;font-weight:600;color:var(--tert)">英文订单</div>
+    <div class="a" id="arl2" style="left:1220px;top:150px;font-size:26px;font-weight:600;color:var(--tert)">转一手</div>
+    <div class="coin" id="cn0">$</div><div class="coin" id="cn1">$</div><div class="coin" id="cn2">$</div>
+    <div class="a card" id="ord" style="left:1400px;top:520px;width:400px;padding:22px 26px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:22px;color:var(--tert)">这一单 · 利润</span>
+      <div style="height:34px;border-radius:8px;background:var(--ok);position:relative;overflow:hidden"><i id="slice" style="position:absolute;right:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(45deg,#D7262E 0 10px,#E35B61 10px 20px);display:block"></i></div>
+      <div style="display:flex;justify-content:space-between;font-size:26px;font-weight:700"><span style="color:var(--ok)">留给您</span><span id="cut" style="color:var(--fm)">− 介绍费</span></div>
+    </div>
+    <div class="a card" id="saved" style="left:140px;top:520px;width:420px;padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:22px;color:var(--tert)">客户手机 · 通讯录</span>
+      <div class="ctr" style="display:flex;justify-content:space-between;font-size:28px"><b>Signboard</b><span style="color:var(--warn)">业务员</span></div>
+      <div class="ctr" style="display:flex;justify-content:space-between;font-size:28px"><b>Lightbox guy</b><span style="color:var(--warn)">业务员</span></div>
+      <div class="ctr" style="display:flex;justify-content:space-between;font-size:28px"><b>Forest Media</b><span style="color:var(--fm)">没存</span></div>
+    </div>
+    <div id="leads"></div>
+    <div class="kin cap1" id="ca" style="top:790px;font-size:80px">接英文订单，总得绕一层<span style="color:var(--warn)">业务员</span>。</div>
+    <div class="kin cap1" id="cb" style="top:790px;font-size:80px">每做一单，都被分走一笔<span style="color:var(--fm)">利润</span>。</div>
+    <div class="kin cap1" id="cc" style="top:790px;font-size:80px">客户存的，全是<span style="color:var(--warn)">业务员的号码</span>。</div>
+    <div class="kin cap1" id="cd" style="top:790px;font-size:80px">忙活半天，留不住<span style="color:var(--fm)">自己的客源</span>。</div>
+    <div class="a" id="fog" style="inset:0;background:rgba(244,244,245,.82);opacity:0"></div>
+    <div class="kin" id="ce" style="top:330px;font-size:250px;font-weight:900;color:var(--fm);letter-spacing:-.02em">太憋屈了！</div>
+  </div>
+
+  <!-- ===== S2 drop ===== -->
+  <div class="scene" id="s2">
+    <div class="kin" id="t2n" style="top:400px;font-size:120px;font-weight:800">现在，<span class="vio">不一样了。</span></div>
+    <div class="kin" id="t2o" style="top:250px;font-size:44px;font-weight:600;color:var(--tert)">直接打给您的</div>
+    <div class="a" style="left:0;width:1920px;top:330px;display:flex;justify-content:center;font-size:200px;font-weight:800;letter-spacing:-.02em;line-height:1.2">
+      <span id="t2a" style="display:inline-block">英文电话，</span><span id="t2b" class="grad" style="display:inline-block">它来接。</span>
+    </div>
+  </div>
+
+  <!-- ===== S3 call + his phone ===== -->
+  <div class="scene" id="s3">
+    <div class="a card" id="cph" style="left:130px;top:110px;width:520px;height:860px;border-radius:56px;padding:56px 36px 60px;display:flex;flex-direction:column;align-items:center">
+      <div id="cst" style="display:flex;align-items:center;gap:12px;font-size:28px;color:#2F9E44;font-weight:600"><i id="cdot" style="width:14px;height:14px;border-radius:50%;background:#2F9E44;display:block"></i><span id="cstT">通话中</span><span class="mono" id="ctm" style="font-weight:500">00:00</span></div>
+      <div class="mono" style="font-size:42px;margin-top:34px;font-weight:500">+65 8123 4567</div>
+      <div style="margin-top:22px"><span class="badge b-nyx" style="font-size:24px;padding:6px 18px"><svg class="i" style="width:26px;height:26px"><use href="#i-bot"/></svg>NyxBot 接听 · 英文</span></div>
+      <div id="wv" style="margin-top:70px;height:240px;display:flex;align-items:center;gap:7px"></div>
+      <div id="who" style="font-size:28px;margin-top:26px;color:var(--tert);height:40px"></div>
+      <div style="margin-top:auto;font-size:24px;color:var(--tert)">Forest Media 的电话</div>
+      <span id="hang" style="margin-top:22px;width:104px;height:104px;border-radius:50%;background:var(--err);color:#fff;display:grid;place-items:center"><svg class="i" style="width:46px;height:46px;transform:rotate(135deg)"><use href="#i-phone"/></svg></span>
+    </div>
+    <div class="a" id="tr" style="left:760px;top:190px;width:1060px;display:flex;flex-direction:column;gap:40px"></div>
+    <div class="a card" id="sum" style="left:760px;top:80px;width:1040px;padding:30px 44px 14px">
+      <div style="display:flex;align-items:center;gap:16px;font-size:26px;color:var(--tert)"><span style="width:56px;height:56px;border-radius:50%;background:var(--nyx-bg2);color:var(--nyx);display:grid;place-items:center"><svg class="i" style="width:32px;height:32px"><use href="#i-bot"/></svg></span><span><b style="color:var(--fg)">NyxBot</b> → 白老板的手机</span><span class="mono" style="margin-left:auto;font-size:24px">15:02</span></div>
+      <div style="display:flex;align-items:center;gap:16px;margin:20px 0 10px;font-size:54px;font-weight:700"><svg class="i" style="width:52px;height:52px;color:var(--nyx)"><use href="#i-phone"/></svg>新询价 · 电话</div>
+      <div id="srows"></div>
+    </div>
+    <div class="a" id="bv" style="left:760px;top:640px;width:1040px;display:flex;flex-direction:column;gap:16px">
+      <div class="bub boss zh" id="bb1" style="font-size:32px;max-width:80%;padding:18px 24px"><span class="wave" id="bbw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>1800，含安装，星期三装。</div>
+      <div class="bub ai zh" id="bb2" style="font-size:30px;max-width:90%;padding:18px 24px"><span style="color:var(--ok)">✓</span> 已用英文回电客人：<span class="en">S$1,800, installation included, Wednesday.</span></div>
+    </div>
+    <div class="a" id="own" style="left:760px;top:900px;font-size:64px;font-weight:800">这一单，<span class="vio">客人是您自己的！</span></div>
+  </div>
+
+  <!-- ===== S4 punch ===== -->
+  <div class="scene" id="s4">
+    <div class="kin" id="t4a" style="top:260px;font-size:150px;font-weight:800;letter-spacing:-.02em">客人上网，找不到您？</div>
+    <div class="kin" id="t4b" style="top:500px;font-size:190px;font-weight:800;letter-spacing:-.02em"><span class="grad">说一句话。</span></div>
+  </div>
+
+  <!-- ===== S5 site ===== -->
+  <div class="scene" id="s5">
+    <div class="a" id="s5l" style="left:110px;top:150px;width:620px;display:flex;flex-direction:column;gap:20px">
+      <div id="s5o" style="font-size:26px;color:var(--tert);display:flex;align-items:center;gap:10px"><svg class="i" style="color:var(--fm)"><use href="#i-store"/></svg>白老板说一句</div>
+      <div class="bub boss zh" id="sb1" style="font-size:32px;max-width:100%;padding:20px 24px;line-height:1.5"><span class="wave" id="sbw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>帮我做个英文网站，放我做过的招牌。</div>
+      <div id="sbm" style="font-size:26px;color:var(--tert);display:flex;gap:12px;align-items:center"><svg class="i" style="color:var(--nyx)"><use href="#i-bot"/></svg>NyxBot 搭建中<span class="mono" id="btm" style="color:var(--nyx);font-size:30px;font-weight:500">00:00</span><span style="font-size:22px">（实际约 10 分钟）</span></div>
+      <div class="bub ai zh" id="sb2" style="font-size:32px;max-width:100%;padding:20px 24px;line-height:1.5">好了 <span style="color:var(--ok)">✓</span> <b class="vio en">forestmedia.sg</b> 上线了。</div>
+      <div id="s5c" style="margin-top:30px;white-space:nowrap;font-size:62px;font-weight:700;line-height:1.25">放的全是<br><span style="color:var(--fm)">您的得意之作。</span></div>
+    </div>
+    <div class="a card" id="brw" style="left:790px;top:110px;width:1030px;height:860px;padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px"><div style="display:flex;gap:7px"><i style="width:13px;height:13px;border-radius:50%;background:#E4E4E7;display:block"></i><i style="width:13px;height:13px;border-radius:50%;background:#E4E4E7;display:block"></i><i style="width:13px;height:13px;border-radius:50%;background:#E4E4E7;display:block"></i></div><div style="flex:1;height:40px;border:1.5px solid var(--hair);border-radius:9px;display:flex;align-items:center;gap:10px;padding:0 14px;font-family:var(--mono);font-size:19px;color:var(--tert)"><svg class="i" style="width:20px;height:20px"><use href="#i-globe"/></svg><span id="url"></span><span class="badge b-n" style="font-size:15px;padding:1px 8px;margin-left:6px">示意</span></div></div>
+      <div id="site" style="flex:1;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;font-family:var(--f);color:#1F2733;background:#fff;display:flex;flex-direction:column;position:relative"></div>
+    </div>
+  </div>
+
+  <!-- ===== S6 next ===== -->
+  <div class="scene" id="s6">
+    <div class="ghost" id="g0" style="left:140px;top:170px">Hi, can I get a quote?</div>
+    <div class="ghost r" id="g1" style="left:1430px;top:220px">Do you do lightboxes?</div>
+    <div class="ghost" id="g2" style="left:200px;top:800px">Open on Sunday?</div>
+    <div class="ghost r" id="g3" style="left:1390px;top:790px">Here's my shopfront 👇</div>
+    <div class="kin" id="t6o" style="top:250px;font-size:34px;font-weight:600;letter-spacing:.3em;color:var(--nyx)">下一步</div>
+    <div class="kin" id="t6" style="top:310px;font-size:200px;font-weight:800;letter-spacing:-.01em">信息回复</div>
+    <div class="kin" id="t6s" style="top:590px;font-size:54px;font-weight:500;color:var(--mute)">英文消息进来，它也替您回。</div>
+    <div class="a" id="t6b" style="left:0;width:1920px;top:700px;display:flex;justify-content:center"><span class="badge b-soft" style="font-size:36px;padding:12px 32px;border:2px solid rgba(94,0,245,.3)">即将开通</span></div>
+  </div>
+
+  <!-- ===== S7 end ===== -->
+  <div class="scene" id="s7">
+    <div class="a" id="eLock" style="left:0;width:1920px;top:150px;display:flex;justify-content:center;align-items:center;gap:30px"><span id="nyxLogo2"></span><span style="font-size:44px;color:var(--tert)">×</span><span style="display:inline-flex;align-items:center;gap:14px;font-family:var(--f);font-weight:800;font-size:44px;letter-spacing:.02em;color:var(--fm-ink)"><svg style="width:66px;height:66px"><use href="#tm"/></svg>FOREST MEDIA</span></div>
+    <div class="kin" id="e1" style="top:300px;font-size:150px;font-weight:800">招牌您来做。</div>
+    <div class="kin" id="e2" style="top:490px;font-size:150px;font-weight:800"><span class="grad">英文交给它。</span></div>
+    <div class="a" id="eB" style="left:0;width:1920px;top:730px;display:flex;justify-content:center;gap:20px">
+      <span class="badge b-nyx eb" style="font-size:34px;padding:12px 28px">试用三个月</span><span class="badge b-ok eb" style="font-size:34px;padding:12px 28px">不要钱</span><span class="badge b-n eb" style="font-size:34px;padding:12px 28px">不签合同</span>
+    </div>
+    <div class="a" id="eF" style="left:96px;right:96px;top:1000px;display:flex;justify-content:space-between;font-size:20px;color:var(--tert)"><span>© 2026 ChronoAI · nyxid.ai</span><span>来电、客人和对话为示例；作品照片来自 Forest Media；域名以实际注册的为准</span></div>
+  </div>
+
+  <div id="tag"><i></i>演示 · 来电、客人和对话为示例</div>
+  <div class="a" id="flash" style="inset:0;background:#fff;opacity:0;pointer-events:none"></div>
+  <div class="a" id="fade" style="inset:0;background:#F4F4F5;opacity:0;pointer-events:none"></div>
+</div>
+<div id="nyxSrc" style="display:none"><svg class="logo" style="height:76px;width:auto" viewBox="0 0 1062 301" role="img" aria-label="NyxID">
+      <path d="M258.614 53.8457V205.377C258.614 234.778 234.78 258.612 205.38 258.612H131.074C130.268 258.612 129.613 257.957 129.613 257.15V117.358C129.613 115.867 127.645 115.332 126.891 116.619L44.0376 257.889C43.7745 258.337 43.2951 258.612 42.7777 258.612H2.073C1.26616 258.612 0.611328 257.957 0.611328 257.15V2.07323C0.611328 1.26639 1.26616 0.611557 2.073 0.611557H85.1516C85.9584 0.611557 86.6133 1.26639 86.6133 2.07323V141.865C86.6133 143.356 88.5807 143.891 89.3349 142.604L172.191 1.33362C172.454 0.886352 172.934 0.611557 173.451 0.611557H205.377C234.777 0.611557 258.611 24.4456 258.611 53.8457H258.614Z" fill="url(#vivid)"/>
+      <path fill="#18181B" d="M581.159 193.441L587.61 215.028H589.099L595.302 193.441L615.648 125.951H654.604L602.994 265.148C599.52 274.411 595.385 281.607 590.588 286.735C585.791 291.862 580.332 295.42 574.212 297.405C568.092 299.39 561.226 300.381 553.617 300.381H531.038V270.359H546.67C550.474 270.359 553.617 269.863 556.099 268.87C558.745 268.043 560.896 266.554 562.55 264.404C564.369 262.419 565.858 259.855 567.016 256.712L570.144 248.577L519.128 125.951H559.324L581.159 193.441ZM462.01 204.606H463.498L461.762 148.034V78.0637H499.228V258.946H454.317L378.641 133.891H377.151L378.641 186.245V258.946H339.188V78.0637H386.58L462.01 204.606ZM731.847 163.17L734.824 168.132H736.065L739.043 163.17L762.614 125.951H804.051L759.885 189.719L808.765 258.946H765.592L738.05 217.012L734.824 211.306H733.584L730.11 217.012L701.328 258.946H660.388L710.509 190.711L665.102 125.951H708.275L731.847 163.17ZM867.114 258.946H828.407V78.0637H867.114V258.946ZM978.508 78.0637C996.372 78.0637 1011.51 81.8679 1023.91 89.4768C1036.32 96.9204 1045.75 107.425 1052.2 120.989C1058.65 134.553 1061.88 150.433 1061.88 168.628C1061.88 182.027 1060.06 194.351 1056.42 205.599C1052.78 216.682 1047.4 226.193 1040.29 234.133C1033.18 242.073 1024.41 248.193 1013.99 252.493C1003.73 256.794 991.906 258.946 978.508 258.946H901.342V78.0637H978.508ZM940.049 225.945H972.057C979.335 225.945 986.035 224.952 992.155 222.967C998.275 220.982 1003.57 217.756 1008.04 213.29C1012.5 208.824 1015.97 202.869 1018.46 195.426C1020.94 187.982 1022.18 178.801 1022.18 167.884C1022.18 153.658 1020.03 142.41 1015.73 134.139C1011.59 125.868 1005.72 119.914 998.109 116.275C990.666 112.636 981.981 110.816 972.057 110.816H940.049V225.945Z"/>
+    </svg></div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = x => 1 - Math.pow(1 - x, 3), eo5 = x => 1 - Math.pow(1 - x, 5);
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const bo = x => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, p) => a + (b - a) * p;
+// all times line up with the voice-over table (VO list in make_audio_fm4.py)
+const M = { PAIN: 3.2, DROP: 12.0, CALL: 14.2, HANG: 21.8, SITE: 31.8, BUILD: 34.6, NEXT: 39.8, FINAL: 43.4, ENDHIT: 50.0, END: 51.5 };
+window.M = M;
+function st(el, o) {
+  const x = o.x || 0, y = o.y || 0, s = o.s == null ? 1 : o.s, r = o.r || 0, op = o.o == null ? 1 : o.o, b = o.b || 0;
+  el.style.transform = `translate(${x.toFixed(2)}px,${y.toFixed(2)}px) scale(${s.toFixed(4)}) rotate(${(+r).toFixed(2)}deg)`;
+  el.style.opacity = op.toFixed(3); el.style.filter = b > .15 ? `blur(${b.toFixed(2)}px)` : '';
+  el.style.visibility = op < .003 ? 'hidden' : 'visible';
+}
+function pop(t, tin, tout = 1e9, o = {}) {
+  const d = o.d ?? .4, dy = o.dy ?? 30, ds = o.ds ?? .04, db = o.db ?? 8, od = o.od ?? .3;
+  const p = (o.ease || eo)(P(t, tin, tin + d)), q = eio(P(t, tout, tout + od));
+  return { o: p * (1 - q), y: (1 - p) * dy + q * (o.qy ?? -12), x: (1 - p) * (o.dx ?? 0) + q * (o.qx ?? 0), s: 1 - (1 - p) * ds + q * (o.qs ?? .02), b: (1 - p) * db + q * (o.qb ?? 8), r: 0 };
+}
+const outMul = (o, q) => { o.o *= 1 - q; o.b += q * 12; o.s *= 1 + .03 * q; return o; };
+function scene(id, t, a, b) { const el = $('#' + id); const on = t >= a && t <= b; el.style.display = on ? 'block' : 'none'; return on; }
+function txt(el, v) { const s = String(v); if (el.textContent !== s) el.textContent = s; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mmss = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+const T = { s0: [0, M.PAIN + .05], s1: [M.PAIN - .05, M.DROP + .05], s2: [M.DROP - .05, M.CALL + .05], s3: [M.CALL - .05, M.SITE + .05], s4: [M.SITE - .05, M.BUILD + .05], s5: [M.BUILD - .05, M.NEXT + .05], s6: [M.NEXT - .05, M.FINAL + .05], s7: [M.FINAL - .05, M.END + .1] };
+
+// ---------- S0 his work (real photos) ----------
+const PH = [['fried-chicken', '中英招牌'], ['ishanghai', '圆形灯箱'], ['otakaraya', '发光字'], ['ihc-sign', '四语标识'], ['pastry-haven', '立式灯箱'], ['trendy', '店招'], ['mall-booth', '展览搭建'], ['sandwich-prop', '展览道具']];
+const PHPOS = [[150, 120, -4], [560, 90, 3], [970, 130, -2], [1380, 100, 4], [250, 470, 3], [660, 500, -3], [1070, 460, 2], [1480, 490, -4]];
+$('#phs').innerHTML = PH.map(([f, l], i) => `<div class="ph" style="left:${PHPOS[i][0]}px;top:${PHPOS[i][1]}px"><img src="img/${f}.jpg"><b>${l}</b></div>`).join('');
+const phs = $$('.ph');
+
+// ---------- S3 call ----------
+const LINES = [
+  ['cu', '客人', "Hi, do you do lightbox signs? About 3 metres.", '你们做灯箱招牌吗？大概 3 米。', 14.6, 16.0],
+  ['bot', 'NyxBot', "Yes, we do! Every sign is custom, so Boss Bai will price it himself.", '做的！每个招牌都不一样，价钱白老板亲自定。', 16.3, 18.1],
+  ['cu', '客人', "Sure. It's at Tampines Mall.", '好的，在 Tampines Mall。', 18.4, 19.3],
+  ['bot', 'NyxBot', "Got it. We'll get back to you today.", '收到，今天回复您。', 19.5, 20.5],
+];
+$('#tr').innerHTML = LINES.map(([k, who, en, zh]) => `<div class="tln"><span class="pill ${k}">${who}</span><div><div class="en">${en.split(' ').map(w => `<span class="w">${esc(w)}</span>`).join('')}</div><div class="zh">${esc(zh)}</div></div></div>`).join('');
+const tlns = $$('.tln');
+const WV = 28; $('#wv').innerHTML = '<i class="wvb"></i>'.repeat(WV); const wvb = $$('#wv .wvb');
+const SROWS = [['客人', 'Mr Lim · 英文来电'], ['要做', '灯箱招牌 · 约 3 米'], ['地点', 'Tampines Mall'], ['等您一句', '<span class="badge b-fm" style="font-size:26px">价格</span> <span class="badge b-fm" style="font-size:26px">做法</span> <span class="badge b-fm" style="font-size:26px">日期</span>']];
+$('#srows').innerHTML = SROWS.map(([k, v]) => `<div class="srow"><span class="k">${k}</span><span>${v.startsWith('<') ? v : esc(v)}</span></div>`).join('');
+const srows = $$('.srow');
+
+// ---------- S5 site (real photos) ----------
+const HERO = 'Signboards, lightboxes and exhibition builds. Made and installed in Singapore.';
+const TILES = [['fried-chicken', 'Shop signboard', 'Chinese + English'], ['ishanghai', 'Round lightbox', 'Mall unit'], ['otakaraya', 'Illuminated letters', 'VIP lounge'], ['pastry-haven', 'Standing lightbox', 'Bakery'], ['trendy', 'Shopfront sign', 'Fashion store'], ['mall-booth', 'Exhibition build', 'Mall atrium']];
+$('#site').innerHTML = `<div class="sn" style="display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1.5px solid #E4E4E7"><span style="display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:.02em"><svg style="width:34px;height:34px"><use href="#tm"/></svg>FOREST MEDIA</span><span style="margin-left:auto;display:flex;gap:18px;font-size:16px;color:#3F3F46"><span>Work</span><span>Services</span><span>Contact</span><span>中文</span></span><span style="background:#25A244;color:#fff;border-radius:8px;padding:7px 13px;font-size:16px;font-weight:600">Contact 8696 1585</span></div>
+  <div class="sh2" style="padding:22px 22px 14px"><div id="heroT" style="font-size:36px;line-height:1.15;font-weight:800;letter-spacing:-.01em;max-width:900px">${[...HERO].map(c => `<span class="hc" style="visibility:hidden">${esc(c)}</span>`).join('')}</div><div id="heroS" style="font-size:18px;color:#3F3F46;margin-top:10px">Forest Media Pte. Ltd. · Tampines workshop · Site measurement islandwide.</div></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 22px 16px">${TILES.map(([f, a, b]) => `<div class="sitetile sg"><img src="img/${f}.jpg"><b>${a}</b><small>${b}</small></div>`).join('')}</div>`;
+const sgs = $$('.sg'), hcs = $$('.hc');
+
+// ---------- logos ----------
+const NYX = document.getElementById('nyxSrc').innerHTML; $('#nyxLogo2').innerHTML = NYX;
+
+// ---------- background ----------
+const GK = [[0, 960, 540, 1500, .55], [M.PAIN, 1500, 300, 1200, .45], [M.DROP - .2, 1400, 400, 1200, .5], [M.DROP + .1, 960, 480, 1800, 1], [M.CALL, 400, 540, 1300, .7], [M.HANG, 1300, 500, 1300, .75], [M.SITE, 960, 520, 1700, .95], [M.BUILD, 1300, 560, 1400, .7], [M.NEXT, 960, 460, 1500, .8], [M.FINAL, 960, 480, 1800, 1], [M.END, 960, 480, 1600, .6]];
+function kf(K, t) { let i = 0; while (i < K.length - 2 && t > K[i + 1][0]) i++; const a = K[i], b = K[i + 1], p = eio(P(t, a[0], b[0])); return a.slice(1).map((v, j) => lerp(v, b[j + 1], p)); }
+const LK = [[0, 1200, -300, 5.5], [M.DROP - .1, 1150, -300, 5.5], [M.DROP + .15, -200, -500, 6.5], [M.SITE - .1, -120, -460, 6.5], [M.SITE + .15, 1300, -200, 5], [M.NEXT - .1, 1250, -200, 5], [M.NEXT + .2, 500, -600, 6.6], [M.FINAL - .1, 520, -560, 6.6], [M.FINAL + .2, 1000, -400, 6], [M.END, 980, -400, 6]];
+const groove = t => (t < M.PAIN) || (t >= M.DROP && t < M.NEXT) || (t >= M.FINAL && t < M.ENDHIT);
+
+// ===== v5: new 20-second opening (voice-over lines 01-05), then the v4 film shifted by OFF =====
+const OFF = 10.8, NM = { PAIN: 3.6, DROP: 22.0, CALL: M.CALL + OFF };
+const NT = { s0: [0, NM.PAIN + .05], s1: [NM.PAIN - .05, 20.35], s2: [20.25, NM.CALL + .05] };
+$('#leads').innerHTML = [0, 1, 2, 3].map(i => `<span class="a ld" style="left:0;top:0;width:76px;height:76px;border-radius:50%;background:var(--cust-bg);color:#2F6B1A;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 6px 16px rgba(0,0,0,.08)"><svg class="i" style="width:38px;height:38px"><use href="#i-phone"/></svg></span>`).join('');
+const lds = $$('.ld');
+const GK2 = [[0, 960, 540, 1500, .55], [NM.PAIN, 1500, 300, 1200, .45], [15.0, 1300, 500, 1300, .4], [18.6, 960, 480, 1500, .3], [NM.DROP - .2, 1400, 400, 1200, .5], [NM.DROP + .1, 960, 480, 1800, 1], [NM.CALL - .05, ...kf(GK, M.CALL - .05).slice(0)]];
+const LK2 = [[0, 1200, -300, 5.5], [NM.DROP - .1, 1150, -300, 5.5], [NM.DROP + .15, -200, -500, 6.5], [NM.CALL - .05, ...kf(LK, M.CALL - .05)]];
+
+window.seek = function (t) {
+  const late = t >= NM.CALL - .05, tt = t - OFF;
+  const g = $('#glow');
+  const [gx, gy, gs, ga] = late ? kf(GK, tt) : kf(GK2, t);
+  const grooveOn = late ? groove(tt) : (t < NM.PAIN || t >= NM.DROP);
+  const bp = grooveOn ? Math.exp(-(t % .5) * 9) * .14 : 0;
+  g.style.width = g.style.height = gs + 'px'; g.style.transform = `translate(${gx - gs / 2}px,${gy - gs / 2}px)`; g.style.opacity = Math.min(1, ga + bp);
+  const [lx, ly, ls] = late ? kf(LK, tt) : kf(LK2, t); $('#lg').setAttribute('transform', `translate(${lx + Math.sin(t * .2) * 14},${ly + t * 2.2}) scale(${ls})`);
+  const fl = late ? [[M.SITE, .75], [M.FINAL, .85], [M.ENDHIT, .25]].reduce((a, [m, k]) => a + Math.max(0, 1 - Math.abs(tt - m - .02) / .16) * k, 0)
+                  : Math.max(0, 1 - Math.abs(t - NM.DROP - .02) / .16) * .9 + Math.max(0, 1 - Math.abs(t - 18.6) / .12) * .25;
+  $('#flash').style.opacity = Math.min(1, fl).toFixed(3);
+  $('#fade').style.opacity = (late ? P(tt, M.END - .9, M.END) : 1 - P(t, 0, .2)).toFixed(3);
+  st($('#tag'), late ? pop(tt, 0, M.FINAL - .3, { dy: 0, db: 0, d: .01 }) : pop(t, NM.PAIN, 1e9, { dy: 0, db: 0 }));
+  s0(t); s1(t); s2(t); s3(tt); s4(tt); s5(tt); s6(tt); s7(tt);
+};
+
+function s0(t) {
+  if (!scene('s0', t, ...NT.s0)) return;
+  const out = eio(P(t, NM.PAIN - .35, NM.PAIN));
+  phs.forEach((el, i) => { const o = pop(t, .1 + i * .25, 1e9, { dy: 60, ds: .25, db: 10, d: .35, ease: bo }); o.r = PHPOS[i][2] * (1 - .3 * P(t, 0, 3.5)); o.y -= t * 6; st(el, outMul(o, out)); });
+  st($('#k0'), outMul(pop(t, .4, 1e9, { dy: 30, db: 12, d: .4 }), out));
+  const hl = Math.sin(Math.PI * P(t, 2.0, 3.2)); $('#k0 span').style.textShadow = hl > 0 ? `0 0 ${(30 * hl).toFixed(1)}px rgba(215,38,46,.35)` : '';
+}
+function s1(t) {
+  if (!scene('s1', t, ...NT.s1)) return;
+  const a0 = NM.PAIN, out = eio(P(t, 20.0, 20.35));
+  const dimFog = eio(P(t, 18.5, 18.8));
+  [['#nC', 0], ['#nS', .2], ['#nB', .4]].forEach(([s, d]) => st($(s), outMul(pop(t, a0 + d, 1e9, { dy: 40, ds: .2, ease: bo, d: .45 }), out)));
+  ['#ar1', '#ar2'].forEach((s, i) => { const el = $(s); el.style.opacity = (P(t, a0 + .6 + i * .3, a0 + .9 + i * .3) * (1 - out)).toFixed(3); el.setAttribute('stroke-dashoffset', (-t * 60).toFixed(1)); });
+  ['#arl1', '#arl2'].forEach((s, i) => st($(s), outMul(pop(t, a0 + .7 + i * .3, 1e9, { dy: 10 }), out)));
+  // beat B (8.1): profit gets cut, coins fly back to the salesman
+  const B0 = 8.1, C0 = 11.5, D0 = 15.2;
+  st($('#ord'), outMul(pop(t, B0, C0 + 3.3, { dy: 30, ds: .1, ease: bo }), out));
+  $('#slice').style.width = (32 * eo(P(t, B0 + .5, B0 + 1.3))).toFixed(1) + '%';
+  st($('#cut'), pop(t, B0 + 1.0, 1e9, { dy: 0, ds: .4, ease: bo, db: 2 }));
+  ['#cn0', '#cn1', '#cn2'].forEach((s, i) => { const t0 = B0 + .6 + i * .7; const ph = ((t - t0) % 2.1 + 2.1) % 2.1; const on = t >= t0 && t < D0 && ph < .8;
+    const p = eio(P(ph, 0, .8)); st($(s), { x: lerp(1460, 940, p), y: 180 - 120 * Math.sin(Math.PI * p), o: on ? Math.min(1, ph / .1) * (1 - P(ph, .6, .8)) : 0, s: 1 }); });
+  // beat C (11.5): the customer's phone book
+  st($('#saved'), outMul(pop(t, C0, D0 - .2, { dy: 30, ds: .1, ease: bo }), out));
+  $$('#saved .ctr').forEach((el, i) => st(el, pop(t, C0 + .3 + i * .4, 1e9, { dx: -20, dy: 0, db: 3, d: .3 })));
+  const sh = t > C0 + 1.5 && t < C0 + 2.0 ? Math.sin(t * 90) * 8 * (1 - P(t, C0 + 1.5, C0 + 2.0)) : 0; $$('#saved .ctr')[2].style.marginLeft = sh.toFixed(1) + 'px';
+  // beat D (15.2): customers drift to the salesman; the boss is left alone
+  lds.forEach((el, i) => { const t0 = D0 + .3 + i * .35; const p = eio(P(t, t0, t0 + .7));
+    st(el, { x: lerp(330, 860 + (i % 2) * 90 - 45 + (i > 1 ? 0 : 0), p), y: lerp(380, 470 + Math.floor(i / 2) * 90, p) - 60 * Math.sin(Math.PI * p), o: P(t, t0 - .1, t0 + .1) * (1 - out), s: 1 }); });
+  const bd = eio(P(t, D0 + 1.4, D0 + 2.2)); $('#nB').style.filter = bd > 0 ? `grayscale(${bd.toFixed(2)})` : ''; if (bd > 0) $('#nB').style.opacity = (1 - .5 * bd) * (1 - out);
+  // captions
+  st($('#ca'), outMul(pop(t, 3.8, B0 - .2, { dy: 24, db: 10 }), out));
+  st($('#cb'), outMul(pop(t, B0, C0 - .2, { dy: 24, db: 10 }), out));
+  st($('#cc'), outMul(pop(t, C0, D0 - .2, { dy: 24, db: 10 }), out));
+  st($('#cd'), outMul(pop(t, D0, 1e9, { dy: 24, db: 10 }), out));
+  // beat E (18.6): 太憋屈了！
+  $('#fog').style.opacity = (dimFog * (1 - out)).toFixed(3);
+  const e = pop(t, 18.6, 1e9, { dy: 0, ds: -.5, db: 16, d: .25, ease: eo5 }); e.x += t > 18.6 && t < 19.2 ? Math.sin(t * 100) * 14 * (1 - P(t, 18.6, 19.2)) : 0; st($('#ce'), outMul(e, out));
+}
+function s2(t) {
+  if (!scene('s2', t, ...NT.s2)) return;
+  const out = eio(P(t, NM.CALL - .35, NM.CALL));
+  st($('#t2n'), pop(t, 20.4, 21.7, { dy: 0, ds: -.2, db: 12, d: .35, ease: eo5, od: .25 }));
+  st($('#t2o'), outMul(pop(t, 21.85, 1e9, { dy: 14 }), out));
+  st($('#t2a'), outMul(pop(t, NM.DROP, 1e9, { dy: 0, ds: -.45, db: 18, d: .3, ease: eo5 }), out));
+  st($('#t2b'), outMul(pop(t, 23.8, 1e9, { dy: 0, ds: -.45, db: 18, d: .3, ease: eo5 }), out));
+}
+function s3(t) {
+  if (!scene('s3', t, ...T.s3)) return;
+  const a0 = M.CALL, out = eio(P(t, M.SITE - .35, M.SITE)), ended = t >= M.HANG;
+  st($('#cph'), outMul(pop(t, a0, 1e9, { dx: -100, dy: 0, db: 12, d: .45 }), out));
+  $('#ctm').textContent = mmss((Math.min(t, M.HANG) - a0) * 4 + 3);
+  txt($('#cstT'), ended ? '通话结束' : '通话中');
+  $('#cst').style.color = ended ? 'var(--tert)' : '#2F9E44'; $('#cdot').style.background = ended ? 'var(--line2)' : '#2F9E44';
+  $('#cdot').style.opacity = ended ? 1 : (.55 + .45 * Math.abs(Math.cos(t * 3))).toFixed(2);
+  let sp = null; LINES.forEach(l => { if (t >= l[4] - .05 && t < l[5] + .1) sp = l[0]; });
+  wvb.forEach((b, k) => { const live = sp && !ended; const h = live ? 16 + 200 * Math.abs(Math.sin(t * 11 + k * .9) * Math.cos(t * 6.3 - k * 1.7)) * (1 - Math.abs(k - WV / 2) / (WV * .7)) : 10;
+    b.style.height = h.toFixed(1) + 'px'; b.style.background = live ? (sp === 'cu' ? '#2F9E44' : 'var(--nyx)') : 'var(--line2)'; });
+  $('#who').innerHTML = ended ? '' : sp === 'cu' ? '<span style="color:#2F6B1A">客人在说</span>' : sp === 'bot' ? '<span class="vio">NyxBot 在回答</span>' : '';
+  $('#hang').style.opacity = ended ? .35 : 1;
+  const trOut = eio(P(t, M.HANG - .15, M.HANG + .2));
+  st($('#tr'), { o: 1 - trOut, y: -30 * trOut, b: 10 * trOut });
+  tlns.forEach((el, i) => { const [k, , , , a, b] = LINES[i]; st(el, pop(t, a - .15, 1e9, { dx: 30, dy: 0, db: 6, d: .25 }));
+    const nextA = LINES[i + 1] ? LINES[i + 1][4] : 1e9; el.style.opacity = (t < a - .15 ? 0 : Math.min(+el.style.opacity, 1 - .55 * eo(P(t, nextA - .1, nextA + .2)))).toFixed(3);
+    const ws = el.querySelectorAll('.w'), dt = (b - a) / ws.length; ws.forEach((w, j) => { const p = eo(P(t, a + j * dt, a + j * dt + .14)); w.style.opacity = p.toFixed(3); w.style.transform = `translateY(${((1 - p) * 10).toFixed(1)}px)`; });
+    const gz = el.querySelector('.zh'), gp = eo(P(t, b - .2, b + .1)); gz.style.opacity = gp.toFixed(3); gz.style.transform = `translateY(${((1 - gp) * 8).toFixed(1)}px)`; });
+  // "价钱不乱报" — the custom-price line glows while the VO says it
+  const hl = Math.sin(Math.PI * P(t, 18.0, 20.2)); tlns[1].style.background = hl > 0 ? `rgba(94,0,245,${(.07 * hl).toFixed(3)})` : ''; tlns[1].style.borderRadius = '14px';
+  st($('#sum'), outMul(pop(t, M.HANG + .1, 1e9, { dx: 80, dy: 0, db: 12, d: .45 }), out));
+  srows.forEach((el, i) => st(el, pop(t, M.HANG + .5 + i * .3, 1e9, { dx: 30, dy: 0, db: 4, d: .3 })));
+  $$('#srows .badge').forEach((el, i) => st(el, pop(t, 23.4 + i * .2, 1e9, { dy: 0, ds: .4, ease: bo, db: 2, d: .3 })));
+  st($('#bb1'), outMul(pop(t, 25.4, 1e9, { dy: 24, ds: .06 }), out));
+  $$('#bbw i').forEach((w, k) => { const live = t >= 25.4 && t < 26.8; w.style.height = (live ? 6 + 20 * Math.abs(Math.sin(t * 13 + k * 1.7) * Math.cos(t * 7 - k)) : [8, 16, 12, 20, 10, 18, 9, 14, 7][k]) + 'px'; });
+  st($('#bb2'), outMul(pop(t, 27.3, 1e9, { dy: 24, ds: .08, ease: bo }), out));
+  st($('#own'), outMul(pop(t, 28.9, 1e9, { dy: 30, db: 12, d: .45 }), out));
+}
+function s4(t) {
+  if (!scene('s4', t, ...T.s4)) return;
+  const out = eio(P(t, M.BUILD - .3, M.BUILD));
+  st($('#t4a'), outMul(pop(t, M.SITE, 1e9, { dy: 0, ds: -.3, db: 16, d: .3, ease: eo5 }), out));
+  st($('#t4b'), outMul(pop(t, 33.5, 1e9, { dy: 0, ds: -.4, db: 16, d: .3, ease: eo5 }), out));
+}
+function s5(t) {
+  if (!scene('s5', t, ...T.s5)) return;
+  const a0 = M.BUILD, out = eio(P(t, M.NEXT - .35, M.NEXT));
+  st($('#s5l'), outMul({ o: 1 }, out));
+  st($('#s5o'), pop(t, a0 + .05, 1e9, { dy: 14 }));
+  st($('#sb1'), pop(t, a0 + .1, 1e9, { dy: 24, ds: .06 }));
+  $$('#sbw i').forEach((w, k) => { const live = t >= a0 + .1 && t < a0 + 1.0; w.style.height = (live ? 6 + 20 * Math.abs(Math.sin(t * 13 + k * 1.7) * Math.cos(t * 7 - k)) : [8, 16, 12, 20, 10, 18, 9, 14, 7][k]) + 'px'; });
+  st($('#sbm'), pop(t, 35.0, 1e9, { dy: 14 }));
+  txt($('#btm'), mmss(P(t, 35.1, 36.6) * 600));
+  st($('#sb2'), pop(t, 36.7, 1e9, { dy: 24, ds: .08, ease: bo }));
+  st($('#s5c'), pop(t, 37.5, 1e9, { dy: 30, db: 10, d: .45 }));
+  st($('#brw'), outMul(pop(t, 34.8, 1e9, { dx: 120, dy: 0, db: 12, d: .45 }), out));
+  const url = 'forestmedia.sg'; txt($('#url'), url.slice(0, Math.round(url.length * P(t, 35.0, 35.3))));
+  st($('.sn'), pop(t, 35.3, 1e9, { dy: -20, db: 4, d: .3 }));
+  hcs.forEach((c, i) => { const v = i < Math.round(hcs.length * P(t, 35.5, 36.2)); if (c._v !== v) { c.style.visibility = v ? 'visible' : 'hidden'; c._v = v; } });
+  st($('#heroS'), pop(t, 36.2, 1e9, { dy: 14, d: .3 }));
+  sgs.forEach((el, i) => { const o = pop(t, 35.8 + i * .2, 1e9, { dy: 40, ds: .15, db: 5, d: .3, ease: bo }); const gl = Math.sin(Math.PI * P(t, 37.6 + i * .12, 38.4 + i * .12)); el.style.boxShadow = gl > 0 ? `0 0 0 ${(4 * gl).toFixed(1)}px rgba(215,38,46,.45)` : ''; st(el, o); });
+}
+function s6(t) {
+  if (!scene('s6', t, ...T.s6)) return;
+  const a0 = M.NEXT, out = eio(P(t, M.FINAL - .35, M.FINAL));
+  ['#g0', '#g1', '#g2', '#g3'].forEach((s, i) => { const o = pop(t, a0 + .2 + i * .25, 1e9, { dy: 30, db: 6, d: .5 }); o.o *= .55; o.y -= (t - a0) * 9; st($(s), outMul(o, out)); });
+  st($('#t6o'), outMul(pop(t, a0 + .1, 1e9, { dy: 14 }), out));
+  st($('#t6'), outMul(pop(t, a0 + .3, 1e9, { dy: 0, ds: -.3, db: 14, d: .4, ease: eo5 }), out));
+  st($('#t6s'), outMul(pop(t, 41.0, 1e9, { dy: 20 }), out));
+  const bb = pop(t, 42.0, 1e9, { dy: 0, ds: .4, ease: bo }); bb.s *= 1 + .04 * Math.sin(Math.max(0, t - 42.4) * 6.28); st($('#t6b'), outMul(bb, out));
+}
+function s7(t) {
+  if (!scene('s7', t, ...T.s7)) return;
+  const a0 = M.FINAL;
+  // order: 1 lockup -> 2 招牌您来做 -> 3 英文交给它 -> 4 badges
+  const L = pop(t, a0, 1e9, { dy: 0, ds: -.25, db: 12, d: .4, ease: eo5 }); const eb = t >= M.ENDHIT ? Math.exp(-(t - M.ENDHIT) * 5) : 0; L.s *= 1 + .05 * eb; st($('#eLock'), L);
+  st($('#e1'), pop(t, 43.7, 1e9, { dy: 0, ds: -.3, db: 14, d: .35, ease: eo5 }));
+  st($('#e2'), pop(t, 45.1, 1e9, { dy: 0, ds: -.3, db: 14, d: .35, ease: eo5 }));
+  [46.6, 47.9, 48.6].forEach((tin, i) => st($$('#eB .eb')[i], pop(t, tin, 1e9, { dy: 20, ds: .2, ease: bo })));
+  st($('#eF'), pop(t, M.ENDHIT, 1e9, { dy: 8 }));
+}
+window.readyPromise = Promise.all([document.fonts.ready, document.fonts.load('700 40px "Mona Sans"'), document.fonts.load('400 20px "JetBrains Mono"'), ...[...document.images].map(im => im.decode().catch(() => 0))]).then(() => { window.seek(0); return true; });
+})();
+</script>
+</body></html>

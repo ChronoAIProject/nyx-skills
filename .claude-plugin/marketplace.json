@@ -1348,6 +1348,19 @@
       ]
     },
     {
+      "name": "nyxbot-promo-video",
+      "source": "./nyxbot-promo-video",
+      "description": "为 ChronoAI / NyxBot 的中小企业客户（餐馆、招牌店等）做 45–65 秒、抓人的中文宣传视频：读客户人物志和方案页，产出逐帧可控的 HTML 动画影片、按配音时段压低的原创配乐、配音稿与字幕（SRT），并渲染 MP4；配音由用户在第三方平台生成。当用户要给某个客户做 NyxBot 宣传片、按人物志和方案做视频、出配音稿或按中文配音调整画面节奏时使用。",
+      "version": "0.1",
+      "keywords": [
+        "video",
+        "nyxbot",
+        "promo",
+        "voiceover",
+        "chinese"
+      ]
+    },
+    {
       "name": "nyxid",
       "source": "./nyxid",
       "description": "Brokers credentials for downstream services (OpenAI, Anthropic, GitHub, Lark, custom APIs, SSH, MCP) so the agent never sees raw API keys or OAuth tokens. Use whenever the user asks to call, proxy, or authenticate against a third-party API/service, mentions NyxID, asks to \"connect\", \"add a service\", \"set up an API key\", manage credentials/nodes/MCP, send messages through bot platforms, or wire up SSH access. Operate exclusively through the `nyxid` CLI.",
