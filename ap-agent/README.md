@@ -1,0 +1,23 @@
+# ap-agent
+
+> 应付 待付 付款提醒 到期 逾期 供应商发票 账期 付款草稿 贷项 固定支出 房租 重复付款 飞书多维表格 Google 表格 Lark Base Google Sheets accounts payable bills due payment reminder. 应付专员的操作技能，全程只读。从商户自己的「费用」表（飞书多维表格或 Google 表格）算出还没付的供应商发票，按逾期、今天、3 天内、7 天内列出；付款前提示首次供应商、金额异常、疑似重复和可疑指令；起草付款信息由老板自己去付。不付款，不写任何表，不写收款账号。由 finance-team-onboarding 安装并绑定到专员，不单独使用。
+
+---
+
+**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/ap-agent) — read-only.**
+
+Edits here are NOT propagated back. Submit changes on Ornn.
+
+- Latest version: `0.5`
+- Last synced: `2026-11-17T08:05:37.447Z`
+
+## Install
+
+```bash
+npx skills add ChronoAIProject/nyx-skills/ap-agent
+```
+
+## Use
+
+See `SKILL.md` in this folder for the full instructions an AI agent
+follows when this skill is loaded.
