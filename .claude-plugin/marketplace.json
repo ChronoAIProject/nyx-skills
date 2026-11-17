@@ -359,6 +359,18 @@
       ]
     },
     {
+      "name": "ap-agent",
+      "source": "./ap-agent",
+      "description": "应付 待付 付款提醒 到期 逾期 供应商发票 账期 付款草稿 贷项 固定支出 房租 重复付款 飞书多维表格 Google 表格 Lark Base Google Sheets accounts payable bills due payment reminder. 应付专员的操作技能，全程只读。从商户自己的「费用」表（飞书多维表格或 Google 表格）算出还没付的供应商发票，按逾期、今天、3 天内、7 天内列出；付款前提示首次供应商、金额异常、疑似重复和可疑指令；起草付款信息由老板自己去付。不付款，不写任何表，不写收款账号。由 finance-team-onboarding 安装并绑定到专员，不单独使用。",
+      "version": "0.5",
+      "keywords": [
+        "finance",
+        "accounts-payable",
+        "lark-base",
+        "google-sheets"
+      ]
+    },
+    {
       "name": "api-google-workspace-connected-service",
       "source": "./api-google-workspace-connected-service",
       "description": "Use Google Workspace connected services through NyxID fixed operation invocation.",
@@ -815,6 +827,19 @@
       ]
     },
     {
+      "name": "finance-supervisor",
+      "source": "./finance-supervisor",
+      "description": "财务主管 每日待办 每周简报 支出简报 待付 逾期 待确认 截止提醒 GST CPF ECI 报税 年报 新加坡 小商户 飞书多维表格 Google 表格 Lark Base Google Sheets finance daily digest weekly brief Singapore deadlines. 财务主管的操作技能，全程只读。读商户自己的「费用」表（飞书多维表格或 Google 表格），每个工作日发一条待办（待确认的记录、逾期和快到期的应付、固定支出、申报缴款截止日、异常），周一附上周支出与待付简报。只做提醒，不是税务意见。不写任何表，不付款。由 finance-team-onboarding 安装并绑定到专员，不单独使用。",
+      "version": "0.5",
+      "keywords": [
+        "finance",
+        "supervisor",
+        "singapore",
+        "lark-base",
+        "google-sheets"
+      ]
+    },
+    {
       "name": "finance-team-onboarding",
       "source": "./finance-team-onboarding",
       "description": "财务 记账 台账 入账 收据 发票 应付 付款提醒 报税提醒 财务助手 财务员 财务主管 小商户 小店 接入 新加坡 Google 表格 飞书多维表格 finance bookkeeping receipts invoices payables deadline reminders onboarding Google Sheets Lark Base Singapore. Use on owner turns when a small-business owner wants NyxBot to keep the books. Bind this skill to NyxBot with set_agent_skills before running it. 账记在老板自己的 Google 表格（NyxBot 代建）或飞书多维表格里。装三个只为老板工作的专员：台账与对账专员（收据和发票入账、记付款、月底资料包）、应付专员（待付和到期提醒、付款草稿，只读）、财务主管（每日待办、周一简报、新加坡申报缴款截止提醒，只读）。建表或核对表，建专员、授权、绑定技能、建定时任务、接聊天入口，最后带老板验收。任何专员都不付款。",
@@ -1215,6 +1240,18 @@
         "lark",
         "github",
         "payload-builder"
+      ]
+    },
+    {
+      "name": "ledger-agent",
+      "source": "./ledger-agent",
+      "description": "台账 记账 入账 收据 小票 发票 供应商发票 贷项通知单 退款 查重 已付 付款状态 月底资料包 飞书多维表格 Google 表格 Lark Base Google Sheets bookkeeping receipt invoice expense ledger. 台账与对账专员的操作技能。把老板在聊天里发来的收据、供应商发票、贷项通知单记进商户自己的「费用」表（飞书多维表格或 Google 表格），每张一行；查重；看不清的标待确认；老板说某条已付时记下付款状态；起草月底资料包。不付款，不抄收款账号。由 finance-team-onboarding 安装并绑定到专员，不单独使用。",
+      "version": "0.4",
+      "keywords": [
+        "finance",
+        "bookkeeping",
+        "lark-base",
+        "google-sheets"
       ]
     },
     {
