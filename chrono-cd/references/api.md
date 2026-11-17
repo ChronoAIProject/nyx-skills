@@ -88,6 +88,75 @@ so older apps stay on `apps.chrono-ai.fun`. The hostname is fixed when the app i
 All apps of an owner share the owner's namespace and quota, so app names and service
 names are unique per owner, across projects.
 
+### `GET /apps?scope=personal|organization`
+
+Everything the caller can see, in one call: the apps of the personal scope and of each
+organization the caller belongs to.
+It is the starting point for "what is deployed". `scope` is optional and keeps one kind
+of scope; any other value is `400 validation_error`.
+
+```json
+{
+  "personal": {
+    "owner_type": "person",
+    "owner_slug": "7d1c1e3f5b",
+    "host_slug": "7d1c1e3f5b",
+    "namespace": "cd-7d1c1e3f5b",
+    "apps": [
+      {
+        "project": "chronoai",
+        "name": "blog",
+        "hostname": "blog-7d1c1e3f5b.apps.nyxid.ai",
+        "url": "https://blog-7d1c1e3f5b.apps.nyxid.ai",
+        "services": [{"name": "web", "image": "ghcr.io/acme/blog:1.4.0", "replicas": 2}],
+        "addons": ["mongodb"],
+        "phase": "applied",
+        "last_reconcile": {"at": "...", "ok": true, "revision": 7},
+        "generation": 9,
+        "revision": 7,
+        "created_at": "...",
+        "updated_at": "...",
+        "updated_by": "11111111-1111-4111-8111-111111111111"
+      }
+    ]
+  },
+  "organizations": [
+    {
+      "org_id": "6f1c...",
+      "slug": "acme",
+      "display_name": "Acme",
+      "role": "admin",
+      "owner_type": "org",
+      "owner_slug": "c24787a75c",
+      "host_slug": "acme",
+      "namespace": "cd-c24787a75c",
+      "apps": []
+    }
+  ],
+  "internal": [],
+  "total": 1
+}
+```
+
+Each scope carries `org_id`, the value to pass as `org_id` on the project routes to work
+in it. The personal scope has none. Apps are sorted by project, then name. Organizations
+are sorted by display name. `total` counts the apps in the answer.
+
+An app here is a summary. It names the services with their image and replica count, the
+add-ons, and the stored outcome of the last reconcile (`phase`, `last_reconcile`). It
+does not carry the env, the files or the secret names; read the app for those. It does
+not ask the cluster either, so it says nothing about pods; `GET .../status` does.
+
+The route only reads. A scope where nothing was ever deployed is listed with an empty
+`apps` and without `owner_type`, `owner_slug` and `host_slug`, because the owner record
+is created by the first deploy. An organization has no `namespace` until then.
+
+`personal` is absent with `scope=organization`. `organizations` is always a list.
+`internal` is an empty list; ignore it. `organizations_unavailable: true` means the caller's organizations
+could not be listed, because the request carried no credential or NyxID did not answer.
+The rest of the answer is still complete. Members and viewers of an organization see its
+apps; `role` tells them whether they may change them.
+
 ### `GET /projects`
 
 `{"projects": [{"name": "chronoai", "apps": 2, "updated_at": "..."}]}` for the scope.
@@ -160,6 +229,15 @@ Service fields:
 | `routes` | Path prefixes on the app hostname. Unique across the app. Longest prefix wins. Setting routes makes the service `public`. |
 | `expose` | `public` (routes), `internal` (in-cluster Service only, default without routes), `none` (no Service). |
 | `env` | Plain, non-secret variables. Up to 60 keys, 4 KiB each. |
+| `pod_env` | Internal scope only. Map env names to `pod_name`, `pod_namespace`, `pod_uid`, `pod_ip`, or `node_name`; no arbitrary field paths. At most 60 `env` and `pod_env` entries combined. Names must be valid variables without the reserved `CHRONO_CD_` prefix and cannot collide with `env`, `secret_keys`, or `addon_env`. Downward API values render before literal env, so `"POD_IP": "pod_ip"` supports addresses such as `http://$(POD_IP):8080`. Choose address templates for the cluster IP family (IPv6 needs brackets). Omitted by default; no API token is mounted. |
+| `termination_grace_seconds` | Internal scope only. Integer 30–900; omitted keeps the existing 30-second grace. Size it for the service: the `pre_stop` time plus the time the process needs after SIGTERM, plus a margin. Kubernetes charges preStop time against this same budget. |
+| `pre_stop` | Internal scope only. Exactly one of `{"sleep_seconds": 30}` (native Kubernetes sleep, 1–300, strictly shorter than grace) or `{"exec": ["/app/drain", "--wait"]}`, a command of the service's own image, described below. Omitted means no lifecycle hook. |
+| `service_account` | Internal scope only. Name (DNS label) of an existing ServiceAccount in this app's namespace, provisioned by infra. `default`, `app-runner`, and `chrono-cd` are reserved. Reconcile checks existence on the app's cluster; chrono-cd never creates, modifies, or deletes the selected account or its RBAC. Requires default egress. Only opted-in pods receive metadata egress, to the endpoints an admin set for the cluster with `PUT /admin/clusters/{cluster}/metadata-egress`; a cluster with none set refuses the deploy at step `identity-egress/<service>`. |
+| `automount_token` | Internal scope only; optional boolean requiring `service_account`. Defaults to false even if the selected account enables mounting. Set true only when the reviewed application needs a projected Kubernetes token. Workload Identity and replica membership do not by themselves imply Pod-read RBAC. |
+| `probes` | Internal scope only. Optional `readiness`, `liveness`, and `startup` objects, each with `path`, `period_seconds` (1–300), `timeout_seconds` (1–30), `failure_threshold` (1–180), and `initial_delay_seconds` (0–300). All omitted fields retain the existing probe defaults, including liveness initial delay 10; set zero explicitly to remove that delay. Requires a service port. `health_path` remains the load-balancer readiness path. |
+| `min_ready_seconds` | Internal scope only. Integer 0–300; default 0. A new replica must remain ready this long before being counted available. The reviewed replica profile uses 30. |
+| `progress_deadline_seconds` | Internal scope only. Integer 60–7200; default 600. Must exceed the startup and readiness probe allowances plus `min_ready_seconds`; each allowance is initial delay + failure threshold × max(period, timeout). Set 2400 for the reviewed AM profile and 1200 for EG. This reports a stalled rollout; it does not kill pods or cancel drain. |
+| `disruption_budget` | Internal scope only. `{"min_available": 1, "unhealthy_pod_eviction_policy": "AlwaysAllow"}` renders a PDB only when replicas > 1. `min_available` must be positive, within the owner replica cap, and below replicas when replicas > 1. Policy is `AlwaysAllow` or `IfHealthyBudget` (Kubernetes default when omitted). Scaling to 0 or 1 retains the spec but removes the PDB; opt-out and service/app deletion remove it too. Protects voluntary evictions, not direct deletion or crashes. |
 | `secret_keys` | Names of secret variables set through the secrets endpoint. The service is not deployed until all are present. |
 | `addon_env` | Per add-on, which variable receives which connection field. MongoDB fields: `uri`, `database`, `username`, `password`. |
 | `egress` | Empty (internet allowed, private ranges blocked) or `none`. |
@@ -169,6 +247,19 @@ Service fields:
 | `files` | Plain configuration files: `[{"path": "/etc/app/config.yaml", "content": "..."}]`. Up to 16, 64 KiB each, 256 KiB in total. Mounted read-only at the path; versioned with the spec. Secret files go through the secrets endpoint instead. |
 | `resources` | Defaults 100m / 128Mi requests, 500m / 512Mi limits. Limits may not exceed twice the owner's quota request. |
 | `metrics` | Opt-in: `{"port": 9090, "path": "/metrics"}` where the service serves Prometheus text-format metrics (`path` defaults to `/metrics`; the port may equal `port`). The platform scraper then reads it every 20 seconds and the series appear in the telemetry routes with `namespace` and `pod` labels. Only the scraper's namespace is admitted to that port. Without it a service still gets CPU, memory, network and restart series from the node. |
+
+`pre_stop.exec` is any command of the service's own image: 1 to 16 arguments, at most
+4096 bytes in total. It runs inside the service container as the container's user, so
+it can do nothing the image's entrypoint could not. No command and no drain time is
+built in. Kubernetes waits for it to finish before sending SIGTERM, and kills the pod
+when `termination_grace_seconds` runs out, so size the grace for the command's longest
+run. To keep a failing drain's exit status while still waiting for routes to withdraw,
+use a shell form such as
+`["/bin/sh", "-c", "/app/drain; status=$?; /bin/sleep 30; exit $status"]`.
+HTTP hooks are refused.
+Native `sleep_seconds` requires Kubernetes support for the Pod lifecycle sleep action
+(stable in Kubernetes 1.33); chrono-cd never silently substitutes an exec process.
+Keep secret values out of hook arguments and specs.
 
 Every service is reachable inside the owner's namespace as `http://<service>:<port>` and
 `http://<service>:80`, so an app's own proxy configuration works unchanged.
@@ -270,7 +361,13 @@ in another project is `404` under this one.
 ### `DELETE /projects/{project}/apps/{app}?purge=true`
 
 Removes every object of the app, the add-on user, and the record. `purge=true` also
-drops the add-on data. Answers `{"project": "<project>", "deleted": "<app>", "purged": <bool>}`.
+drops the add-on data: the app's own database is dropped as the app's own scoped user
+before that user is deleted, so no other database can be touched. Answers
+`{"project": "<project>", "deleted": "<app>", "purged": <bool>}` only once everything it
+names is gone. When the data cannot be dropped, the answer is `502 addon_unavailable`
+and nothing is removed: the app, its user and its data stay for a retry. One such case
+is an add-on Secret that is missing from the namespace; the message says so. Delete
+without `purge` then, and have a platform admin drop the database.
 
 ### `PUT /projects/{project}/apps/{app}/services/{service}/secrets`
 
@@ -332,7 +429,10 @@ hostname from the public edge on every status call: `route.serving` is `true` wh
 answer came from the app (any status, its own 404 included) and `false` while the edge
 still answers for no route, which lasts a few minutes after a new hostname's route is
 accepted. While it is `false` the phase stays `progressing`. `serving_status` is the
-HTTP status the probe saw. Both are absent when nothing is public yet.
+HTTP status the probe saw. The probe asks `/` when a public service routes it, otherwise
+the alphabetically first routed prefix (`/api/v1/monitoring` for an app that routes only
+`/status` and `/api/v1/monitoring`), because the gateway answers a path no route claims
+with its own 404. Both are absent when nothing is public yet.
 
 ### `GET /projects/{project}/apps/{app}/logs?service=<name>&tail=100&pod=<pod>`
 
