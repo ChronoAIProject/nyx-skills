@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/deadline-monitor-digest-payload-builder) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/deadline-monitor-digest-payload-builder) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.3`
-- Last synced: `2026-11-18T04:01:17.033Z`
+- Last synced: `2026-11-18T13:01:18.185Z`
 
 ## Install
 

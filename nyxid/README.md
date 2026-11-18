@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/nyxid) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/nyxid) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.5`
-- Last synced: `2026-11-18T04:01:23.402Z`
+- Last synced: `2026-11-18T13:01:24.743Z`
 
 ## Install
 

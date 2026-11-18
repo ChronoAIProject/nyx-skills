@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/codex-formalize) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/codex-formalize) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-11-18T04:00:19.149Z`
+- Last synced: `2026-11-18T13:00:19.539Z`
 
 ## Install
 

@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/aevatar-team-builder) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/aevatar-team-builder) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.7`
-- Last synced: `2026-11-18T04:00:50.303Z`
+- Last synced: `2026-11-18T13:00:50.912Z`
 
 ## Install
 

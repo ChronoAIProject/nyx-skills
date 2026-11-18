@@ -4,7 +4,7 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skillsets/chronoai-service-manual-bundle) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skillsets/chronoai-service-manual-bundle) — read-only.**
 
 A curated multi-skill Claude Code plugin. Edits here are NOT propagated
 back; manage this skillset on Ornn.

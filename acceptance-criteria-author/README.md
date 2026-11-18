@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/acceptance-criteria-author) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/acceptance-criteria-author) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-11-18T04:00:58.799Z`
+- Last synced: `2026-11-18T13:00:58.578Z`
 
 ## Install
 

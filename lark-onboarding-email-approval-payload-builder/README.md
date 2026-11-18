@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/lark-onboarding-email-approval-payload-builder) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/lark-onboarding-email-approval-payload-builder) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.1`
-- Last synced: `2026-11-18T04:01:22.356Z`
+- Last synced: `2026-11-18T13:01:23.659Z`
 
 ## Install
 

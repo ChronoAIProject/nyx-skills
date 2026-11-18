@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/lark-bot-file-upload-validation) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/lark-bot-file-upload-validation) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.1`
-- Last synced: `2026-11-18T04:00:26.618Z`
+- Last synced: `2026-11-18T13:00:27.368Z`
 
 ## Install
 

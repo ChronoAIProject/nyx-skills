@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/restaurant-reservation-onboarding) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/restaurant-reservation-onboarding) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.26`
-- Last synced: `2026-11-18T04:00:11.819Z`
+- Last synced: `2026-11-18T13:00:10.763Z`
 
 ## Install
 

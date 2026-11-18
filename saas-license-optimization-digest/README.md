@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/saas-license-optimization-digest) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/saas-license-optimization-digest) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `4.1`
-- Last synced: `2026-11-18T04:00:35.433Z`
+- Last synced: `2026-11-18T13:00:34.520Z`
 
 ## Install
 

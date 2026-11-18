@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/acceptance-fixture-drift-attestation) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/acceptance-fixture-drift-attestation) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.0`
-- Last synced: `2026-11-18T04:00:27.972Z`
+- Last synced: `2026-11-18T13:00:28.488Z`
 
 ## Install
 

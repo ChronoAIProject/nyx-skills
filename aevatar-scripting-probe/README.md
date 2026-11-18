@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/aevatar-scripting-probe) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/aevatar-scripting-probe) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.0`
-- Last synced: `2026-11-18T04:01:05.168Z`
+- Last synced: `2026-11-18T13:01:06.509Z`
 
 ## Install
 

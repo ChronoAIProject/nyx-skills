@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/promo-scout) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/promo-scout) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.0`
-- Last synced: `2026-11-18T04:00:45.838Z`
+- Last synced: `2026-11-18T13:00:46.564Z`
 
 ## Install
 

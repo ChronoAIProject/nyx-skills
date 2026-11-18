@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/research-paper-writing-rigor) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/research-paper-writing-rigor) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.0`
-- Last synced: `2026-11-18T04:00:17.013Z`
+- Last synced: `2026-11-18T13:00:17.341Z`
 
 ## Install
 

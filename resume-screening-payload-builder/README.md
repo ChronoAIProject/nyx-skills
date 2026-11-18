@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/resume-screening-payload-builder) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/resume-screening-payload-builder) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.1`
-- Last synced: `2026-11-18T04:01:18.625Z`
+- Last synced: `2026-11-18T13:01:19.698Z`
 
 ## Install
 

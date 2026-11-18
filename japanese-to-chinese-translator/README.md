@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/japanese-to-chinese-translator) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/japanese-to-chinese-translator) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `0.1`
-- Last synced: `2026-11-18T04:01:25.393Z`
+- Last synced: `2026-11-18T13:01:26.769Z`
 
 ## Install
 

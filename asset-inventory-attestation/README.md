@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/asset-inventory-attestation) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/asset-inventory-attestation) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.1`
-- Last synced: `2026-11-18T04:00:36.038Z`
+- Last synced: `2026-11-18T13:00:35.006Z`
 
 ## Install
 

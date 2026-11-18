@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/petty-cash-approval-payload-builder) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/petty-cash-approval-payload-builder) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `2.2`
-- Last synced: `2026-11-18T04:01:21.027Z`
+- Last synced: `2026-11-18T13:01:22.212Z`
 
 ## Install
 

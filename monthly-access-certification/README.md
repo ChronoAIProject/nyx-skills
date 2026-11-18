@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/monthly-access-certification) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/monthly-access-certification) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `3.1`
-- Last synced: `2026-11-18T04:00:34.910Z`
+- Last synced: `2026-11-18T13:00:34.025Z`
 
 ## Install
 

@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/cma) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/cma) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.0`
-- Last synced: `2026-11-18T04:00:17.451Z`
+- Last synced: `2026-11-18T13:00:17.980Z`
 
 ## Install
 

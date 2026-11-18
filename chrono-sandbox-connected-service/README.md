@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/chrono-sandbox-connected-service) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/chrono-sandbox-connected-service) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.0`
-- Last synced: `2026-11-18T04:00:14.596Z`
+- Last synced: `2026-11-18T13:00:14.169Z`
 
 ## Install
 

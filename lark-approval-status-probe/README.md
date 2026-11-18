@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/lark-approval-status-probe) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/lark-approval-status-probe) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.1`
-- Last synced: `2026-11-18T04:01:09.577Z`
+- Last synced: `2026-11-18T13:01:11.839Z`
 
 ## Install
 

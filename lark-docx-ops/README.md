@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/lark-docx-ops) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/lark-docx-ops) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `1.2`
-- Last synced: `2026-11-18T04:01:02.604Z`
+- Last synced: `2026-11-18T13:01:02.826Z`
 
 ## Install
 

@@ -4,12 +4,12 @@
 
 ---
 
-**Mirrored from [Ornn](https://ornn.chrono-ai.fun/skills/restaurant-reservation-desk) — read-only.**
+**Mirrored from [Ornn](https://ornn.nyxid.ai/skills/restaurant-reservation-desk) — read-only.**
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
 - Latest version: `3.2`
-- Last synced: `2026-11-18T04:00:11.337Z`
+- Last synced: `2026-11-18T13:00:10.019Z`
 
 ## Install
 
