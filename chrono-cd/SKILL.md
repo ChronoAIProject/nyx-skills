@@ -2,7 +2,7 @@
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
 compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-27 against chrono-cd on the live platform.
-version: "2.9"
+version: "2.10"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -106,6 +106,11 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
   40 pods, 80Gi for an organization, summed over all apps as replicas times requests plus
   one surge pod. `409 quota_exceeded` says by how much. The
   user can only request more; a platform admin approves.
+- **Apps per owner are capped**: 20 for a person, 50 for an organization, shown as
+  `quota.apps` (the cap) and `usage.apps` (the count) on `/account`. Every app counts,
+  also one with no replicas. Only creating an app checks it: updating or deleting never
+  fails on it. `409 quota_exceeded` "apps: N of CAP in use" means delete an app the user
+  no longer needs, or ask for a higher cap.
 - **Organization scope:** the user must be an `admin` of the organization to deploy;
   `member` and `viewer` can only read. Pass `org_id` on every call for that scope.
 - **Permissions:** every call here needs `can_deploy` on `/account` (the NyxID role
@@ -203,7 +208,7 @@ Expected non-200 answers and what to do:
 | `422 missing_secret_keys` | Normal when the spec declares secrets. The app is stored and everything else is deployed. Go to step 3. |
 | `400 image_unauthorized` | Private package without a usable credential. Ask for a classic token with `read:packages` and send `registry_credential`. |
 | `400 image_not_found` | Wrong owner, package or tag. Check with the user. |
-| `409 quota_exceeded` | Lower replicas or requests, or go to "Ask for more quota". |
+| `409 quota_exceeded` | Lower replicas or requests, or go to "Ask for more quota". For "apps: N of CAP in use", delete an unused app or ask for a higher `apps`. |
 | `409 service_name_taken` | Another app of this owner uses that service name. Rename the service. |
 | `409 app_exists` | The app lives in another project. Use that project path. |
 | `502 reconcile_failed` | Stored but not applied. Read `GET .../status`, fix the cause, send the same `PUT` again. |
@@ -326,7 +331,8 @@ nyxid proxy request chrono-cd api/v1/quota-requests --method POST \
   --data '{"cpu_request": "4", "memory_request": "8Gi", "pods": 20, "storage": "40Gi", "reason": "..."}' --output json
 ```
 
-Proxy tool: `chrono-cd`, `POST`, `/api/v1/quota-requests`, body: that object.
+Proxy tool: `chrono-cd`, `POST`, `/api/v1/quota-requests`, body: that object. Add
+`"apps": 30` to ask for a higher app cap; without it the cap stays as it is.
 
 One pending request per owner. A platform admin approves or rejects; `GET api/v1/quota-requests`
 shows the state. Tell the user it is not instant.

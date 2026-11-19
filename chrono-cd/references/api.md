@@ -58,8 +58,8 @@ Organization projects carry `owner` = the organization id, `owner_type` = `org`,
   "slug": "7d1c1e3f5b",
   "host_slug": "7d1c1e3f5b",
   "namespace": "cd-7d1c1e3f5b",
-  "quota": {"cpu_request": "2", "memory_request": "4Gi", "pods": 10, "storage": "20Gi"},
-  "usage": {"cpu_request": "200m", "memory_request": "256Mi", "pods": 2, "storage": "0"},
+  "quota": {"cpu_request": "2", "memory_request": "4Gi", "pods": 10, "storage": "20Gi", "apps": 20},
+  "usage": {"cpu_request": "200m", "memory_request": "256Mi", "pods": 2, "storage": "0", "apps": 1},
   "apps": 1,
   "organizations": [{"id": "6f1c...", "slug": "acme", "display_name": "Acme", "role": "admin"}]
 }
@@ -73,6 +73,13 @@ its NyxID slug once a member has reached it, or the hashed `slug` until then. `o
 depends on that lookup. `can_deploy` is what every route here needs (permission
 `chrono-cd:deploy`; without it `403`). `can_internal` and `is_admin` unlock the routes
 and fields described in the `chrono-cd-internal` skill.
+
+`quota.apps` is the most apps the owner may have and `usage.apps` the apps it has. Every
+app counts, also one with no replicas or no Service. The cap is checked only when an app
+is created: updates, deletes and reads never fail on it, and an owner above it keeps its
+apps but creates a new one only once it is below the cap again. The default is 20 for a
+person and 50 for an organization or an internal namespace; a platform admin may set
+another number per owner. One app too many answers `409 quota_exceeded`.
 
 ## Projects and apps
 
@@ -635,6 +642,7 @@ owner may be pending at a time.
 ```
 
 Answers `201` with the request, or `409 quota_request_pending` when one is already waiting.
+`apps` may be added to ask for a different app cap; absent, the cap stays as it is.
 
 ```json
 {
