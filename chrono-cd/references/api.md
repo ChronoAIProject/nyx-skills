@@ -142,7 +142,8 @@ Each scope carries `org_id`, the value to pass as `org_id` on the project routes
 in it. The personal scope has none. Apps are sorted by project, then name. Organizations
 are sorted by display name. `total` counts the apps in the answer.
 
-An app here is a summary. It names the services with their image and replica count, the
+An app here is a summary. It names the services with their image and replica count
+(with `autoscaling`, the declared range, and `replicas` is then its floor), the
 add-ons, and the stored outcome of the last reconcile (`phase`, `last_reconcile`). It
 does not carry the env, the files or the secret names; read the app for those. It does
 not ask the cluster either, so it says nothing about pods; `GET .../status` does.
@@ -225,25 +226,26 @@ Service fields:
 | `image` | `ghcr.io/<owner>/<package>:<tag>` or `@sha256:<digest>`. Resolved to a digest at every apply; the Deployment is pinned to it. A new push to the same tag is picked up by `PUT` again or by `restart`. |
 | `port` | 1-65535. Required unless `expose` is `none`. Immutable. |
 | `health_path` | Default `/`. The readiness, liveness and startup probes, and the load balancer health check, use it. |
-| `replicas` | 0 to the platform maximum (3). Default 1. A service with a `pvc` volume runs 1. |
+| `replicas` | 0 to the platform maximum (3). Default 1. A service with a `pvc` volume runs 1. Absent on a service that declares `autoscaling` instead. |
 | `routes` | Path prefixes on the app hostname. Unique across the app. Longest prefix wins. Setting routes makes the service `public`. |
 | `expose` | `public` (routes), `internal` (in-cluster Service only, default without routes), `none` (no Service). |
 | `env` | Plain, non-secret variables. Up to 60 keys, 4 KiB each. |
 | `pod_env` | Internal scope only. Map env names to `pod_name`, `pod_namespace`, `pod_uid`, `pod_ip`, or `node_name`; no arbitrary field paths. At most 60 `env` and `pod_env` entries combined. Names must be valid variables without the reserved `CHRONO_CD_` prefix and cannot collide with `env`, `secret_keys`, or `addon_env`. Downward API values render before literal env, so `"POD_IP": "pod_ip"` supports addresses such as `http://$(POD_IP):8080`. Choose address templates for the cluster IP family (IPv6 needs brackets). Omitted by default; no API token is mounted. |
-| `termination_grace_seconds` | Internal scope only. Integer 30–900; omitted keeps the existing 30-second grace. Size it for the service: the `pre_stop` time plus the time the process needs after SIGTERM, plus a margin. Kubernetes charges preStop time against this same budget. |
+| `termination_grace_seconds` | Internal scope only. Integer from 30 to the platform maximum (3600); omitted keeps the existing 30-second grace. Size it for the service: the `pre_stop` time plus the time the process needs after SIGTERM, plus a margin. Kubernetes charges preStop time against this same budget. The pod ends as soon as the process exits, so a long grace costs time only while work is still running. A rolling update does not wait for the old pod, so `progress_deadline_seconds` need not grow with the grace. A draining pod still counts against the namespace quota until it ends, and a deploy is admitted with room for one surge pod only: in a namespace with no spare quota, a second deploy during the drain, or the next replica of a service with more than one, waits for the draining pod and can pass `progress_deadline_seconds` while it waits. Keep spare quota for the pods that can be draining at once. A service with a persistent volume is replaced, not rolled: the new pod starts only after the old one has ended, the service is down for the whole drain, and a drain longer than `progress_deadline_seconds` shows the service as `degraded` until the new pod is ready; set a deadline longer than the drain to avoid that. |
 | `pre_stop` | Internal scope only. Exactly one of `{"sleep_seconds": 30}` (native Kubernetes sleep, 1–300, strictly shorter than grace) or `{"exec": ["/app/drain", "--wait"]}`, a command of the service's own image, described below. Omitted means no lifecycle hook. |
 | `service_account` | Internal scope only. Name (DNS label) of an existing ServiceAccount in this app's namespace, provisioned by infra. `default`, `app-runner`, and `chrono-cd` are reserved. Reconcile checks existence on the app's cluster; chrono-cd never creates, modifies, or deletes the selected account or its RBAC. Requires default egress. Only opted-in pods receive metadata egress, to the endpoints an admin set for the cluster with `PUT /admin/clusters/{cluster}/metadata-egress`; a cluster with none set refuses the deploy at step `identity-egress/<service>`. |
 | `automount_token` | Internal scope only; optional boolean requiring `service_account`. Defaults to false even if the selected account enables mounting. Set true only when the reviewed application needs a projected Kubernetes token. Workload Identity and replica membership do not by themselves imply Pod-read RBAC. |
-| `probes` | Internal scope only. Optional `readiness`, `liveness`, and `startup` objects, each with `path`, `period_seconds` (1–300), `timeout_seconds` (1–30), `failure_threshold` (1–180), and `initial_delay_seconds` (0–300). All omitted fields retain the existing probe defaults, including liveness initial delay 10; set zero explicitly to remove that delay. Requires a service port. `health_path` remains the load-balancer readiness path. |
+| `probes` | Internal scope only. Optional `readiness`, `liveness`, and `startup` objects, each with `path`, `period_seconds` (1–300), `timeout_seconds` (1–30), `failure_threshold` (1–180), and `initial_delay_seconds` (0–300). Optional `type`: `http` (default), or `tcp` for a service that does not speak HTTP, such as Redis; with `tcp` all three probes open a TCP connection to the service `port` instead of requesting a path, the periods, timeouts, thresholds and delays work as before, a `path` is refused, and so is `expose` `public`, because the load balancer health check is an HTTP request. All omitted fields retain the existing probe defaults, including liveness initial delay 10; set zero explicitly to remove that delay. Requires a service port. `health_path` remains the load-balancer readiness path. |
 | `min_ready_seconds` | Internal scope only. Integer 0–300; default 0. A new replica must remain ready this long before being counted available. The reviewed replica profile uses 30. |
 | `progress_deadline_seconds` | Internal scope only. Integer 60–7200; default 600. Must exceed the startup and readiness probe allowances plus `min_ready_seconds`; each allowance is initial delay + failure threshold × max(period, timeout). Set 2400 for the reviewed AM profile and 1200 for EG. This reports a stalled rollout; it does not kill pods or cancel drain. |
-| `disruption_budget` | Internal scope only. `{"min_available": 1, "unhealthy_pod_eviction_policy": "AlwaysAllow"}` renders a PDB only when replicas > 1. `min_available` must be positive, within the owner replica cap, and below replicas when replicas > 1. Policy is `AlwaysAllow` or `IfHealthyBudget` (Kubernetes default when omitted). Scaling to 0 or 1 retains the spec but removes the PDB; opt-out and service/app deletion remove it too. Protects voluntary evictions, not direct deletion or crashes. |
+| `disruption_budget` | Internal scope only. `{"min_available": 1, "unhealthy_pod_eviction_policy": "AlwaysAllow"}` renders a PDB only when replicas > 1. `min_available` must be positive, within the owner replica cap, and below replicas when replicas > 1. With `autoscaling`, `min_replicas` stands for replicas in both rules. Policy is `AlwaysAllow` or `IfHealthyBudget` (Kubernetes default when omitted). Scaling to 0 or 1 retains the spec but removes the PDB; opt-out and service/app deletion remove it too. Protects voluntary evictions, not direct deletion or crashes. |
+| `autoscaling` | Internal scope only. `{"min_replicas": 2, "max_replicas": 5, "cpu_utilization": 65}` in place of `replicas`: the platform renders a HorizontalPodAutoscaler (`autoscaling/v2`) that holds the service's average CPU use at `cpu_utilization` percent of its CPU request. All three are required: `1 <= min_replicas <= max_replicas <=` the owner's replica cap, `cpu_utilization` 10–95. Mutually exclusive with `replicas`: a body with both answers `400 validation_error`, and because a stored spec always carries `replicas`, a `PATCH` that opts in sends `"replicas": null` with the range, and one that opts out sends `"autoscaling": null` with the count. Refused with a `pvc` volume. The Deployment starts at `min_replicas`; after that the autoscaler owns the count, and no deploy, `PATCH`, restart, secret change or reconcile resets it. Quota counts `max_replicas` (plus the surge pod, as always), so `usage` shows the top of the range. To stop the service, opt out with `"replicas": 0`. Opt-out, removing the service and deleting the app remove the autoscaler. |
 | `secret_keys` | Names of secret variables set through the secrets endpoint. The service is not deployed until all are present. |
 | `addon_env` | Per add-on, which variable receives which connection field. MongoDB fields: `uri`, `database`, `username`, `password`. |
 | `egress` | Empty (internet allowed, private ranges blocked) or `none`. |
 | `ingress_from` | Sibling services that may reach this one; others in the namespace are blocked. |
 | `ingress_from_namespaces` | Other namespaces whose pods may reach this service on its `port`, up to 8 names: `["monitoring"]` lets the platform's Alertmanager post to an internal app. Siblings are unaffected. The caller's namespace must allow the egress on its side. |
-| `volumes` | Up to 4. `type` `pvc` (persistent, 100Mi or more) or `emptydir` (scratch, up to 32Gi). |
+| `volumes` | Up to 4. `type` `pvc` (persistent, 100Mi or more) or `emptydir` (scratch, up to 32Gi). A pod that mounts a `pvc` runs with `fsGroup` 1000 (change policy `OnRootMismatch`): the mount is group-writable for group 1000 and the container's processes get that group as a supplementary group, so an image that runs as any non-root user can write to it. |
 | `files` | Plain configuration files: `[{"path": "/etc/app/config.yaml", "content": "..."}]`. Up to 16, 64 KiB each, 256 KiB in total. Mounted read-only at the path; versioned with the spec. Secret files go through the secrets endpoint instead. |
 | `resources` | Defaults 100m / 128Mi requests, 500m / 512Mi limits. Limits may not exceed twice the owner's quota request. |
 | `metrics` | Opt-in: `{"port": 9090, "path": "/metrics"}` where the service serves Prometheus text-format metrics (`path` defaults to `/metrics`; the port may equal `port`). The platform scraper then reads it every 20 seconds and the series appear in the telemetry routes with `namespace` and `pod` labels. Only the scraper's namespace is admitted to that port. Without it a service still gets CPU, memory, network and restart series from the node. |
@@ -260,6 +262,42 @@ HTTP hooks are refused.
 Native `sleep_seconds` requires Kubernetes support for the Pod lifecycle sleep action
 (stable in Kubernetes 1.33); chrono-cd never silently substitutes an exec process.
 Keep secret values out of hook arguments and specs.
+
+#### Jobs
+
+Internal scope only. `jobs`, next to `services`, declares scheduled runs of a service's
+container: the same image digest, `env`, `pod_env`, `secret_keys`, `addon_env`, `files`,
+secret files, `service_account`, security profile and `resources` as the service named,
+with other arguments. The platform renders one `batch/v1` CronJob per job.
+
+```json
+"jobs": {
+  "sweep": {"service": "nyxagent", "schedule": "*/5 * * * *", "args": ["sweep"],
+            "concurrency": "forbid", "active_deadline_seconds": 240}
+}
+```
+
+| Field | Rule |
+|---|---|
+| name (the key) | Lowercase letters, digits and inner hyphens. The CronJob is named `<service>-<job>`, at most 52 characters, and that name must not be the name of a service or of another job's CronJob in the namespace (`409 service_name_taken` across apps). At most 8 jobs per app. |
+| `service` | Required. A service of this app. One with a `pvc` volume is refused: only the service's own pod can mount the claim. One with `egress: none` is refused: a run could reach nothing. |
+| `schedule` | Required. Five cron fields in UTC: minute, hour, day of month, month, day of week (0-6, Sunday is 0). Each is `*`, a number, a range `a-b`, a step `*/n` or `a-b/n`, or a comma list of those. Names (`MON`) and macros (`@hourly`) are refused. Two runs must be at least 5 minutes apart: `*/5 * * * *` is the tightest schedule, and `*/7 * * * *` is refused because minute 56 and minute 0 are 4 minutes apart. |
+| `args` | Required. 1 to 32 arguments that replace the container's arguments; the image's entrypoint stays. At most 1024 bytes each and 4096 in total. They are stored in the spec, so keep secret values out of them. |
+| `concurrency` | `forbid` (default): a run that is due while the last one is still going is skipped. `replace`: the going run is stopped and the new one starts. Running both is not offered. |
+| `active_deadline_seconds` | 10 to 86400; default 600. A run that takes longer is stopped and counts as failed. |
+
+A run is one pod that is never restarted and never retried; the next scheduled run is
+the retry. It has no port, no probes and no `pre_stop`, receives no traffic from the
+service's Service or route, and is not counted in the service's `replicas`, autoscaling
+range or disruption budget. Nothing can call a run: the service's `ingress_from`,
+`ingress_from_namespaces` and `metrics` admit traffic to its replicas only, and the
+namespace's allow between pods leaves runs out. When a run calls out it is the service:
+it has the service's egress to the internet and the opened ranges, the metadata access
+of its `service_account`, and a sibling that lists the service in `ingress_from` admits
+its runs too. One run of each job counts against the owner's quota like one more
+replica of its service. A job whose service is waiting for secret keys is not created
+until they are set. Dropping the job, its service or the app deletes the CronJob with
+its runs. A `PATCH` with `"jobs": {"sweep": null}` drops one job.
 
 Every service is reachable inside the owner's namespace as `http://<service>:<port>` and
 `http://<service>:80`, so an app's own proxy configuration works unchanged.
@@ -418,6 +456,45 @@ Live state from the cluster.
 }
 ```
 
+A service that declares `autoscaling` also carries `autoscaler`, the live state of its
+HorizontalPodAutoscaler:
+
+```json
+"autoscaler": {"found": true, "min_replicas": 2, "max_replicas": 5, "current_replicas": 3, "desired_replicas": 4,
+               "cpu_utilization": 80,
+               "conditions": [{"type": "ScalingActive", "status": "True", "reason": "ValidMetricFound"}]}
+```
+
+`current_replicas` is what the autoscaler last saw and `desired_replicas` what it last
+asked for; `replicas`, `ready`, `updated` and `available` next to it stay the pod counts.
+`cpu_utilization` is the measured average in percent of the CPU request, absent until
+the cluster's metrics API has answered for the pods. `conditions` are the autoscaler's
+own: `ScalingActive` `False` means it cannot read CPU and is not scaling.
+`found: false` means the cluster has no autoscaler for the service, which the next
+deploy or admin reconcile restores. The service is `ready` when its pods match the count
+the autoscaler set, not `min_replicas`. A service without `autoscaling` has no
+`autoscaler` member.
+
+An app that declares `jobs` also carries `jobs`, the live state of each job's CronJob:
+
+```json
+"jobs": {
+  "sweep": {"found": true, "active": 0,
+            "last_schedule_time": "2026-11-18T10:05:00Z", "last_successful_time": "2026-11-18T10:05:40Z",
+            "last_run": {"outcome": "succeeded", "started_at": "2026-11-18T10:05:00Z", "finished_at": "2026-11-18T10:05:40Z"}}
+}
+```
+
+`last_run` is the most recent run the cluster still holds (it keeps the last successful
+and the last failed one), absent before the first. `outcome` is `running`, `succeeded`
+or `failed`; a failed run carries the cluster's `reason` (`DeadlineExceeded`,
+`BackoffLimitExceeded`) and `message`, and `finished_at` is absent while it runs.
+`active` is the number of runs going now. `last_schedule_time` and
+`last_successful_time` are the cluster's own record and outlive the runs.
+`found: false` means the cluster has no CronJob for the job: its service is waiting for
+secret keys, or the next deploy or admin reconcile restores it. Jobs do not change the
+app's `phase`, and an app without `jobs` has no `jobs` member.
+
 `phase` is `ready`, `progressing`, `degraded` (a pod is in `ImagePullBackOff`,
 `CrashLoopBackOff`, `OOMKilled` or `CreateContainerConfigError`, or the rollout timed out),
 `error` (the last apply failed) or `deleting`. Pod `reason` and `message` carry the
@@ -450,7 +527,8 @@ stores (30 days of metrics, 90 days of logs). The live `logs` route above only t
 running pods; these routes answer for pods that have gone and for any window up to 31
 days. Any member of the scope may read. Every query is pinned on the server to the
 owner's namespace and to the app's pods (or one service's pods with `service=`), so
-query text cannot reach another tenant. A deployment without a store answers
+query text cannot reach another tenant. The pods of an app's job runs are included, with
+their service's when `service=` is set; the live `logs` route lists only replicas. A deployment without a store answers
 `501 telemetry_disabled`.
 
 CPU, memory, network and restart series exist for every pod. A service's own metrics
