@@ -374,6 +374,7 @@ Response: the app view.
   "spec": {"...": "the normalized spec, with image_digest per service"},
   "addons": {"mongodb": {"database": "cd_7d1c1e3f5b_mathesis", "user": "cd_7d1c1e3f5b_mathesis", "provisioned_at": "2026-10-19T12:00:00Z"}},
   "secret_keys_present": {"wishpool-api": ["CHRONO_NYXID_CLIENT_ID", "CHRONO_NYXID_CLIENT_SECRET"]},
+  "backend_timeouts": {"web": {"seconds": 3600, "in_effect": true}},
   "has_registry_credential": true,
   "registry_username": "octocat",
   "registry_credential_source": "request",
@@ -391,8 +392,14 @@ Response: the app view.
 `deleting`. When an apply fails the error response carries the stored app under
 `"app"` so the client can see what was kept.
 
-`generation` increases on every accepted spec change and is the optimistic lock.
+`backend_timeouts` is present only when a platform admin set a load balancer request timeout for a service of an internal app. It is read-only: no owner write sets, changes or clears it. `in_effect` is `false` while that service is gone from the spec or has no public route; the value is kept and applies again once the route is back.
+
+`generation` increases on every accepted spec change, and on an admin's change of `backend_timeouts`, and is the optimistic lock.
 `revision` increases on every successful apply.
+
+#### Load balancer timeout
+
+A public service gets the platform's load balancer request timeout, 300 seconds unless the platform sets another. On the platform's external Application Load Balancer it bounds the whole response, a long-lived stream such as Server-Sent Events included, not just the wait for the first byte. The owner cannot change it. For an internal app, a platform admin can raise it for one service, up to 3600 seconds, on request; the app view then shows it under `backend_timeouts`. A long stream still ends when its pod does (a deploy, restart or node drain, after `termination_grace_seconds` at the latest), and a proxy in front of the hostname or the caller's own client timeout can end it sooner.
 
 ### `PATCH /projects/{project}/apps/{app}`
 
