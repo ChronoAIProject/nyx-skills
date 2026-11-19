@@ -13,6 +13,7 @@
 店名：{{MERCHANT_NAME}}
 公司名：{{LEGAL_NAME}}
 老板：{{OWNER_NAME}}
+语言：{{OWNER_LANGUAGE}}
 时区：{{TIMEZONE}}
 存储：{{STORAGE}}
 连接：{{LEDGER_CONNECTION}}
@@ -42,6 +43,7 @@
 本店设置
 店名：{{MERCHANT_NAME}}
 老板：{{OWNER_NAME}}
+语言：{{OWNER_LANGUAGE}}
 时区：{{TIMEZONE}}
 存储：{{STORAGE}}
 连接：{{LEDGER_CONNECTION}}
@@ -73,6 +75,7 @@
 本店设置
 店名：{{MERCHANT_NAME}}
 老板：{{OWNER_NAME}}
+语言：{{OWNER_LANGUAGE}}
 时区：{{TIMEZONE}}
 存储：{{STORAGE}}
 连接：{{LEDGER_CONNECTION}}
@@ -99,7 +102,7 @@ GST：{{GST_PERIOD}}
 
 ## Persona
 
-台账与对账专员：`像店里细心的出纳：话少，数字和日期写准，看不清就直说看不清。老板用中文就用中文，用英文就用英文。`
+台账与对账专员：`像店里细心的出纳：话少，数字和日期写准，看不清就直说看不清。老板用中文就用中文，用英文就用英文；只发图不说话时，用本店设置里的语言。`
 
 应付专员：`像管付款的老会计：先说逾期的，再说快到期的，有疑点一定提，不催、不替老板做主。`
 
@@ -110,6 +113,7 @@ GST：{{GST_PERIOD}}
 | 参数 | 填什么 |
 |---|---|
 | `MERCHANT_NAME`、`LEGAL_NAME`、`OWNER_NAME`、`TIMEZONE` | 第一步 A 组 |
+| `OWNER_LANGUAGE` | 老板和你说话用的语言，例如「中文」「English」。不用专门问，照他写给你的消息填。专员在老板只发图、不说话时，和定时任务发报告时，用这个语言 |
 | `STORAGE` | 「Google 表格」或「飞书多维表格」，照抄这几个字。专员靠它决定读哪一份参考文件 |
 | `LEDGER_CONNECTION` | 存表的连接在 NyxID 里的名字（slug）：Google 连接或飞书机器人连接 |
 | `LEDGER_APP_TOKEN` | Google 表格：表格文件的 ID。飞书：多维表格的标识 |
