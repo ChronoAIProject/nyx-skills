@@ -224,6 +224,8 @@ Service fields:
 | Field | Rule |
 |---|---|
 | `image` | `ghcr.io/<owner>/<package>:<tag>` or `@sha256:<digest>`. Resolved to a digest at every apply; the Deployment is pinned to it. A new push to the same tag is picked up by `PUT` again or by `restart`. |
+| `command` | Optional. 1 to 32 strings that replace the image's entrypoint (Kubernetes `command`). Without `args` the image's own arguments are dropped too, as in Kubernetes. At most 1024 bytes each and 4096 in total; the first names the program. Omitted or `[]` keeps the image's entrypoint; `PATCH` with `"command": null` removes it. All scopes. |
+| `args` | Optional. 1 to 32 strings that replace the image's arguments (its `CMD`) and keep its entrypoint (Kubernetes `args`). Same bounds as `command`. Omitted or `[]` keeps the image's arguments; `PATCH` with `"args": null` removes them. All scopes. Described below. |
 | `port` | 1-65535. Required unless `expose` is `none`. Immutable. |
 | `health_path` | Default `/`. The readiness, liveness and startup probes, and the load balancer health check, use it. |
 | `replicas` | 0 to the platform maximum (3). Default 1. A service with a `pvc` volume runs 1. Absent on a service that declares `autoscaling` instead. |
@@ -250,6 +252,29 @@ Service fields:
 | `resources` | Defaults 100m / 128Mi requests, 500m / 512Mi limits. Limits may not exceed twice the owner's quota request. |
 | `metrics` | Opt-in: `{"port": 9090, "path": "/metrics"}` where the service serves Prometheus text-format metrics (`path` defaults to `/metrics`; the port may equal `port`). The platform scraper then reads it every 20 seconds and the series appear in the telemetry routes with `namespace` and `pod` labels. Only the scraper's namespace is admitted to that port. Without it a service still gets CPU, memory, network and restart series from the node. |
 
+`command` and `args` configure an unmodified image from the spec, for example a
+`cache` service that runs `redis-server` with its own options:
+
+```json
+"cache": {
+  "image": "ghcr.io/example/redis:7.4-alpine",
+  "args": ["redis-server", "--requirepass", "$(CACHE_PASSWORD)", "--appendonly", "yes"],
+  "secret_keys": ["CACHE_PASSWORD"],
+  "port": 6379, "expose": "internal"
+}
+```
+
+Kubernetes expands `$(NAME)` in both against the container's environment: `env`,
+`pod_env`, `addon_env` and `secret_keys`. A reference to an unknown name stays as
+written, and `$$(NAME)` is a literal `$(NAME)`. No shell runs unless the command is one,
+so `$NAME` and `${NAME}` are not expanded. `command` and `args` are stored in the spec and
+shown by every read of it, so never put a literal secret in them: set it as a secret key
+and reference it as `$(NAME)`. They change nothing else: the security profile is the same
+(an image that must start as root is still refused), the probes, `pre_stop` and `files`
+work as before, and `pre_stop.exec` runs its own command in the container whatever the
+container was started with. A change of either rolls the service like any other change of
+its pod.
+
 `pre_stop.exec` is any command of the service's own image: 1 to 16 arguments, at most
 4096 bytes in total. It runs inside the service container as the container's user, so
 it can do nothing the image's entrypoint could not. No command and no drain time is
@@ -272,7 +297,7 @@ with other arguments. The platform renders one `batch/v1` CronJob per job.
 
 ```json
 "jobs": {
-  "sweep": {"service": "nyxagent", "schedule": "*/5 * * * *", "args": ["sweep"],
+  "cleanup": {"service": "worker", "schedule": "*/5 * * * *", "args": ["cleanup"],
             "concurrency": "forbid", "active_deadline_seconds": 240}
 }
 ```
@@ -282,7 +307,7 @@ with other arguments. The platform renders one `batch/v1` CronJob per job.
 | name (the key) | Lowercase letters, digits and inner hyphens. The CronJob is named `<service>-<job>`, at most 52 characters, and that name must not be the name of a service or of another job's CronJob in the namespace (`409 service_name_taken` across apps). At most 8 jobs per app. |
 | `service` | Required. A service of this app. One with a `pvc` volume is refused: only the service's own pod can mount the claim. One with `egress: none` is refused: a run could reach nothing. |
 | `schedule` | Required. Five cron fields in UTC: minute, hour, day of month, month, day of week (0-6, Sunday is 0). Each is `*`, a number, a range `a-b`, a step `*/n` or `a-b/n`, or a comma list of those. Names (`MON`) and macros (`@hourly`) are refused. Two runs must be at least 5 minutes apart: `*/5 * * * *` is the tightest schedule, and `*/7 * * * *` is refused because minute 56 and minute 0 are 4 minutes apart. |
-| `args` | Required. 1 to 32 arguments that replace the container's arguments; the image's entrypoint stays. At most 1024 bytes each and 4096 in total. They are stored in the spec, so keep secret values out of them. |
+| `args` | Required. 1 to 32 arguments that replace the container's arguments, the service's `args` included; the entrypoint stays, which is the service's `command` when it sets one, else the image's. At most 1024 bytes each and 4096 in total. They are stored in the spec, so keep secret values out of them; `$(NAME)` expands as in the service's `args`. |
 | `concurrency` | `forbid` (default): a run that is due while the last one is still going is skipped. `replace`: the going run is stopped and the new one starts. Running both is not offered. |
 | `active_deadline_seconds` | 10 to 86400; default 600. A run that takes longer is stopped and counts as failed. |
 
@@ -297,7 +322,7 @@ of its `service_account`, and a sibling that lists the service in `ingress_from`
 its runs too. One run of each job counts against the owner's quota like one more
 replica of its service. A job whose service is waiting for secret keys is not created
 until they are set. Dropping the job, its service or the app deletes the CronJob with
-its runs. A `PATCH` with `"jobs": {"sweep": null}` drops one job.
+its runs. A `PATCH` with `"jobs": {"cleanup": null}` drops one job.
 
 Every service is reachable inside the owner's namespace as `http://<service>:<port>` and
 `http://<service>:80`, so an app's own proxy configuration works unchanged.
@@ -330,7 +355,8 @@ Private packages need a pull credential. Two ways:
   never get it.
 
 Either way the token is write-only: it is stored as a pull Secret in the owner's
-namespace and never returned, logged or audited. `{"remove": true}` deletes it.
+namespace and never returned, logged or audited. `{"remove": true}` deletes it. Any of
+these credentials is sent to `ghcr.io` only, and the pull Secret is for `ghcr.io` only.
 
 Response: the app view.
 
@@ -479,7 +505,7 @@ An app that declares `jobs` also carries `jobs`, the live state of each job's Cr
 
 ```json
 "jobs": {
-  "sweep": {"found": true, "active": 0,
+  "cleanup": {"found": true, "active": 0,
             "last_schedule_time": "2026-11-18T10:05:00Z", "last_successful_time": "2026-11-18T10:05:40Z",
             "last_run": {"outcome": "succeeded", "started_at": "2026-11-18T10:05:00Z", "finished_at": "2026-11-18T10:05:40Z"}}
 }

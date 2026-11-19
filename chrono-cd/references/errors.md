@@ -11,7 +11,7 @@ chrono-cd codes:
 | `app_exists` | 13001 | 409 | A create collided with an existing app, or the app lives in another project. |
 | `image_not_found` | 13002 | 400 | The registry has no manifest for the reference. |
 | `image_unauthorized` | 13003 | 400 | Private package without a credential, or the credential was refused. |
-| `registry_not_allowed` | 13004 | 400 | The image host is not one the platform pulls from (`ghcr.io`). |
+| `registry_not_allowed` | 13004 | 400 | The image host is not one the platform pulls from (`ghcr.io`; in the internal scope also the Artifact Registry repositories the platform lists for it). |
 | `registry_unavailable` | 13005 | 502 | The registry could not be reached. |
 | `quota_exceeded` | 13006 | 409 | The app would exceed the owner's quota; the message says by how much. |
 | `stale_generation` | 13007 | 409 | `If-Match` did not equal the stored generation. |
