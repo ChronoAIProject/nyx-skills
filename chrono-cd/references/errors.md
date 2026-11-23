@@ -25,3 +25,7 @@ chrono-cd codes:
 | `telemetry_unavailable` | 13015 | 502 | The metrics or logs store did not answer. |
 | `query_rejected` | 13016 | 400 | The store refused the PromQL or LogsQL query; the message carries its words. |
 
+`conflict` (1004, 409) also answers a request that would add a MongoDB add-on when the
+platform-wide capacity for them is used up. It is not the owner's quota and a quota
+request does not change it; the message says to contact the platform team.
+

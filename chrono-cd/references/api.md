@@ -226,6 +226,14 @@ selects an organization scope.
 }
 ```
 
+`addons` asks for add-ons; `mongodb` is the only one and takes no options. The platform
+holds a limited number of MongoDB add-ons in total, across every owner and scope. A
+request that adds one, a new app with it or an existing app gaining it, answers
+`409 conflict` when that platform-wide capacity is used up; nothing is created. This is
+not the owner's quota, and a quota request does not raise it: the message says to contact
+the platform team. Apps that already have the add-on are never refused for it: they
+update, read and delete as usual.
+
 Service fields:
 
 | Field | Rule |

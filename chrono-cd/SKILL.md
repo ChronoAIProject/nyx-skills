@@ -2,7 +2,7 @@
 name: chrono-cd
 description: Deploy a user's application to the ChronoAI cluster with chrono-cd through NyxID, either with the CLI (`nyxid proxy request chrono-cd ...`) or, for agents without a shell such as the NyxID Assistant and NyxBot on Telegram or Lark, with their NyxID proxy request tool (service `chrono-cd`, method, path, body). Covers the whole flow an agent runs for the user - check the account and quota, pick a personal or organization scope, write the app spec (one or more ghcr.io images with ports, routes, env, config files, volumes and an optional MongoDB add-on), create or update the app, set its secrets, watch status and logs, query stored metrics and logs for any window up to 31 days (presets or PromQL and LogsQL), restart, roll back by re-deploying a tag, delete, and ask for more quota. Use whenever the user wants to deploy, update, inspect or remove an app on the ChronoAI platform (hostnames under apps.nyxid.ai, older apps under apps.chrono-ai.fun), or asks what chrono-cd needs from them. Every request body and response shape is given, so the agent never guesses.
 compatibility: Needs one of two transports. A shell with the nyxid CLI, logged in with `nyxid login`; or a NyxID proxy request tool that takes a service slug, a method, a path and a body (the NyxID Assistant, NyxBot on Telegram or Lark, Aevatar agents). The NyxID service `chrono-cd` is added to every account automatically. Private GitHub packages need a classic GitHub token with read:packages, sent once as registry_credential. Verified 2026-10-27 against chrono-cd on the live platform.
-version: "2.10"
+version: "2.11"
 license: Apache-2.0
 metadata:
   category: tool-based
@@ -111,6 +111,11 @@ owner reach each other by name, `http://SERVICE:PORT`, in any project.
   also one with no replicas. Only creating an app checks it: updating or deleting never
   fails on it. `409 quota_exceeded` "apps: N of CAP in use" means delete an app the user
   no longer needs, or ask for a higher cap.
+- **MongoDB add-ons are limited platform-wide**: the platform holds a limited number in
+  total, for all users together. When it is full, adding one (a new app with it, or an
+  app gaining it) answers `409 conflict`. That is not the user's quota and a quota
+  request cannot fix it: tell the user to contact the platform team. Apps that already
+  have the add-on keep working and can be updated.
 - **Organization scope:** the user must be an `admin` of the organization to deploy;
   `member` and `viewer` can only read. Pass `org_id` on every call for that scope.
 - **Permissions:** every call here needs `can_deploy` on `/account` (the NyxID role
@@ -209,6 +214,7 @@ Expected non-200 answers and what to do:
 | `400 image_unauthorized` | Private package without a usable credential. Ask for a classic token with `read:packages` and send `registry_credential`. |
 | `400 image_not_found` | Wrong owner, package or tag. Check with the user. |
 | `409 quota_exceeded` | Lower replicas or requests, or go to "Ask for more quota". For "apps: N of CAP in use", delete an unused app or ask for a higher `apps`. |
+| `409 conflict`, MongoDB add-ons at the platform-wide capacity limit | Not the user's quota; do not ask for quota. Deploy without `addons`, or tell the user to contact the platform team. Nothing was created. |
 | `409 service_name_taken` | Another app of this owner uses that service name. Rename the service. |
 | `409 app_exists` | The app lives in another project. Use that project path. |
 | `502 reconcile_failed` | Stored but not applied. Read `GET .../status`, fix the cause, send the same `PUT` again. |
