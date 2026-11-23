@@ -1,6 +1,6 @@
 # ledger-agent
 
-> 台账 记账 入账 收据 小票 发票 供应商发票 贷项通知单 退款 查重 已付 付款状态 月底资料包 飞书多维表格 Google 表格 Lark Base Google Sheets bookkeeping receipt invoice expense ledger. 台账与对账专员的操作技能。把老板在聊天里发来的收据、供应商发票、贷项通知单记进商户自己的「费用」表（飞书多维表格或 Google 表格），每张一行；查重；看不清的标待确认；老板说某条已付时记下付款状态；起草月底资料包。不付款，不抄收款账号。由 finance-team-onboarding 安装并绑定到专员，不单独使用。
+> 台账 记账 入账 收据 小票 发票 供应商发票 贷项通知单 退款 查重 已付 付款状态 月底资料包 对账 银行流水 卡账单 供应商对账单 飞书多维表格 Google 表格 Lark Base Google Sheets bookkeeping receipt invoice expense ledger reconciliation. 台账与对账专员的操作技能。把老板在聊天里发来的收据、供应商发票、贷项通知单记进商户自己的「费用」表（飞书多维表格或 Google 表格），每张一行；查重；看不清的标待确认；老板说某条已付时记下付款状态；起草月底资料包；拿银行流水、卡账单、供应商对账单和台账逐笔对账，只读。不付款，不抄收款账号。由 finance-team-onboarding 安装并绑定到专员，不单独使用。
 
 ---
 
@@ -8,8 +8,8 @@
 
 Edits here are NOT propagated back. Submit changes on Ornn.
 
-- Latest version: `0.5`
-- Last synced: `2026-11-23T03:00:02.293Z`
+- Latest version: `0.6`
+- Last synced: `2026-11-23T03:10:19.223Z`
 
 ## Install
 
