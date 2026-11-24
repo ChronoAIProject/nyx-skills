@@ -29,3 +29,7 @@ chrono-cd codes:
 platform-wide capacity for them is used up. It is not the owner's quota and a quota
 request does not change it; the message says to contact the platform team.
 
+A user's apps always use the platform's default database cluster. The answers that name
+another database cluster concern only the platform's own apps and never reach a user's
+app.
+

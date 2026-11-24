@@ -234,6 +234,10 @@ not the owner's quota, and a quota request does not raise it: the message says t
 the platform team. Apps that already have the add-on are never refused for it: they
 update, read and delete as usual.
 
+An add-on stays on the database cluster it was created on. A user's apps always use the
+platform's default cluster, so their app view has no `addons.mongodb.cluster`; the field
+names another cluster only for the platform's own apps.
+
 Service fields:
 
 | Field | Rule |
