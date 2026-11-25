@@ -1,6 +1,6 @@
 ---
 name: finance-team-onboarding
-version: "0.10"
+version: "0.11"
 description: "财务 记账 台账 入账 收据 发票 应付 付款提醒 报税提醒 财务助手 财务员 财务主管 小商户 小店 接入 修台账公式 下一个编号坏了 升级专员 更新岗位说明 新加坡 Google 表格 飞书多维表格 finance bookkeeping receipts invoices payables deadline reminders onboarding Google Sheets Lark Base Singapore. Use on owner turns when a small-business owner wants NyxBot to keep the books. Bind this skill to NyxBot with set_agent_skills before running it. 账记在老板自己的 Google 表格（NyxBot 代建）或飞书多维表格里。装三个只为老板工作的专员：台账与对账专员（收据和发票入账、记付款、月底资料包）、应付专员（待付和到期提醒、付款草稿，只读）、财务主管（每日待办、周一简报、新加坡申报缴款截止提醒，只读）。建表或核对表，建专员、授权、绑定技能、建定时任务、接聊天入口，最后带老板验收。任何专员都不付款。"
 metadata:
   category: plain
@@ -180,7 +180,7 @@ D 提醒和入口
 - 老板问技能有没有更新、说「把专员换成最新版」：照下面五步做，**五步都做完才算升级完**，只换了技能版本不算：
   1. 查四个技能（三个专员的，加你自己身上的这一个）在 Ornn 上的最新版本，和绑定的版本比。不一样就说明新版改了什么，老板同意后改绑，回读版本号。技能按版本锁定，不改绑就一直是旧版。你自己身上的这一个换了新版，先读新版正文，再按新版做后面几步。
   2. 照 `references/roles.md` 的最新模板重写三个专员的 Role 和 Persona。参数值从现有 Role 里照抄（店名、公司名、老板、时区、存储、连接、表格、默认账期、大额提醒线、本店规矩、公司类型这些），一个都不改；现有 Role 里没有的参数（例如「语言」），按老板和你说话用的语言填。只换模板文字。
-  3. 回读三个 Role：和模板逐字一致、只差参数，字数不超过 2048。
+  3. 回读三个 Role：和模板逐字一致、只差参数，字数不超过 2048；多出模板没有的行就删掉重写。
   4. 告诉老板改了什么，每个专员一句，例如「台账与对账专员换成 0.5，岗位说明换成最新模板，加了只发单据就入账、回复用中文两句，设置没变」。
   5. 从 0.6 及更早升上来、用 Google 表格的：照 `references/repair-gsheet.md` 修台账公式（旧公式会被追加的新行挪开，第二笔记不进去）。
 - 老板只说「把专员的岗位说明更新到最新」：只做上面第 2 到 4 步，技能版本不动。2026-11-20 复测时，老板说「把三个专员的技能也换成最新版」，NyxBot 只换了技能版本，没有补「语言」一行，也没提。
